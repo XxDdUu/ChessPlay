@@ -11,12 +11,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeMenuButton(text: String, onClick: () -> Unit) {
+fun HomeMenuButton(text: String, onClick: () -> Unit, width: Int, height: Int) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(233.dp)
-            .height(56.dp),
+            .width(width.dp)
+            .height(height.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(text = text, fontSize = 18.sp)

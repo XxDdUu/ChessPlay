@@ -15,7 +15,7 @@ fun HomeMenuButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(220.dp)
+            .width(233.dp)
             .height(56.dp),
         shape = RoundedCornerShape(12.dp)
     ) {

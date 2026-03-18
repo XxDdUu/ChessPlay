@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidsvg)
     debugImplementation(libs.androidx.ui.tooling)
 
     // Navigation & Lifecycle
@@ -115,12 +116,12 @@ dependencies {
     implementation(libs.androidx.datastore.core)
 
     // Junit test
-
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.androidx.test.runner)
+    //Accompanist
+    implementation(libs.accompanist.drawable)
 
     // Third Party
     implementation(libs.coil.compose)

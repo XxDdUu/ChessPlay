@@ -40,15 +40,15 @@ fun HomeScreen(
             modifier = Modifier.padding(bottom = 48.dp)
         )
 
-        HomeMenuButton("Play", onPlayClick)
+        HomeMenuButton("Play", onPlayClick, 350, 58)
 
         Spacer(Modifier.height(16.dp))
 
-        HomeMenuButton("Multiplayer", onMultiplayerClick)
+        HomeMenuButton("Multiplayer", onMultiplayerClick, 350, 58)
 
         Spacer(Modifier.height(16.dp))
 
-        HomeMenuButton("Settings", onSettingsClick)
+        HomeMenuButton("Settings", onSettingsClick, 350, 58)
     }
 }
 @Composable

@@ -12,6 +12,7 @@ import model.board.Piece
 import model.service.move.pseudoLegalMoves
 import model.state.BoardSnapshot
 import model.state.GameState
+import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,7 +30,7 @@ interface ChessUiService {
 
 typealias GameStateObserver = (GameState) -> Unit
 
-object DefaultChessUiService : ChessUiService {
+class DefaultChessUiService @Inject constructor() : ChessUiService {
     override var gameState = GameState()
     private val observers = HashSet<GameStateObserver>()
 

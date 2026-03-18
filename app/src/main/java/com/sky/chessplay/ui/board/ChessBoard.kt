@@ -16,7 +16,6 @@ import com.sky.chessplay.domain.model.Promotion
 import com.sky.chessplay.domain.model.Rank
 import com.sky.chessplay.ui.board.decorator.PromotionSelection
 import model.board.Square
-import model.service.DefaultChessUiService
 import model.state.GameState
 
 @Composable
@@ -26,15 +25,15 @@ fun ChessBoard(
     onDragStart: (Position) -> Unit,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
+    onSquareSizeChanged: (Int) -> Unit,
     applyPromotion: (Promotion) -> Unit,
     cancelPromotion: () -> Unit,
 ) {
     val squaresByPosition = Position.entries.associateWith { Square(it, gameState) }
-
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .onSizeChanged { DefaultChessUiService.onSquareSizeChanged(it.width / 8) }
+            .onSizeChanged { onSquareSizeChanged(it.width / 8) }
     ) {
         Column {
             for (rank in Rank.entries.reversed()) {
@@ -75,5 +74,6 @@ fun PreviewChessBoard() {
         onDrag = {},
         onDragEnd = {},
         applyPromotion = {},
+        onSquareSizeChanged = {}
     ) { }
 }

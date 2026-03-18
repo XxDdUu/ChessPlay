@@ -11,11 +11,11 @@ enum class Position {
     g1, g2, g3, g4, g5, g6, g7, g8,
     h1, h2, h3, h4, h5, h6, h7, h8;
 
-    val file: File = File.values()[ordinal / 8]
-    val rank: Rank = Rank.values()[ordinal % 8]
+    val file: File = File.entries[ordinal / 8]
+    val rank: Rank = Rank.entries[ordinal % 8]
 
     companion object {
-        private val positionByFileAndRank = values().associateBy { it.file to it.rank }
+        private val positionByFileAndRank = entries.associateBy { it.file to it.rank }
 
         fun fromFileAndRank(file: File, rank: Rank) =
             positionByFileAndRank.getValue(file to rank)
@@ -34,7 +34,7 @@ enum class File {
     val number = ordinal + 1
 
     companion object {
-        fun from(file: Int): File? = if (file in 1..8) values()[file - 1] else null
+        fun from(file: Int): File? = if (file in 1..8) entries[file - 1] else null
     }
 }
 
@@ -44,6 +44,6 @@ enum class Rank {
     val number = ordinal + 1
 
     companion object {
-        fun from(rank: Int): Rank? = if (rank in 1..8) Rank.values()[rank - 1] else null
+        fun from(rank: Int): Rank? = if (rank in 1..8) entries[rank - 1] else null
     }
 }

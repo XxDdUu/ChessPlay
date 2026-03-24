@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import com.sky.chessplay.domain.model.Position
@@ -27,7 +28,8 @@ fun Square(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clickable() { onClick(square.position) }
+            .clickable() { onClick(square.position) },
+        contentAlignment = Alignment.Center
     ) {
         squareDecorators.forEach {
             it.decorate(square)

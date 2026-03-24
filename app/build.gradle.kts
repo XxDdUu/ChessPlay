@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -120,8 +121,13 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.androidx.test.runner)
-    //Accompanist
+    // Accompanist
     implementation(libs.accompanist.drawable)
+
+    // Google Service
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     // Third Party
     implementation(libs.coil.compose)

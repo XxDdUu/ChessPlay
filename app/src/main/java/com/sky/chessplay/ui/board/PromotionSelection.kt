@@ -63,7 +63,7 @@ fun PromotionSelection(
         }
 
         Column(
-            modifier = Modifier.width((gameState.uiState.squareSize * 0.7f).dp).absoluteOffset(offsetX, offsetY)
+            modifier = Modifier.width((gameState.uiState.squareSize * 1.0f).dp).absoluteOffset(offsetX, offsetY)
                 .clip(RoundedCornerShape(20)),
         ) {
             if (gameState.sideToPlay == Side.BLACK) {

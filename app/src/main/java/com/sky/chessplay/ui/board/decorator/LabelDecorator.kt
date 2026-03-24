@@ -13,21 +13,34 @@ import com.sky.chessplay.domain.model.Rank
 import model.board.Square
 
 object LabelDecorator : SquareDecorator {
+
     @Composable
     override fun decorate(square: Square) {
-        if (square.position.file == File.a) {
-            Box(Modifier.fillMaxSize().padding(8.dp)) {
+
+        Box(Modifier.fillMaxSize()) {
+
+            // Rank (1–8)
+            if (square.position.file == File.a) {
                 Text(
-                    square.position.rank.number.toString(),
+                    text = square.position.rank.number.toString(),
                     color = square.color,
-                    modifier = Modifier.align(Alignment.TopStart)
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp)
                 )
             }
-        }
-        if (square.position.rank == Rank.r1) {
-            Box(Modifier.fillMaxSize().padding(4.dp)) {
-                Text(square.position.file.name, color = square.color, modifier = Modifier.align(Alignment.BottomEnd))
+
+            // File (a–h)
+            if (square.position.rank == Rank.r1) {
+                Text(
+                    text = square.position.file.name,
+                    color = square.color,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(6.dp)
+                )
             }
         }
     }
 }
+

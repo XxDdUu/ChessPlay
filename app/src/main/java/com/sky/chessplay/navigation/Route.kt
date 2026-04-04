@@ -5,4 +5,6 @@ sealed class Route(val route: String) {
     data object OfflinePlay: Route("offline-play")
     data object MultiplayerOfflinePlay: Route("multiplayer-offline-play")
     data object OnlinePlay: Route ("online-play")
+    data object Auth : Route("authentication")
+
 }

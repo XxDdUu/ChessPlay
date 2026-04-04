@@ -35,6 +35,12 @@ tablerIcons = "1.0.0"
 composeMaterial3 = "1.5.6"
 androidsvg = "1.4"
 accompanist = "0.34.0"
+appcompat = "1.7.1"
+
+
+# Google & Firebase Auth
+playServicesAuth = "21.3.0"
+material = "1.12.0"
 
 [libraries]
 # Kotlin & Coroutines
@@ -83,6 +89,11 @@ accompanist-drawable = { group = "com.google.accompanist", name = "accompanist-d
 # Google Service
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -95,6 +95,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidsvg)
+    implementation(libs.androidx.appcompat)
     debugImplementation(libs.androidx.ui.tooling)
 
     // Navigation & Lifecycle
@@ -125,9 +126,13 @@ dependencies {
     implementation(libs.accompanist.drawable)
 
     // Google Service
-
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.google.material)
+
+    // Firebase Auth
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
 
     // Third Party
     implementation(libs.coil.compose)

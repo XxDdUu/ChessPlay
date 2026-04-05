@@ -64,7 +64,7 @@ android {
                 "BASE_URL",
                 "\"https://api.myapp.com\""
             )
-            manifestPlaceholders["appName"] = "ChessPlay"
+            manifestPlaceholders["app_name"] = "ChessPlay"
         }
     }
 

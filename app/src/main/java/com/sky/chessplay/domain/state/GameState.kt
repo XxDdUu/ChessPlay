@@ -1,17 +1,19 @@
 package model.state
 
-import androidx.compose.ui.geometry.Offset
 import com.sky.chessplay.domain.model.Board
+import com.sky.chessplay.domain.model.BoardSnapshot
+import com.sky.chessplay.domain.model.File
 import com.sky.chessplay.domain.model.Move
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
-import com.sky.chessplay.domain.model.Side
+import com.sky.chessplay.domain.model.Rank
 import com.sky.chessplay.domain.model.Side.BLACK
 import com.sky.chessplay.domain.model.Side.WHITE
 import model.board.Bishop
 import model.board.King
 import model.board.Knight
 import model.board.Pawn
+import model.board.Piece
 import model.board.Queen
 import model.board.Rook
 
@@ -25,25 +27,10 @@ data class GameState(
         )
     ),
     val promotionSelection: List<Promotion> = emptyList(),
-    val uiState: UiState = UiState(),
 ) {
     val piecesByPosition = boardSnapshots.last().piecesByPosition
     val sideToPlay = boardSnapshots.last().sideToPlay
 }
-
-data class BoardSnapshot(
-    val piecesByPosition: Board,
-    val sideToPlay: Side,
-    val move: Move? = null,
-)
-
-data class UiState(
-    val squareSize: Int = 1,
-    val pieceDragOffset: Offset = Offset.Zero,
-    val pieceMinDragOffset: Offset = Offset.Zero,
-    val pieceMaxDragOffset: Offset = Offset.Zero,
-    val constrainedPieceDragOffset: Offset = Offset.Zero,
-)
 
 private val initialPieces: Board = mapOf(
     Position.a8 to Rook(BLACK),
@@ -82,3 +69,68 @@ private val initialPieces: Board = mapOf(
     Position.g1 to Knight(WHITE),
     Position.h1 to Rook(WHITE),
 )
+
+fun GameState.fromFen(fen: String): GameState {
+
+    val parts = fen.split(" ")
+    val boardPart = parts[0]
+    val turnPart = parts[1]
+
+    val rows = boardPart.split("/")
+
+    val newBoard: MutableMap<Position, Piece> = mutableMapOf()
+
+    for (rankIndex in rows.indices) {
+        var fileIndex = 0
+
+        for (char in rows[rankIndex]) {
+            if (char.isDigit()) {
+                fileIndex += char.digitToInt()
+            } else {
+                val file = File.entries[fileIndex]
+                val rank = Rank.entries[7 - rankIndex]
+
+                val position = Position.fromFileAndRank(file, rank)
+
+                val piece = when (char) {
+                    'p' -> Pawn(BLACK)
+                    'r' -> Rook(BLACK)
+                    'n' -> Knight(BLACK)
+                    'b' -> Bishop(BLACK)
+                    'q' -> Queen(BLACK)
+                    'k' -> King(BLACK)
+
+                    'P' -> Pawn(WHITE)
+                    'R' -> Rook(WHITE)
+                    'N' -> Knight(WHITE)
+                    'B' -> Bishop(WHITE)
+                    'Q' -> Queen(WHITE)
+                    'K' -> King(WHITE)
+
+                    else -> null
+                }
+
+                piece?.let {
+                    newBoard[position] = it
+                }
+
+                fileIndex++
+            }
+        }
+    }
+
+    val side = if (turnPart == "w") WHITE else BLACK
+
+    return copy(
+        activePosition = null,
+        legalMoves = emptyList(),
+        promotionSelection = emptyList(),
+        boardSnapshots = listOf(
+            BoardSnapshot(
+                piecesByPosition = newBoard,
+                sideToPlay = side
+            )
+        )
+    )
+}
+

@@ -19,6 +19,7 @@ import com.google.android.gms.common.api.ApiException
 import com.sky.chessplay.data.remote.GoogleAuthClient
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
+import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.presentation.auth.AuthScreen
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 import com.sky.chessplay.ui.presentation.home.HomeScreen
@@ -34,9 +35,7 @@ fun ChessPlayRoot() {
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        Log.d("Auth", "RESULT: ${result.resultCode}")
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+    ) { result -> val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
 
         try {
             val account = task.getResult(ApiException::class.java)
@@ -44,11 +43,9 @@ fun ChessPlayRoot() {
             Log.e("Auth", "API ERROR CODE: ${e.statusCode}")
         }
         if (result.resultCode == Activity.RESULT_OK) {
-            Log.d("Auth", "RESULT OK")
             googleAuthClient.handleSignInResult(
                 intent = result.data,
                 onSuccess = { idToken ->
-                    Log.d("Auth", "TOKEN: $idToken")
                     authViewModel.signInWithGoogle(idToken)
                 },
                 onError = {}
@@ -63,47 +60,52 @@ fun ChessPlayRoot() {
             }
         }
     }
-
-    NavHost(
+    AppScaffold(
         navController = navController,
-        startDestination = Route.Home.route
+        title = "chess"
     ) {
-        composable(Route.Home.route) {
-            HomeScreen(
-                onPlayClick = {
-                    navController.navigate(Route.OfflinePlay.route)
-                },
-                onMultiplayerClick = {
-                    if (authState is AuthState.Authenticated) {
-                        navController.navigate(Route.MultiplayerOfflinePlay.route)
-                    } else {
-                        navController.navigate(Route.Auth.route)
-                    }
-                },
-                onSettingsClick = {}
-            )
-        }
+        NavHost(
+            navController = navController,
+            startDestination = Route.Home.route,
+        ) {
+            composable(Route.Home.route) {
+                HomeScreen(
+                    onPlayClick = {
+                        navController.navigate(Route.OfflinePlay.route)
+                    },
+                    onMultiplayerClick = {
+                        if (authState is AuthState.Authenticated) {
+                            navController.navigate(Route.MultiplayerOfflinePlay.route)
+                        } else {
+                            navController.navigate(Route.Auth.route)
+                        }
+                    },
+                    onSettingsClick = {}
+                )
+            }
 
-        composable(Route.OfflinePlay.route) {
-            OfflinePlayScreen()
-        }
+            composable(Route.OfflinePlay.route) {
+                OfflinePlayScreen()
+            }
 
-        composable(Route.MultiplayerOfflinePlay.route) {
-            OfflinePlayScreen()
-        }
+            composable(Route.MultiplayerOfflinePlay.route) {
+                OfflinePlayScreen()
+            }
 
-        composable(Route.OnlinePlay.route) {
-        }
-        composable(Route.Auth.route) {
-            AuthScreen(
-                onGoogleClick = {
-                    Log.d("Auth", "CLICK GOOGLE")
-                    launcher.launch(googleAuthClient.getSignInIntent())},
-                onNextClick = {},
-                onEmailChange = {},
-                email = "",
-                viewModel = authViewModel
-            )
+            composable(Route.OnlinePlay.route) {
+            }
+            composable(Route.Auth.route) {
+                AuthScreen(
+                    onGoogleClick = {
+                        Log.d("Auth", "CLICK GOOGLE")
+                        launcher.launch(googleAuthClient.getSignInIntent())
+                    },
+                    onNextClick = {},
+                    onEmailChange = {},
+                    email = "",
+                    viewModel = authViewModel
+                )
+            }
         }
     }
 }

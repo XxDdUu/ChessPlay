@@ -18,39 +18,36 @@ class ChessViewModel @Inject constructor(
 
     var gameState by mutableStateOf(uiService.gameState)
         private set
-
+    init {
+        uiService.updateOnStateChanges {
+            gameState = it
+        }
+    }
     fun onClick(position: Position) {
         uiService.onClick(position)
-        gameState = uiService.gameState
     }
 
     fun onDragStart(position: Position) {
         uiService.onDragStart(position)
-        gameState = uiService.gameState
     }
 
     fun onDrag(offset: Offset) {
         uiService.onDrag(offset)
-        gameState = uiService.gameState
     }
 
     fun onDragEnd() {
         uiService.onDragEnd()
-        gameState = uiService.gameState
     }
 
     fun applyPromotion(promotion: Promotion) {
         uiService.applyPromotion(promotion)
-        gameState = uiService.gameState
     }
 
     fun cancelPromotion() {
         uiService.cancelPromotion()
-        gameState = uiService.gameState
     }
 
     fun onSquareSizeChanged(size: Int) {
         uiService.onSquareSizeChanged(size)
-        gameState = uiService.gameState
     }
 }

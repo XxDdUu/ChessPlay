@@ -15,12 +15,14 @@ import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
 import com.sky.chessplay.domain.model.Rank
 import com.sky.chessplay.ui.board.decorator.PromotionSelection
+import com.sky.chessplay.ui.state.UiState
 import model.board.Square
 import model.state.GameState
 
 @Composable
 fun ChessBoard(
     gameState: GameState,
+    uiState: UiState,
     onClick: (Position) -> Unit,
     onDragStart: (Position) -> Unit,
     onDrag: (Offset) -> Unit,
@@ -46,6 +48,7 @@ fun ChessBoard(
 
                         Box(modifier = Modifier.weight(1f).zIndex(zIndexSquare)) {
                             Square(
+                                uiState = uiState,
                                 square = square,
                                 onClick = onClick,
                                 onDragStart = onDragStart,
@@ -59,6 +62,7 @@ fun ChessBoard(
         }
         PromotionSelection(
             gameState = gameState,
+            uiState = uiState,
             applyPromotion = applyPromotion,
             cancelPromotion = cancelPromotion,
         )
@@ -69,6 +73,7 @@ fun ChessBoard(
 fun PreviewChessBoard() {
     ChessBoard(
         gameState = GameState(),
+        uiState = UiState(),
         onClick = {},
         onDragStart = {},
         onDrag = {},

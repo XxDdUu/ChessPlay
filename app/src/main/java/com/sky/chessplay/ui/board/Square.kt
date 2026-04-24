@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import com.sky.chessplay.domain.model.Position
+import com.sky.chessplay.ui.state.UiState
 import model.board.Square
 import view.board.decorator.ActivePieceDecorator
 import view.board.decorator.BackgroundDecorator
@@ -20,6 +21,7 @@ import view.board.decorator.LegalMoveDecorator
 @Composable
 fun Square(
     square: Square,
+    uiState: UiState,
     onClick: (Position) -> Unit,
     onDragStart: (Position) -> Unit,
     onDrag: (Offset) -> Unit,
@@ -35,6 +37,7 @@ fun Square(
             it.decorate(square)
         }
         Piece(
+            uiState = uiState,
             square = square,
             onDragStart = onDragStart,
             onDrag = onDrag,

@@ -1,12 +1,14 @@
 package com.sky.chessplay.domain.socket
 
 sealed class SocketEvent {
+    data class MoveReceived(val fen: String) : SocketEvent()
     object Connected : SocketEvent()
     object Disconnected : SocketEvent()
     data class GameStart(
         val gameId: String,
         val side: String,
-        val opponent: Int
+        val opponent: Int,
+        val fen: String
     ) : SocketEvent()
 
     data class GameUpdate(

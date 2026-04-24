@@ -30,6 +30,64 @@ data class GameState(
 ) {
     val piecesByPosition = boardSnapshots.last().piecesByPosition
     val sideToPlay = boardSnapshots.last().sideToPlay
+    companion object {
+        fun fromFen(fen: String): GameState {
+
+            val parts = fen.split(" ")
+            val boardPart = parts[0]
+            val turnPart = parts[1]
+
+            val rows = boardPart.split("/")
+            val newBoard = mutableMapOf<Position, Piece>()
+
+            for (rankIndex in rows.indices) {
+                var fileIndex = 0
+
+                for (char in rows[rankIndex]) {
+                    if (char.isDigit()) {
+                        fileIndex += char.digitToInt()
+                    } else {
+                        val file = File.entries[fileIndex]
+                        val rank = Rank.entries[7 - rankIndex]
+
+                        val position = Position.fromFileAndRank(file, rank)
+
+                        val piece = when (char) {
+                            'p' -> Pawn(BLACK)
+                            'r' -> Rook(BLACK)
+                            'n' -> Knight(BLACK)
+                            'b' -> Bishop(BLACK)
+                            'q' -> Queen(BLACK)
+                            'k' -> King(BLACK)
+
+                            'P' -> Pawn(WHITE)
+                            'R' -> Rook(WHITE)
+                            'N' -> Knight(WHITE)
+                            'B' -> Bishop(WHITE)
+                            'Q' -> Queen(WHITE)
+                            'K' -> King(WHITE)
+
+                            else -> null
+                        }
+
+                        piece?.let { newBoard[position] = it }
+                        fileIndex++
+                    }
+                }
+            }
+
+            val side = if (turnPart == "w") WHITE else BLACK
+
+            return GameState(
+                boardSnapshots = listOf(
+                    BoardSnapshot(
+                        piecesByPosition = newBoard,
+                        sideToPlay = side
+                    )
+                )
+            )
+        }
+    }
 }
 
 private val initialPieces: Board = mapOf(
@@ -69,68 +127,4 @@ private val initialPieces: Board = mapOf(
     Position.g1 to Knight(WHITE),
     Position.h1 to Rook(WHITE),
 )
-
-fun GameState.fromFen(fen: String): GameState {
-
-    val parts = fen.split(" ")
-    val boardPart = parts[0]
-    val turnPart = parts[1]
-
-    val rows = boardPart.split("/")
-
-    val newBoard: MutableMap<Position, Piece> = mutableMapOf()
-
-    for (rankIndex in rows.indices) {
-        var fileIndex = 0
-
-        for (char in rows[rankIndex]) {
-            if (char.isDigit()) {
-                fileIndex += char.digitToInt()
-            } else {
-                val file = File.entries[fileIndex]
-                val rank = Rank.entries[7 - rankIndex]
-
-                val position = Position.fromFileAndRank(file, rank)
-
-                val piece = when (char) {
-                    'p' -> Pawn(BLACK)
-                    'r' -> Rook(BLACK)
-                    'n' -> Knight(BLACK)
-                    'b' -> Bishop(BLACK)
-                    'q' -> Queen(BLACK)
-                    'k' -> King(BLACK)
-
-                    'P' -> Pawn(WHITE)
-                    'R' -> Rook(WHITE)
-                    'N' -> Knight(WHITE)
-                    'B' -> Bishop(WHITE)
-                    'Q' -> Queen(WHITE)
-                    'K' -> King(WHITE)
-
-                    else -> null
-                }
-
-                piece?.let {
-                    newBoard[position] = it
-                }
-
-                fileIndex++
-            }
-        }
-    }
-
-    val side = if (turnPart == "w") WHITE else BLACK
-
-    return copy(
-        activePosition = null,
-        legalMoves = emptyList(),
-        promotionSelection = emptyList(),
-        boardSnapshots = listOf(
-            BoardSnapshot(
-                piecesByPosition = newBoard,
-                sideToPlay = side
-            )
-        )
-    )
-}
 

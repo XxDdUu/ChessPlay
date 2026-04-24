@@ -37,6 +37,7 @@ import com.sky.chessplay.domain.model.Promotion
 import com.sky.chessplay.domain.model.Rank
 import com.sky.chessplay.domain.model.Side
 import com.sky.chessplay.ui.graphics.SvgCache
+import com.sky.chessplay.ui.state.UiState
 import model.board.Queen
 import model.state.GameState
 
@@ -44,14 +45,15 @@ import model.state.GameState
 @Composable
 fun PromotionSelection(
     gameState: GameState,
+    uiState: UiState,
     applyPromotion: (Promotion) -> Unit,
     cancelPromotion: () -> Unit,
 ) {
     if (gameState.promotionSelection.isNotEmpty()) {
         val position = gameState.promotionSelection.first().to
-        val offsetX = ((position.file.ordinal + 0.15f) * gameState.uiState.squareSize).dp
+        val offsetX = ((position.file.ordinal + 0.15f) * uiState.squareSize).dp
         val offsetY =
-            (gameState.uiState.squareSize * if (position.rank == Rank.r8) 0.15f else 5.05f).dp - if (position.rank == Rank.r1) 24.dp else 0.dp
+            (uiState.squareSize * if (position.rank == Rank.r8) 0.15f else 5.05f).dp - if (position.rank == Rank.r1) 24.dp else 0.dp
         val sortedPromotions = when (gameState.sideToPlay) {
             Side.WHITE ->
                 gameState.promotionSelection
@@ -63,7 +65,7 @@ fun PromotionSelection(
         }
 
         Column(
-            modifier = Modifier.width((gameState.uiState.squareSize * 1.0f).dp).absoluteOffset(offsetX, offsetY)
+            modifier = Modifier.width((uiState.squareSize * 1.0f).dp).absoluteOffset(offsetX, offsetY)
                 .clip(RoundedCornerShape(20)),
         ) {
             if (gameState.sideToPlay == Side.BLACK) {

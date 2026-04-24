@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.ui.graphics.SvgCache
+import com.sky.chessplay.ui.state.UiState
 import model.board.Square
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -24,11 +25,12 @@ import model.board.Square
 fun Piece(
     square: Square,
     onDragStart: (Position) -> Unit,
+    uiState: UiState,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
 ) {
     val piece = square.piece ?: return
-    val dragOffset = if (square.isActive) square.gameState.uiState.constrainedPieceDragOffset else Offset.Zero
+    val dragOffset = if (square.isActive) uiState.constrainedPieceDragOffset else Offset.Zero
 
     val context = LocalContext.current
     val drawable = remember(piece.asset) {

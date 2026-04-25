@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,11 +18,11 @@ import com.google.android.gms.common.api.ApiException
 import com.sky.chessplay.data.remote.GoogleAuthClient
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
-import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.presentation.auth.AuthScreen
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.offline_play.OfflinePlayScreen
+import com.sky.chessplay.ui.presentation.online_play.OnlineGameModeScreen
 
 @Composable
 fun ChessPlayRoot() {
@@ -53,17 +52,6 @@ fun ChessPlayRoot() {
         }
     }
 
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Authenticated) {
-            navController.navigate(Route.MultiplayerOfflinePlay.route) {
-                popUpTo(Route.Auth.route) { inclusive = true }
-            }
-        }
-    }
-    AppScaffold(
-        navController = navController,
-        title = "chess"
-    ) {
         NavHost(
             navController = navController,
             startDestination = Route.Home.route,
@@ -75,12 +63,13 @@ fun ChessPlayRoot() {
                     },
                     onMultiplayerClick = {
                         if (authState is AuthState.Authenticated) {
-                            navController.navigate(Route.MultiplayerOfflinePlay.route)
+                            navController.navigate(Route.OnlineGameMode.route)
                         } else {
                             navController.navigate(Route.Auth.route)
                         }
                     },
-                    onSettingsClick = {}
+                    onSettingsClick = {},
+                    navController = navController
                 )
             }
 
@@ -90,6 +79,14 @@ fun ChessPlayRoot() {
 
             composable(Route.MultiplayerOfflinePlay.route) {
                 OfflinePlayScreen()
+            }
+            composable(Route.OnlineGameMode.route) {
+                OnlineGameModeScreen(
+                    navController = navController,
+                    onJoinRoom = {},
+                    onAutoMatch = {},
+                    onCreateRoom = {}
+                )
             }
 
             composable(Route.OnlinePlay.route) {
@@ -107,5 +104,4 @@ fun ChessPlayRoot() {
                 )
             }
         }
-    }
 }

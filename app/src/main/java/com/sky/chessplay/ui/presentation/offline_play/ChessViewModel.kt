@@ -7,6 +7,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
+import com.sky.chessplay.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import model.service.ChessUiService
 import javax.inject.Inject
@@ -18,39 +19,41 @@ class ChessViewModel @Inject constructor(
 
     var gameState by mutableStateOf(uiService.gameState)
         private set
-
+    var uiState by mutableStateOf(UiState())
+        private set
+    init {
+        uiService.updateOnStateChanges {
+            gameState = it
+        }
+    }
+    fun startGame(isOnline: Boolean) {
+        uiService.init(isOnline)
+    }
     fun onClick(position: Position) {
         uiService.onClick(position)
-        gameState = uiService.gameState
     }
 
     fun onDragStart(position: Position) {
         uiService.onDragStart(position)
-        gameState = uiService.gameState
     }
 
     fun onDrag(offset: Offset) {
         uiService.onDrag(offset)
-        gameState = uiService.gameState
     }
 
     fun onDragEnd() {
         uiService.onDragEnd()
-        gameState = uiService.gameState
     }
 
     fun applyPromotion(promotion: Promotion) {
         uiService.applyPromotion(promotion)
-        gameState = uiService.gameState
     }
 
     fun cancelPromotion() {
         uiService.cancelPromotion()
-        gameState = uiService.gameState
     }
 
     fun onSquareSizeChanged(size: Int) {
         uiService.onSquareSizeChanged(size)
-        gameState = uiService.gameState
     }
 }

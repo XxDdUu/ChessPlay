@@ -1,23 +1,31 @@
 package model.service
 
 import androidx.compose.ui.geometry.Offset
+import com.sky.chessplay.domain.engine.ChessEngine
+import com.sky.chessplay.domain.engine.EngineFactory
+import com.sky.chessplay.domain.model.BoardSnapshot
 import com.sky.chessplay.domain.model.CapturingMove
 import com.sky.chessplay.domain.model.File
 import com.sky.chessplay.domain.model.Move
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
 import com.sky.chessplay.domain.model.Rank
+import com.sky.chessplay.ui.state.UiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import model.board.King
 import model.board.Piece
 import model.service.move.pseudoLegalMoves
-import model.state.BoardSnapshot
 import model.state.GameState
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
 interface ChessUiService {
+    val uiState: UiState
     val gameState: GameState
+    fun init(isOnline: Boolean)
     fun onClick(position: Position)
     fun onDragStart(position: Position)
     fun onDrag(offset: Offset)
@@ -30,9 +38,28 @@ interface ChessUiService {
 
 typealias GameStateObserver = (GameState) -> Unit
 
-class DefaultChessUiService @Inject constructor() : ChessUiService {
+class DefaultChessUiService @Inject constructor(
+    private val engineFactory: EngineFactory
+) : ChessUiService {
+    init {
+        CoroutineScope(Dispatchers.Main).launch {
+            engine.gameStateFlow.collect {
+                gameState = it
+                update()
+            }
+        }
+    }
+    override var uiState = UiState()
+        private set
+
     override var gameState = GameState()
     private val observers = HashSet<GameStateObserver>()
+
+    private lateinit var engine: ChessEngine
+
+    override fun init(isOnline: Boolean) {
+        engine = engineFactory.create(isOnline)
+    }
 
     override fun onClick(position: Position) {
         if (gameState.promotionSelection.isNotEmpty()) return
@@ -66,20 +93,20 @@ class DefaultChessUiService @Inject constructor() : ChessUiService {
     override fun onDragStart(position: Position) {
         if (gameState.promotionSelection.isNotEmpty()) return
 
-        val squareSize = gameState.uiState.squareSize
+        val squareSize = uiState.squareSize
         val piece = gameState.piecesByPosition[position] ?: error("Can only drag when piece is on square")
         gameState = gameState.copy(
             activePosition = position,
-            legalMoves = legalMoves(piece = piece, gameState = gameState),
-            uiState = gameState.uiState.copy(
-                pieceMinDragOffset = Offset(
-                    (-position.file.ordinal * squareSize - squareSize / 2).toFloat(),
-                    (-(7 - position.rank.ordinal) * squareSize - squareSize / 2).toFloat(),
-                ),
-                pieceMaxDragOffset = Offset(
-                    ((7 - position.file.ordinal) * squareSize + squareSize / 2).toFloat(),
-                    (position.rank.ordinal * squareSize + squareSize / 2).toFloat(),
-                ),
+            legalMoves = engine.getLegalMoves(gameState, position)
+        )
+        uiState = uiState.copy(
+            pieceMinDragOffset = Offset(
+                (-position.file.ordinal * squareSize - squareSize / 2).toFloat(),
+                (-(7 - position.rank.ordinal) * squareSize - squareSize / 2).toFloat(),
+            ),
+            pieceMaxDragOffset = Offset(
+                ((7 - position.file.ordinal) * squareSize + squareSize / 2).toFloat(),
+                (position.rank.ordinal * squareSize + squareSize / 2).toFloat(),
             ),
         )
         update()
@@ -88,17 +115,15 @@ class DefaultChessUiService @Inject constructor() : ChessUiService {
     override fun onDrag(offset: Offset) {
         if (gameState.promotionSelection.isNotEmpty()) return
 
-        val newOffset = gameState.uiState.pieceDragOffset + offset
-        val min = gameState.uiState.pieceMinDragOffset
-        val max = gameState.uiState.pieceMaxDragOffset
-        gameState = gameState.copy(
-            uiState = gameState.uiState.copy(
+        val newOffset = uiState.pieceDragOffset + offset
+        val min = uiState.pieceMinDragOffset
+        val max = uiState.pieceMaxDragOffset
+            uiState = uiState.copy(
                 pieceDragOffset = newOffset,
                 constrainedPieceDragOffset = Offset(
                     min(max(min.x, newOffset.x), max.x),
                     min(max(min.y, newOffset.y), max.y),
                 )
-            ),
         )
         update()
     }
@@ -108,8 +133,8 @@ class DefaultChessUiService @Inject constructor() : ChessUiService {
 
         val fromPosition = gameState.activePosition ?: error("Can only drag with active square")
         val toPosition = fromPosition.getTargetPosition(
-            offset = gameState.uiState.constrainedPieceDragOffset,
-            squareSize = gameState.uiState.squareSize,
+            offset = uiState.constrainedPieceDragOffset,
+            squareSize = uiState.squareSize,
         )
 
         val move = gameState.legalMoves.find { it.from == gameState.activePosition && it.to == toPosition }
@@ -119,15 +144,13 @@ class DefaultChessUiService @Inject constructor() : ChessUiService {
                 promotionSelection = gameState.legalMoves.filterIsInstance<Promotion>().filter { it.to == move.to },
             )
         } else if (move != null) {
-            gameState = gameState.applyMove(move)
+            engine.makeMove(gameState, move)
         } else {
-            gameState = gameState.copy(
-                uiState = gameState.uiState.copy(
-                    pieceDragOffset = Offset.Zero,
-                    pieceMinDragOffset = Offset.Zero,
-                    pieceMaxDragOffset = Offset.Zero,
-                    constrainedPieceDragOffset = Offset.Zero,
-                ),
+            uiState = uiState.copy(
+                pieceDragOffset = Offset.Zero,
+                pieceMinDragOffset = Offset.Zero,
+                pieceMaxDragOffset = Offset.Zero,
+                constrainedPieceDragOffset = Offset.Zero,
             )
         }
 
@@ -135,27 +158,28 @@ class DefaultChessUiService @Inject constructor() : ChessUiService {
     }
 
     override fun applyPromotion(promotion: Promotion) {
-        gameState = gameState.applyMove(promotion)
+        engine.makeMove(gameState, promotion)
         update()
     }
 
     override fun cancelPromotion() {
         gameState = gameState.copy(
             promotionSelection = emptyList(),
-            uiState = gameState.uiState.copy(
-                pieceDragOffset = Offset.Zero,
-                pieceMinDragOffset = Offset.Zero,
-                pieceMaxDragOffset = Offset.Zero,
-                constrainedPieceDragOffset = Offset.Zero,
-            )
         )
+
+        uiState = uiState.copy(
+            pieceDragOffset = Offset.Zero,
+            pieceMinDragOffset = Offset.Zero,
+            pieceMaxDragOffset = Offset.Zero,
+            constrainedPieceDragOffset = Offset.Zero,
+        )
+
         update()
     }
 
+
     override fun onSquareSizeChanged(squareSize: Int) {
-        gameState = gameState.copy(
-            uiState = gameState.uiState.copy(squareSize = squareSize),
-        )
+            uiState = uiState.copy(squareSize = squareSize)
         // No update required
     }
 
@@ -204,14 +228,19 @@ fun GameState.applyMove(move: Move): GameState {
             move = null,
         ),
         promotionSelection = emptyList(),
-        uiState = uiState.copy(
-            pieceDragOffset = Offset.Zero,
-            pieceMinDragOffset = Offset.Zero,
-            pieceMaxDragOffset = Offset.Zero,
-            constrainedPieceDragOffset = Offset.Zero,
-        ),
     )
 }
+fun GameState.simulateMove(move: Move): GameState {
+    return copy(
+        boardSnapshots = listOf(
+            BoardSnapshot(
+                piecesByPosition = move.applyOn(piecesByPosition),
+                sideToPlay = sideToPlay.opposite
+            )
+        )
+    )
+}
+
 
 private fun legalMoves(piece: Piece, gameState: GameState): List<Move> {
     if (piece.side != gameState.sideToPlay) return emptyList()
@@ -222,13 +251,15 @@ private fun legalMoves(piece: Piece, gameState: GameState): List<Move> {
 }
 
 private fun GameState.isKingInCheck(move: Move): Boolean {
-    val nextGameState = applyMove(move)
+    val nextGameState = simulateMove(move)
 
-    val opponentSet = move.piece.side.opposite
-    val opponentPieces = nextGameState.piecesByPosition.values.filter { it.side == opponentSet }
+    val opponentSide = move.piece.side.opposite
+    val opponentPieces = nextGameState.piecesByPosition.values.filter { it.side == opponentSide }
+
     return opponentPieces
         .flatMap { it.pseudoLegalMoves(nextGameState) }
         .filterIsInstance<CapturingMove>()
         .any { it.capturedPiece is King }
 }
+
 

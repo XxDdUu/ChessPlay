@@ -1,5 +1,6 @@
 package model.service.move
 
+import com.sky.chessplay.domain.model.BoardSnapshot
 import com.sky.chessplay.domain.model.Capture
 import com.sky.chessplay.domain.model.CapturePromotion
 import com.sky.chessplay.domain.model.CapturingMove
@@ -17,7 +18,6 @@ import model.board.Pawn
 import model.board.Queen
 import model.board.Rook
 import model.service.util.positionOf
-import model.state.BoardSnapshot
 import model.state.GameState
 
 

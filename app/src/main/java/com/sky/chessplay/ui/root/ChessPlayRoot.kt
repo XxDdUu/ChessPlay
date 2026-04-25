@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,6 +22,7 @@ import com.sky.chessplay.ui.presentation.auth.AuthScreen
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.offline_play.OfflinePlayScreen
+import com.sky.chessplay.ui.presentation.online_play.OnlineGameModeScreen
 
 @Composable
 fun ChessPlayRoot() {
@@ -34,9 +34,7 @@ fun ChessPlayRoot() {
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        Log.d("Auth", "RESULT: ${result.resultCode}")
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+    ) { result -> val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
 
         try {
             val account = task.getResult(ApiException::class.java)
@@ -44,11 +42,9 @@ fun ChessPlayRoot() {
             Log.e("Auth", "API ERROR CODE: ${e.statusCode}")
         }
         if (result.resultCode == Activity.RESULT_OK) {
-            Log.d("Auth", "RESULT OK")
             googleAuthClient.handleSignInResult(
                 intent = result.data,
                 onSuccess = { idToken ->
-                    Log.d("Auth", "TOKEN: $idToken")
                     authViewModel.signInWithGoogle(idToken)
                 },
                 onError = {}
@@ -56,54 +52,56 @@ fun ChessPlayRoot() {
         }
     }
 
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Authenticated) {
-            navController.navigate(Route.MultiplayerOfflinePlay.route) {
-                popUpTo(Route.Auth.route) { inclusive = true }
+        NavHost(
+            navController = navController,
+            startDestination = Route.Home.route,
+        ) {
+            composable(Route.Home.route) {
+                HomeScreen(
+                    onPlayClick = {
+                        navController.navigate(Route.OfflinePlay.route)
+                    },
+                    onMultiplayerClick = {
+                        if (authState is AuthState.Authenticated) {
+                            navController.navigate(Route.OnlineGameMode.route)
+                        } else {
+                            navController.navigate(Route.Auth.route)
+                        }
+                    },
+                    onSettingsClick = {},
+                    navController = navController
+                )
+            }
+
+            composable(Route.OfflinePlay.route) {
+                OfflinePlayScreen()
+            }
+
+            composable(Route.MultiplayerOfflinePlay.route) {
+                OfflinePlayScreen()
+            }
+            composable(Route.OnlineGameMode.route) {
+                OnlineGameModeScreen(
+                    navController = navController,
+                    onJoinRoom = {},
+                    onAutoMatch = {},
+                    onCreateRoom = {}
+                )
+            }
+
+            composable(Route.OnlinePlay.route) {
+            }
+            composable(Route.Auth.route) {
+                AuthScreen(
+                    onGoogleClick = {
+                        Log.d("Auth", "CLICK GOOGLE")
+                        launcher.launch(googleAuthClient.getSignInIntent())
+                    },
+                    onNextClick = {},
+                    onEmailChange = {},
+                    email = "",
+                    viewModel = authViewModel
+                )
             }
         }
-    }
-
-    NavHost(
-        navController = navController,
-        startDestination = Route.Home.route
-    ) {
-        composable(Route.Home.route) {
-            HomeScreen(
-                onPlayClick = {
-                    navController.navigate(Route.OfflinePlay.route)
-                },
-                onMultiplayerClick = {
-                    if (authState is AuthState.Authenticated) {
-                        navController.navigate(Route.MultiplayerOfflinePlay.route)
-                    } else {
-                        navController.navigate(Route.Auth.route)
-                    }
-                },
-                onSettingsClick = {}
-            )
-        }
-
-        composable(Route.OfflinePlay.route) {
-            OfflinePlayScreen()
-        }
-
-        composable(Route.MultiplayerOfflinePlay.route) {
-            OfflinePlayScreen()
-        }
-
-        composable(Route.OnlinePlay.route) {
-        }
-        composable(Route.Auth.route) {
-            AuthScreen(
-                onGoogleClick = {
-                    Log.d("Auth", "CLICK GOOGLE")
-                    launcher.launch(googleAuthClient.getSignInIntent())},
-                onNextClick = {},
-                onEmailChange = {},
-                email = "",
-                viewModel = authViewModel
-            )
-        }
-    }
 }

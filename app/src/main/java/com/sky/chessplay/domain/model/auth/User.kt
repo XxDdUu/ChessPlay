@@ -5,4 +5,5 @@ data class User(
     val username: String,
     val country_code: String,
     val createdAt: String,
+    val avatar: String?
 )

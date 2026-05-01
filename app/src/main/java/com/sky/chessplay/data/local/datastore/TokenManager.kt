@@ -15,9 +15,14 @@ class TokenManager @Inject constructor(
 
     suspend fun saveToken(token: String?) {
         dataStore.edit {
-            it[TOKEN_KEY] = token as String
+            if (token != null) {
+                it[TOKEN_KEY] = token
+            } else {
+                it.remove(TOKEN_KEY)
+            }
         }
     }
+
 
     suspend fun getToken(): String? {
         return dataStore.data.first()[TOKEN_KEY]

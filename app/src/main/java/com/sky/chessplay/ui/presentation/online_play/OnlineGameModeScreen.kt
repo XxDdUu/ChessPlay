@@ -22,22 +22,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.presentation.online.MatchMakingModal
 
 @Composable
 fun OnlineGameModeScreen(
     navController: NavHostController,
     onAutoMatch: () -> Unit,
     onCreateRoom: () -> Unit,
-    onJoinRoom: () -> Unit
+    onJoinRoom: () -> Unit,
+    viewModel: MatchViewModel = hiltViewModel(),
+    authState: AuthState
 ) {
     AppScaffold(
         navController = navController,
         showBottomBar = false,
         showFab = false
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,7 +100,12 @@ fun OnlineGameModeScreen(
                         title = "Auto Match",
                         subtitle = "Find opponents instantly",
                         colors = listOf(Color(0xFF22C55E), Color(0xFF16A34A)),
-                        onClick = onAutoMatch
+                        onClick = {
+                            (authState as? AuthState.Authenticated)?.user?.let { user ->
+                                viewModel.start(user.id)
+                                onAutoMatch()
+                            }
+                        }
                     )
 
                     GradientButton(
@@ -112,6 +123,7 @@ fun OnlineGameModeScreen(
                     )
                 }
             }
+            MatchMakingModal(viewModel = viewModel)
         }
     }
 }

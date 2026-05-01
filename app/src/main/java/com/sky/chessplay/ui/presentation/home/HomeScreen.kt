@@ -18,17 +18,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.home.HomeMenuButton
 import com.sky.chessplay.ui.layout.AppScaffold
 
 @Composable
 fun HomeScreen(
+    authState: AuthState,
     navController: NavHostController,
     onPlayClick: () -> Unit,
     onMultiplayerClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
+    val user = (authState as? AuthState.Authenticated)?.user
     AppScaffold(
         navController = navController,
         showBottomBar = true,
@@ -45,7 +48,11 @@ fun HomeScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            HomeHeader(onSettingsClick)
+            HomeHeader(
+                username = user?.username ?: "Guest",
+                avatarUrl = user?.avatar,
+                onSettingsClick = onSettingsClick
+            )
 
             Spacer(Modifier.height(24.dp))
 

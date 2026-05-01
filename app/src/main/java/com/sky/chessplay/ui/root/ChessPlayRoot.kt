@@ -1,7 +1,6 @@
 package com.sky.chessplay.ui.root
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -13,15 +12,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.common.api.ApiException
 import com.sky.chessplay.data.remote.GoogleAuthClient
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
-import com.sky.chessplay.ui.presentation.auth.AuthScreen
+import com.sky.chessplay.ui.presentation.auth.AuthScreenRoute
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.offline_play.OfflinePlayScreen
+import com.sky.chessplay.ui.presentation.online_play.MatchViewModel
 import com.sky.chessplay.ui.presentation.online_play.OnlineGameModeScreen
 
 @Composable
@@ -29,18 +27,13 @@ fun ChessPlayRoot() {
     val context = LocalContext.current
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = hiltViewModel()
+    val matchViewModel: MatchViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsState()
     val googleAuthClient = remember { GoogleAuthClient(context) }
 
-    val launcher = rememberLauncherForActivityResult(
+    rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) { result -> val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-
-        try {
-            val account = task.getResult(ApiException::class.java)
-        } catch (e: ApiException) {
-            Log.e("Auth", "API ERROR CODE: ${e.statusCode}")
-        }
+    ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             googleAuthClient.handleSignInResult(
                 intent = result.data,
@@ -63,13 +56,16 @@ fun ChessPlayRoot() {
                     },
                     onMultiplayerClick = {
                         if (authState is AuthState.Authenticated) {
-                            navController.navigate(Route.OnlineGameMode.route)
+                            navController.navigate(Route.OnlineGameMode.route) {
+                                popUpTo(Route.Auth.route) { inclusive = true }
+                            }
                         } else {
                             navController.navigate(Route.Auth.route)
                         }
                     },
                     onSettingsClick = {},
-                    navController = navController
+                    navController = navController,
+                    authState = authState
                 )
             }
 
@@ -85,23 +81,16 @@ fun ChessPlayRoot() {
                     navController = navController,
                     onJoinRoom = {},
                     onAutoMatch = {},
-                    onCreateRoom = {}
+                    onCreateRoom = {},
+                    viewModel = matchViewModel,
+                    authState = authState
                 )
             }
 
             composable(Route.OnlinePlay.route) {
             }
             composable(Route.Auth.route) {
-                AuthScreen(
-                    onGoogleClick = {
-                        Log.d("Auth", "CLICK GOOGLE")
-                        launcher.launch(googleAuthClient.getSignInIntent())
-                    },
-                    onNextClick = {},
-                    onEmailChange = {},
-                    email = "",
-                    viewModel = authViewModel
-                )
+                AuthScreenRoute()
             }
         }
 }

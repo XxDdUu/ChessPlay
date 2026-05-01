@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import model.state.GameState
 
-class RemoteChessEngine(
+class  RemoteChessEngine(
     private val socket: ChessSocket
 ) : ChessEngine {
 
@@ -21,17 +21,12 @@ class RemoteChessEngine(
         socket.observeEvents { event ->
             when (event) {
 
-                is SocketEvent.GameUpdate -> {
+                is SocketEvent.GameInit -> {
                     val newState = GameState.fromFen(event.fen)
                     _gameState.value = newState
                 }
 
-                is SocketEvent.GameStart -> {
-                    val newState = GameState.fromFen(event.fen)
-                    _gameState.value = newState
-                }
-
-                is SocketEvent.Reconnect -> {
+                is SocketEvent.Move -> {
                     val newState = GameState.fromFen(event.fen)
                     _gameState.value = newState
                 }

@@ -5,7 +5,6 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.google.gms.google-services")
 }
 
 android {
@@ -52,7 +51,18 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://10.0.2.2:8088/api/v1/\""
+                "\"http://10.0.2.2:8080/\""
+            )
+
+            buildConfigField(
+                "String",
+                "GOOGLE_CLIENT_ID",
+                "\"1234567890-abc-dev.apps.googleusercontent.com\""
+            )
+            buildConfigField(
+                "String",
+                "GOOGLE_WEB_CLIENT_ID",
+                "\"818283934941-pkc6070np750322csfe1n6efpo1j1fsl.apps.googleusercontent.com\""
             )
             manifestPlaceholders["app_name"] = "Chess Play (Dev)"
         }
@@ -63,6 +73,16 @@ android {
                 "String",
                 "BASE_URL",
                 "\"https://api.myapp.com\""
+            )
+            buildConfigField(
+                "String",
+                "GOOGLE_CLIENT_ID",
+                "\"1234567890-abcxyz.apps.googleusercontent.com\""
+            )
+            buildConfigField(
+                "String",
+                "GOOGLE_WEB_CLIENT_ID",
+                "\"818283934941-pkc6070np750322csfe1n6efpo1j1fsl.apps.googleusercontent.com\""
             )
             manifestPlaceholders["app_name"] = "ChessPlay"
         }

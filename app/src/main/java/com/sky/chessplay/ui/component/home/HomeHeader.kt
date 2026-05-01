@@ -22,9 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 @Composable
-fun HomeHeader(onSettingsClick: () -> Unit) {
+fun HomeHeader(
+    username: String,
+    avatarUrl: String?,
+    onSettingsClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,16 +41,27 @@ fun HomeHeader(onSettingsClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(Color.Gray, CircleShape)
-        )
+        // Avatar
+        if (avatarUrl != null) {
+            AsyncImage( // Coil
+                model = avatarUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color.Gray, CircleShape)
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color.Gray, CircleShape)
+            )
+        }
 
         Spacer(Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text("GuestWolf702", color = Color.White, fontWeight = FontWeight.Bold)
+            Text(username, color = Color.White, fontWeight = FontWeight.Bold)
             Text("990 ♟️   💎1", color = Color.LightGray)
         }
 
@@ -54,3 +70,4 @@ fun HomeHeader(onSettingsClick: () -> Unit) {
         }
     }
 }
+

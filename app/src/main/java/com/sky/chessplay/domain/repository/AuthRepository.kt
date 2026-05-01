@@ -6,7 +6,8 @@ import com.sky.chessplay.remote.dto.request.RegisterRequest
 
 
 interface AuthRepository {
-    suspend fun register(request: RegisterRequest): User
-    suspend fun login(request: LoginRequest): User
-    suspend fun getMe(): User
+    suspend fun register(request: RegisterRequest): Result<User>
+    suspend fun login(request: LoginRequest): Result<User>
+    suspend fun getMe(): Result<User>
+    suspend fun loginWithGoogle(idToken: String): Result<User>
 }

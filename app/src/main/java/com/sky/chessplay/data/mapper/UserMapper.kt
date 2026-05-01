@@ -6,7 +6,8 @@ import com.sky.chessplay.domain.model.auth.User
 
 fun UserResponse.toDomain(): User = User(
     id = id,
-    username = username,
-    country_code,
-    createdAt = createdAt
+    username = username ?: "Unknown",
+    country_code = country_code ?: "VN",
+    createdAt = createdAt ?: "",
+    avatar = avatar ?: null,
 )

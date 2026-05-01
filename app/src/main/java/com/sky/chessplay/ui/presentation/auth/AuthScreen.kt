@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.presentation.auth
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,8 +21,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.sky.chessplay.R
 import com.sky.chessplay.domain.state.AuthState
 
@@ -40,20 +38,16 @@ fun AuthScreen(
     onEmailChange: (String) -> Unit,
     onNextClick: () -> Unit,
     onGoogleClick: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
-) {
-    val state by viewModel.authState.collectAsState()
+    state: AuthState
+    ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
-    ) {
 
-        Text(
-            text = "Sign in",
-            style = MaterialTheme.typography.headlineMedium
-        )
+    ) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -120,9 +114,7 @@ fun AuthScreen(
         }
         when (state) {
 
-            is AuthState.Idle -> {
-                Text("Please login")
-            }
+            is AuthState.Idle -> {}
 
             is AuthState.Loading -> {
                 CircularProgressIndicator()
@@ -135,6 +127,8 @@ fun AuthScreen(
             is AuthState.Error -> {
                 Text((state as AuthState.Error).message)
             }
+
+            AuthState.Unauthenticated -> TODO()
         }
     }
 }
@@ -145,6 +139,7 @@ fun AuthScreenPreview() {
         email = "@abc",
         {},
         {},
-        {}
+        {},
+        state = AuthState.Idle
     )
 }

@@ -22,7 +22,7 @@ class OnlineChessViewModel @Inject constructor(
         private set
     val engine = factory.create(isOnline = true)
     init {
-        socket.connect("123", "YOUR_JWT")
+        socket.connect("123")
 
         socket.observeEvents { event ->
             handleEvent(event)
@@ -34,18 +34,6 @@ class OnlineChessViewModel @Inject constructor(
 
             is SocketEvent.Connected -> {
                 // optional: show UI connected
-            }
-
-            is SocketEvent.GameStart -> {
-                // init game
-            }
-
-            is SocketEvent.GameUpdate -> {
-                gameState = GameState.fromFen(event.fen)
-            }
-
-            is SocketEvent.Reconnect -> {
-                gameState = GameState.fromFen(event.fen)
             }
 
             is SocketEvent.GameOver -> {
@@ -79,35 +67,6 @@ class OnlineChessViewModel @Inject constructor(
                 println("❌ Disconnected from server")
             }
 
-            // ♟️ GAME START
-            is SocketEvent.GameStart -> {
-                println("🎮 Game started: ${event.gameId}, side=${event.side}")
-
-                gameState = GameState.fromFen(
-                    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-                )
-
-                // TODO: lưu side của player (WHITE / BLACK)
-            }
-
-            // ♟️ OPPONENT MOVE / UPDATE
-            is SocketEvent.GameUpdate -> {
-                println("♟️ Opponent move: ${event.move}")
-
-                // update board từ FEN server gửi
-                gameState = GameState.fromFen(event.fen)
-            }
-
-            // 🔄 RECONNECT
-            is SocketEvent.Reconnect -> {
-                println("🔄 Reconnected to game ${event.gameId}")
-
-                gameState = GameState.fromFen(event.fen)
-
-                // TODO:
-                // - restore history nếu cần
-                // - restore side
-            }
 
             // 🏁 GAME OVER
             is SocketEvent.GameOver -> {
@@ -134,7 +93,8 @@ class OnlineChessViewModel @Inject constructor(
                 // TODO: show toast / snackbar
             }
 
-            is SocketEvent.MoveReceived -> TODO()
+            is SocketEvent.Move -> TODO()
+            is SocketEvent.GameInit -> TODO()
         }
     }
 }

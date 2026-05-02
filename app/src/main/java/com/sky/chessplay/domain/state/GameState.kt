@@ -7,8 +7,11 @@ import com.sky.chessplay.domain.model.Move
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
 import com.sky.chessplay.domain.model.Rank
+import com.sky.chessplay.domain.model.Side
 import com.sky.chessplay.domain.model.Side.BLACK
 import com.sky.chessplay.domain.model.Side.WHITE
+import com.sky.chessplay.domain.socket.SocketEvent
+import com.sky.chessplay.domain.socket.SocketEvent.GameStatus
 import model.board.Bishop
 import model.board.King
 import model.board.Knight
@@ -18,6 +21,11 @@ import model.board.Queen
 import model.board.Rook
 
 data class GameState(
+    val currentTurn: Side = WHITE,
+    val mySide: Side = WHITE,
+    val status: GameStatus = GameStatus.WAITING,
+    val opponent: SocketEvent.Opponent? = null,
+
     val activePosition: Position? = null,
     val legalMoves: List<Move> = emptyList(),
     val boardSnapshots: List<BoardSnapshot> = listOf(
@@ -28,6 +36,8 @@ data class GameState(
     ),
     val promotionSelection: List<Promotion> = emptyList(),
 ) {
+    val isMyTurn: Boolean
+        get() = mySide == sideToPlay
     val piecesByPosition = boardSnapshots.last().piecesByPosition
     val sideToPlay = boardSnapshots.last().sideToPlay
     companion object {

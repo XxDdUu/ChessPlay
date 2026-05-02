@@ -2,8 +2,8 @@ package com.sky.chessplay.data.socket
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.sky.chessplay.domain.model.Move
+import com.sky.chessplay.domain.model.Side
 import com.sky.chessplay.domain.model.toUci
 import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.socket.MatchEvent
@@ -43,17 +43,18 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         webSocket = OkHttpClient().newWebSocket(request, socketListener)
     }
 
-    override fun sendReady() {
+    override fun sendReady(gameId: String?) {
         val json = JSONObject()
             .put("type", "READY")
-
+            .put("gameId", gameId)
         webSocket?.send(json.toString())
     }
 
-    override fun sendMove(move: Move) {
+    override fun sendMove(move: Move, activeGameId: String?) {
         val json = JSONObject()
             .put("type", "MOVE")
             .put("move", move.toUci())
+            .put("gameId", activeGameId)
 
         webSocket?.send(json.toString())
     }
@@ -75,8 +76,6 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             try {
-                Log.d("SOCKET_RAW", text) // 🔥
-
                 val json = JSONObject(text)
                 val type = json.getString("type")
 
@@ -85,7 +84,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "GAME_START", "RECONNECT_GAME" -> {
                         SocketEvent.GameInit(
                             gameId = json.getString("gameId"),
-                            side = json.getString("side"),
+                            side = json.getString("side").toSide(),
                             fen = json.getString("fen"),
                             opponentId = json.getLong("opponentId"),
                             opponentName = json.optString("opponentName"),
@@ -155,10 +154,8 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                 }
 
                 matchEvent?.let { event ->
-                    Log.d("SOCKET_MATCH_EVENT", event.toString())
                     CoroutineScope(Dispatchers.IO).launch {
                         _events.emit(event)
-                        Log.d("SOCKET_EMIT", "Emitted: $event")
                     }
                 }
 
@@ -186,5 +183,12 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             listeners.forEach { it(SocketEvent.Disconnected) }
         }
+    }
+}
+fun String.toSide(): Side {
+    return when (this.lowercase()) {
+        "w", "white" -> Side.WHITE
+        "b", "black" -> Side.BLACK
+        else -> error("Invalid side: $this")
     }
 }

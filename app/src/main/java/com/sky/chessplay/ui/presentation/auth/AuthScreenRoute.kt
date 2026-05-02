@@ -4,18 +4,23 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.sky.chessplay.BuildConfig
+import com.sky.chessplay.domain.state.AuthState
+import com.sky.chessplay.navigation.Route
 
 @Composable
 fun AuthScreenRoute(
+    navController: NavHostController,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.authState.collectAsState()
@@ -23,6 +28,13 @@ fun AuthScreenRoute(
 
     val context = LocalContext.current
 
+    LaunchedEffect(state) {
+        if (state is AuthState.Authenticated) {
+            navController.navigate(Route.OnlineGameMode.route) {
+                popUpTo(Route.Auth.route) { inclusive = true }
+            }
+        }
+    }
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()

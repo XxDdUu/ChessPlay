@@ -17,19 +17,23 @@ import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
 import com.sky.chessplay.ui.presentation.auth.AuthScreenRoute
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
+import com.sky.chessplay.ui.presentation.chess.ChessViewModel
+import com.sky.chessplay.ui.presentation.chess.offline_play.OfflinePlayScreen
+import com.sky.chessplay.ui.presentation.chess.online_play.MatchViewModel
+import com.sky.chessplay.ui.presentation.chess.online_play.OnlineGameModeScreen
+import com.sky.chessplay.ui.presentation.chess.online_play.OnlinePlayScreen
 import com.sky.chessplay.ui.presentation.home.HomeScreen
-import com.sky.chessplay.ui.presentation.offline_play.OfflinePlayScreen
-import com.sky.chessplay.ui.presentation.online_play.MatchViewModel
-import com.sky.chessplay.ui.presentation.online_play.OnlineGameModeScreen
 
 @Composable
 fun ChessPlayRoot() {
     val context = LocalContext.current
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = hiltViewModel()
-    val matchViewModel: MatchViewModel = hiltViewModel()
     val authState by authViewModel.authState.collectAsState()
     val googleAuthClient = remember { GoogleAuthClient(context) }
+    val matchViewModel: MatchViewModel = hiltViewModel()
+    val chessViewModel: ChessViewModel = hiltViewModel()
+
 
     rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -82,15 +86,19 @@ fun ChessPlayRoot() {
                     onJoinRoom = {},
                     onAutoMatch = {},
                     onCreateRoom = {},
-                    viewModel = matchViewModel,
-                    authState = authState
+                    authState = authState,
+                    matchViewModel = matchViewModel
                 )
             }
 
             composable(Route.OnlinePlay.route) {
+                OnlinePlayScreen(
+                    viewModel = chessViewModel,
+                    matchViewModel = matchViewModel
+                )
             }
             composable(Route.Auth.route) {
-                AuthScreenRoute()
+                AuthScreenRoute(navController = navController)
             }
         }
 }

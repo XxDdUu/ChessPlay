@@ -10,6 +10,7 @@ import com.sky.chessplay.domain.model.Move
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
 import com.sky.chessplay.domain.model.Rank
+import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.state.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,6 @@ import kotlin.math.min
 interface ChessUiService {
     val uiState: UiState
     val gameState: GameState
-    fun init(isOnline: Boolean)
     fun onClick(position: Position)
     fun onDragStart(position: Position)
     fun onDrag(offset: Offset)
@@ -34,6 +34,10 @@ interface ChessUiService {
     fun cancelPromotion()
     fun onSquareSizeChanged(squareSize: Int)
     fun updateOnStateChanges(onState: GameStateObserver)
+
+    fun initLocal()
+
+    fun initOnline(gameInit: SocketEvent.GameInit)
 }
 
 typealias GameStateObserver = (GameState) -> Unit
@@ -41,14 +45,6 @@ typealias GameStateObserver = (GameState) -> Unit
 class DefaultChessUiService @Inject constructor(
     private val engineFactory: EngineFactory
 ) : ChessUiService {
-    init {
-        CoroutineScope(Dispatchers.Main).launch {
-            engine.gameStateFlow.collect {
-                gameState = it
-                update()
-            }
-        }
-    }
     override var uiState = UiState()
         private set
 
@@ -57,9 +53,31 @@ class DefaultChessUiService @Inject constructor(
 
     private lateinit var engine: ChessEngine
 
-    override fun init(isOnline: Boolean) {
-        engine = engineFactory.create(isOnline)
+    override fun initLocal() {
+        engine = engineFactory.create(false)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            engine.gameStateFlow.collect {
+                gameState = it
+                update()
+            }
+        }
+
+        engine.initNewGame()
     }
+    override fun initOnline(gameInit: SocketEvent.GameInit) {
+        engine = engineFactory.create(true)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            engine.gameStateFlow.collect {
+                gameState = it
+                update()
+            }
+        }
+
+        engine.loadGame(gameInit)
+    }
+
 
     override fun onClick(position: Position) {
         if (gameState.promotionSelection.isNotEmpty()) return
@@ -75,7 +93,7 @@ class DefaultChessUiService @Inject constructor(
                     promotionSelection = gameState.legalMoves.filterIsInstance<Promotion>().filter { it.to == move.to },
                 )
             else if (move != null)
-                gameState.applyMove(move)
+                engine.makeMove(gameState, move)
             else if (activePosition != null) gameState.copy(
                 activePosition = null,
                 legalMoves = emptyList(),

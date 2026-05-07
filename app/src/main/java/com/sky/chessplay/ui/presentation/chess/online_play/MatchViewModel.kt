@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.data.local.datastore.TokenManager
-import com.sky.chessplay.data.socket.ChessSocketClient
 import com.sky.chessplay.domain.repository.MatchRepository
+import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.socket.MatchEvent
 import com.sky.chessplay.domain.socket.MatchEvent.Opponent
 import com.sky.chessplay.domain.socket.SocketEvent
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MatchViewModel @Inject constructor(
-    private val socketClient: ChessSocketClient,
+    private val socketClient: ChessSocket,
     private val tokenManager: TokenManager,
     private val repo: MatchRepository
 ) : ViewModel() {

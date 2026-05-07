@@ -7,6 +7,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import com.sky.chessplay.domain.model.Position
 import com.sky.chessplay.domain.model.Promotion
+import com.sky.chessplay.domain.model.Side
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,11 +22,15 @@ class ChessViewModel @Inject constructor(
 
     var gameState by mutableStateOf(uiService.gameState)
         private set
-    var uiState by mutableStateOf(UiState())
+
+    var dragOffset by mutableStateOf(Offset.Zero)
+        private set
+    var uiState by mutableStateOf(buildUiState(gameState))
         private set
     init {
         uiService.updateOnStateChanges {
             gameState = it
+            uiState = buildUiState(it)
         }
     }
     fun startLocalGame() {
@@ -41,14 +46,23 @@ class ChessViewModel @Inject constructor(
 
     fun onDragStart(position: Position) {
         uiService.onDragStart(position)
+        uiState = buildUiState(gameState)
     }
 
     fun onDrag(offset: Offset) {
+        dragOffset += offset
         uiService.onDrag(offset)
+
+        uiState = buildUiState(gameState).copy(
+            constrainedPieceDragOffset = dragOffset
+        )
     }
 
     fun onDragEnd() {
+        dragOffset = Offset.Zero
         uiService.onDragEnd()
+
+        uiState = buildUiState(gameState)
     }
 
     fun applyPromotion(promotion: Promotion) {
@@ -75,5 +89,21 @@ class ChessViewModel @Inject constructor(
                 }
             }
         }
+    }
+    private fun buildUiState(state: GameState): UiState {
+        return UiState(
+            canInteract = { square ->
+                if (state.mySide == null) {
+                    return@UiState square.piece?.side == state.sideToPlay
+                }
+                square.piece?.side == state.mySide && state.isMyTurn
+            },
+            shouldAnimate = { square ->
+                if (state.mySide == null) return@UiState true
+                square.piece?.side == state.mySide
+            },
+            constrainedPieceDragOffset = dragOffset,
+            isFlipped = state.mySide == Side.BLACK
+        )
     }
 }

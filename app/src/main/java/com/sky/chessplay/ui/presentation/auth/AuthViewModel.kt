@@ -104,17 +104,27 @@ class AuthViewModel @Inject constructor(
 
             val result = repo.loginWithGoogle(idToken)
 
-            _authState.value = result.fold(
-                onSuccess = { user ->
-                    AuthState.Authenticated(user)
+            result.fold(
+                onSuccess = {
+                    val meResult = repo.getMe()
+
+                    _authState.value = meResult.fold(
+                        onSuccess = { user ->
+                            AuthState.Authenticated(user)
+                        },
+                        onFailure = {
+                            AuthState.Error("GetMe failed")
+                        }
+                    )
                 },
                 onFailure = {
-                    AuthState.Error(it.message ?: "Google login failed")
+                    _authState.value =
+                        AuthState.Error(it.message ?: "Google login failed")
                 }
             )
         }
     }
     fun onGoogleClick(idToken: String) {
-        signInWithGoogle(   idToken)
+        signInWithGoogle(idToken)
     }
 }

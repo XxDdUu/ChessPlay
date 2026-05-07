@@ -22,7 +22,7 @@ import model.board.Rook
 
 data class GameState(
     val currentTurn: Side = WHITE,
-    val mySide: Side = WHITE,
+    val mySide: Side ?= null,
     val status: GameStatus = GameStatus.WAITING,
     val opponent: SocketEvent.Opponent? = null,
 
@@ -137,4 +137,3 @@ private val initialPieces: Board = mapOf(
     Position.g1 to Knight(WHITE),
     Position.h1 to Rook(WHITE),
 )
-

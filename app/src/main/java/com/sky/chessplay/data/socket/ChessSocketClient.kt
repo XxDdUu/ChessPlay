@@ -2,6 +2,7 @@ package com.sky.chessplay.data.socket
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.sky.chessplay.domain.model.Move
 import com.sky.chessplay.domain.model.Side
 import com.sky.chessplay.domain.model.toUci
@@ -20,26 +21,28 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ChessSocketClient @Inject constructor() : ChessSocket {
 
     private val _events = MutableSharedFlow<MatchEvent>()
-    val events = _events.asSharedFlow()
+    override val events = _events.asSharedFlow()
     private var webSocket: WebSocket? = null
     private val listeners = mutableListOf<(SocketEvent) -> Unit>()
 
     private var currentGameId: String? = null
     private var lastToken: String? = null
     private var reconnectAttempts = 0
-
+    init {
+        Log.d("Socket CREATED", this.toString())
+    }
     override fun connect( token: String) {
         this.lastToken = token
         reconnectAttempts = 0
-
         val request = Request.Builder()
             .url("ws://10.0.2.2:8080/ws?token=$token")
             .build()
-
         webSocket = OkHttpClient().newWebSocket(request, socketListener)
     }
 
@@ -51,11 +54,13 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
     }
 
     override fun sendMove(move: Move, activeGameId: String?) {
+        if (webSocket == null) {
+            return
+        }
         val json = JSONObject()
             .put("type", "MOVE")
-            .put("move", move.toUci())
+            .put("move", move.toUci().uppercase())
             .put("gameId", activeGameId)
-
         webSocket?.send(json.toString())
     }
 
@@ -75,6 +80,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
+
             try {
                 val json = JSONObject(text)
                 val type = json.getString("type")
@@ -89,7 +95,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                             opponentId = json.getLong("opponentId"),
                             opponentName = json.optString("opponentName"),
                             opponentRating = json.optInt("opponentRating"),
-                            history = null
+                            history = null,
                         )
                     }
 
@@ -132,7 +138,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "GAME_START" -> MatchEvent.GameStart(
                         gameId = json.getString("gameId"),
                         side = json.getString("side"),
-                        fen = json.getString("fen"),
+                        fen = json.optString("fen"),
                         opponentName = json.optString("opponentName"),
                         opponentRating = json.optInt("opponentRating")
                     )
@@ -140,7 +146,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "RECONNECT_GAME" -> MatchEvent.ReconnectGame(
                         gameId = json.getString("gameId"),
                         side = json.getString("side"),
-                        fen = json.getString("fen"),
+                        fen = json.optString("fen"),
                         opponentId = json.getLong("opponentId"),
                         opponentName = json.getString("opponentName"),
                         opponentRating = json.optInt("opponentRating")
@@ -167,8 +173,8 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            Log.e("SOCKET", "FAILED: ${t.message}", t)
             listeners.forEach { it(SocketEvent.Error("Connection error")) }
-
             if (reconnectAttempts < 5) {
                 reconnectAttempts++
 

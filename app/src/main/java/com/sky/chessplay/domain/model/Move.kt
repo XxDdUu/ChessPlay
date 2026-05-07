@@ -93,3 +93,5 @@ data class QueenSideCastle(override val piece: King) : NonCapturingMove {
     override fun applyOn(board: Board) =
         board.minus(from).minus(rookFrom).plus(to to piece).plus(rookTo to board.getValue(rookFrom))
 }
+const val DEFAULT_FEN =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

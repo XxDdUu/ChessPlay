@@ -1,5 +1,6 @@
 package view.board
 
+import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -24,42 +25,71 @@ import model.board.Square
 @Composable
 fun Piece(
     square: Square,
-    onDragStart: (Position) -> Unit,
     uiState: UiState,
+    enableDrag: Boolean,
+    disableAnimation: Boolean,
+    onDragStart: (Position) -> Unit,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
 ) {
     val piece = square.piece ?: return
-    val dragOffset = if (square.isActive) uiState.constrainedPieceDragOffset else Offset.Zero
+
+    val isDragging = square.isActive
+
+    val targetOffset = if (isDragging) {
+        uiState.constrainedPieceDragOffset
+    } else Offset.Zero
+
+    val offset = if (disableAnimation) {
+        targetOffset
+    } else {
+        animateOffsetAsState(targetOffset).value
+    }
 
     val context = LocalContext.current
     val drawable = remember(piece.asset) {
         SvgCache.get(context, piece.asset)
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { onDragStart(square.position) },
-                    onDrag = { _, dragAmount -> onDrag(dragAmount) },
-                    onDragEnd = { onDragEnd() }
-                )
-            }
+
+            .then(
+                if (enableDrag) {
+                    Modifier.pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragStart = { onDragStart(square.position) },
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                onDrag(dragAmount)
+                            },
+                            onDragEnd = onDragEnd
+                        )
+                    }
+                } else Modifier
+            )
+
             .graphicsLayer {
-                translationX = dragOffset.x
-                translationY = dragOffset.y
-                 scaleX = 2.5f
-                 scaleY = 2.5f
+                translationX = offset.x
+                translationY = offset.y
+
+                if (isDragging) {
+                    scaleX = 1.2f
+                    scaleY = 1.2f
+                } else {
+                    scaleX = 2.5f
+                    scaleY = 2.5f
+                }
             },
+
         contentAlignment = Alignment.Center
     ) {
         Image(
             painter = rememberDrawablePainter(drawable),
             contentDescription = null,
             contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxSize(0.35f)
+            modifier = Modifier.fillMaxSize(0.35f)
         )
     }
 }

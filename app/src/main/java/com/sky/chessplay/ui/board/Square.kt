@@ -27,6 +27,8 @@ fun Square(
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
 ) {
+    val canInteract = uiState.canInteract(square)
+    val shouldAnimate = uiState.shouldAnimate(square)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -42,6 +44,8 @@ fun Square(
             onDragStart = onDragStart,
             onDrag = onDrag,
             onDragEnd = onDragEnd,
+            enableDrag = canInteract,
+            disableAnimation = shouldAnimate,
         )
     }
 }

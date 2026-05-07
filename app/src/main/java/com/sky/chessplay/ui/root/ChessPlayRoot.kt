@@ -69,7 +69,6 @@ fun ChessPlayRoot() {
                     },
                     onSettingsClick = {},
                     navController = navController,
-                    authState = authState
                 )
             }
 

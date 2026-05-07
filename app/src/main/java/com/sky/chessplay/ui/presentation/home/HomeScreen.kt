@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -17,20 +19,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.home.HomeMenuButton
 import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 
 @Composable
 fun HomeScreen(
-    authState: AuthState,
+    authViewModel: AuthViewModel = hiltViewModel(),
     navController: NavHostController,
     onPlayClick: () -> Unit,
     onMultiplayerClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
+    val authState by authViewModel.authState.collectAsState()
     val user = (authState as? AuthState.Authenticated)?.user
     AppScaffold(
         navController = navController,

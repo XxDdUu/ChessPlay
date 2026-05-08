@@ -3,6 +3,7 @@ package com.sky.chessplay.data.socket
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.sky.chessplay.domain.model.DEFAULT_FEN
 import com.sky.chessplay.domain.model.Move
 import com.sky.chessplay.domain.model.Side
 import com.sky.chessplay.domain.model.toUci
@@ -29,7 +30,12 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
     private val _events = MutableSharedFlow<MatchEvent>()
     override val events = _events.asSharedFlow()
     private var webSocket: WebSocket? = null
-    private val listeners = mutableListOf<(SocketEvent) -> Unit>()
+    private var lastPrepareGame: MatchEvent.PrepareGame? = null
+    private val _socketEvents =
+        MutableSharedFlow<SocketEvent>()
+
+    override val socketEvents =
+        _socketEvents.asSharedFlow()
 
     private var currentGameId: String? = null
     private var lastToken: String? = null
@@ -65,7 +71,13 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
     }
 
     override fun observeEvents(listener: (SocketEvent) -> Unit) {
-        listeners += listener
+        CoroutineScope(Dispatchers.Main).launch {
+
+            socketEvents.collect { event ->
+
+                listener(event)
+            }
+        }
     }
 
     override fun disconnect() {
@@ -76,22 +88,45 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
     private val socketListener = object : WebSocketListener() {
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            listeners.forEach { it(SocketEvent.Connected) }
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-
+            Log.d("RAW_SOCKET", text)
             try {
                 val json = JSONObject(text)
                 val type = json.getString("type")
 
                 val socketEvent = when (type) {
+                    "GAME_START" -> {
 
-                    "GAME_START", "RECONNECT_GAME" -> {
+                        val prepare = lastPrepareGame
+
+                        SocketEvent.GameInit(
+
+                            gameId = json.getString("gameId"),
+
+                            side = json.getString("side").toSide(),
+
+                            fen = json.optString("fen")
+                                .takeIf { it.isNotBlank() }
+                                ?: DEFAULT_FEN,
+
+                            opponentId = prepare?.opponentId ?: -1L,
+
+                            opponentName = prepare?.opponentName,
+
+                            opponentRating = prepare?.opponentRating,
+
+                            history = null
+                        )
+                    }
+
+                     "RECONNECT_GAME" -> {
                         SocketEvent.GameInit(
                             gameId = json.getString("gameId"),
                             side = json.getString("side").toSide(),
-                            fen = json.getString("fen"),
+                            fen = json.optString("fen").takeIf { it.isNotBlank() }
+                                ?: DEFAULT_FEN,
                             opponentId = json.getLong("opponentId"),
                             opponentName = json.optString("opponentName"),
                             opponentRating = json.optInt("opponentRating"),
@@ -102,7 +137,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "OPPONENT_MOVE" -> {
                         SocketEvent.Move(
                             move = json.getString("move"),
-                            fen = json.getString("fen")
+                            fen = json.optString("fen").takeIf { it.isNotBlank() }
                         )
                     }
 
@@ -117,19 +152,27 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                 }
 
                 socketEvent?.let { e ->
-                    listeners.forEach { it(e) }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        _socketEvents.emit(e)
+                    }
                 }
 
                 val matchEvent = when (type) {
 
-                    "PREPARE_GAME" -> MatchEvent.PrepareGame(
-                        gameId = json.getString("gameId"),
-                        opponentId = json.getLong("opponentId"),
-                        opponentName = json.getString("opponentName"),
-                        opponentCountry = json.optString("opponentCountry"),
-                        opponentRating = json.optInt("opponentRating"),
-                        timeout = json.optInt("timeout", 10)
-                    )
+                    "PREPARE_GAME" -> {
+
+                        MatchEvent.PrepareGame(
+                            gameId = json.getString("gameId"),
+                            opponentId = json.getLong("opponentId"),
+                            opponentName = json.getString("opponentName"),
+                            opponentCountry = json.optString("opponentCountry"),
+                            opponentRating = json.optInt("opponentRating"),
+                            timeout = json.optInt("timeout", 10)
+                        ).also {
+
+                            lastPrepareGame = it
+                        }
+                    }
 
                     "MATCH_CANCELLED" -> MatchEvent.MatchCancelled(
                         reason = json.optString("reason", "Cancelled")
@@ -138,7 +181,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "GAME_START" -> MatchEvent.GameStart(
                         gameId = json.getString("gameId"),
                         side = json.getString("side"),
-                        fen = json.optString("fen"),
+                        fen = json.optString("fen", DEFAULT_FEN),
                         opponentName = json.optString("opponentName"),
                         opponentRating = json.optInt("opponentRating")
                     )
@@ -146,7 +189,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "RECONNECT_GAME" -> MatchEvent.ReconnectGame(
                         gameId = json.getString("gameId"),
                         side = json.getString("side"),
-                        fen = json.optString("fen"),
+                        fen = json.optString("fen", DEFAULT_FEN),
                         opponentId = json.getLong("opponentId"),
                         opponentName = json.getString("opponentName"),
                         opponentRating = json.optInt("opponentRating")
@@ -174,7 +217,6 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.e("SOCKET", "FAILED: ${t.message}", t)
-            listeners.forEach { it(SocketEvent.Error("Connection error")) }
             if (reconnectAttempts < 5) {
                 reconnectAttempts++
 
@@ -187,7 +229,6 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            listeners.forEach { it(SocketEvent.Disconnected) }
         }
     }
 }

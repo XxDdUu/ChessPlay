@@ -16,7 +16,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import javax.inject.Inject
 
 
@@ -35,8 +34,11 @@ class MatchViewModel @Inject constructor(
         }
 
         // Game events
-        socketClient.observeEvents { event ->
-            handleSocketEvent(event)
+        viewModelScope.launch {
+            socketClient.socketEvents.collect { event ->
+
+                handleSocketEvent(event)
+            }
         }
     }
 
@@ -219,75 +221,5 @@ class MatchViewModel @Inject constructor(
                 delay(1000)
             }
         }
-    }
-}
-fun handleMessage(raw: String, emit: (MatchEvent) -> Unit) {
-    try {
-        val msg = JSONObject(raw)
-        val type = msg.getString("type")
-
-        when (type) {
-
-            "SEARCHING" -> {
-                emit(MatchEvent.Searching)
-            }
-
-            "PREPARE_GAME" -> {
-                emit(
-                    MatchEvent.PrepareGame(
-                        gameId = msg.getString("gameId"),
-                        opponentId = msg.getLong("opponentId"),
-                        opponentName = msg.getString("opponentName"),
-                        opponentCountry = msg.optString("opponentCountry"),
-                        opponentRating = msg.optInt("opponentRating"),
-                        timeout = msg.optInt("timeout", 10)
-                    )
-                )
-            }
-
-            "MATCH_CANCELLED" -> {
-                emit(
-                    MatchEvent.MatchCancelled(
-                        reason = msg.optString("reason", "Cancelled")
-                    )
-                )
-            }
-
-            "GAME_START" -> {
-                emit(
-                    MatchEvent.GameStart(
-                        gameId = msg.getString("gameId"),
-                        side = msg.getString("side"),
-                        fen = msg.getString("fen"),
-                        opponentName = msg.optString("opponentName"),
-                        opponentRating = msg.optInt("opponentRating")
-                    )
-                )
-            }
-
-            "RECONNECT_GAME" -> {
-                emit(
-                    MatchEvent.ReconnectGame(
-                        gameId = msg.getString("gameId"),
-                        side = msg.getString("side"),
-                        fen = msg.getString("fen"),
-                        opponentId = msg.getLong("opponentId"),
-                        opponentName = msg.getString("opponentName"),
-                        opponentRating = msg.optInt("opponentRating")
-                    )
-                )
-            }
-
-            "ERROR" -> {
-                emit(
-                    MatchEvent.Error(
-                        message = msg.optString("message", "Unknown error")
-                    )
-                )
-            }
-        }
-
-    } catch (e: Exception) {
-        emit(MatchEvent.Error("Parse error: ${e.message}"))
     }
 }

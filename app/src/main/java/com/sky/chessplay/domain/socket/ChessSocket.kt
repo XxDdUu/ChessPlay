@@ -10,4 +10,5 @@ interface ChessSocket {
     fun sendReady(gameId: String?)
     fun observeEvents(listener: (SocketEvent) -> Unit)
     val events: SharedFlow<MatchEvent>
+    val socketEvents: SharedFlow<SocketEvent>
 }

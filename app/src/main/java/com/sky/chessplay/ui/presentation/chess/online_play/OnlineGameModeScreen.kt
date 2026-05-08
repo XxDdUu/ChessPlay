@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
@@ -36,7 +35,7 @@ fun OnlineGameModeScreen(
     onAutoMatch: () -> Unit,
     onCreateRoom: () -> Unit,
     onJoinRoom: () -> Unit,
-    matchViewModel: MatchViewModel = hiltViewModel(),
+    matchViewModel: MatchViewModel,
     authState: AuthState
 ) {
     val navigateToGame = matchViewModel.navigateToGame

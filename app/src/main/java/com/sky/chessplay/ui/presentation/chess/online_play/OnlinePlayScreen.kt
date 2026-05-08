@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.presentation.chess.online_play
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,8 +43,10 @@ fun OnlinePlayScreen(
         configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     LaunchedEffect(gameInit) {
+        Log.d("Game State DEBUG", gameState.toString())
+        Log.d("Ui State DEBUG", "$uiState")
+        Log.d("Init game DEBUG", "$gameInit")
         gameInit?.let { init ->
-
             val fen = init.fen.takeIf { it.isNotBlank() }
                 ?: DEFAULT_FEN
 

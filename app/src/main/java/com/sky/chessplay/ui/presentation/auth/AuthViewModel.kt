@@ -96,7 +96,10 @@ class AuthViewModel @Inject constructor(
         }
     }
     fun logout() {
-        _authState.value = AuthState.Idle
+        viewModelScope.launch {
+            repo.logout()
+            _authState.value = AuthState.Unauthenticated
+        }
     }
     fun signInWithGoogle(idToken: String) {
         viewModelScope.launch {
@@ -127,4 +130,5 @@ class AuthViewModel @Inject constructor(
     fun onGoogleClick(idToken: String) {
         signInWithGoogle(idToken)
     }
+
 }

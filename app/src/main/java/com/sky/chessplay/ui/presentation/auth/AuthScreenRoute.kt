@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -21,9 +21,9 @@ import com.sky.chessplay.navigation.Route
 @Composable
 fun AuthScreenRoute(
     navController: NavHostController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel
 ) {
-    val state by viewModel.authState.collectAsState()
+    val state by viewModel.authState.collectAsStateWithLifecycle()
     val email by viewModel.email.collectAsState()
 
     val context = LocalContext.current

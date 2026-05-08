@@ -69,6 +69,8 @@ fun ChessPlayRoot() {
                     },
                     onSettingsClick = {},
                     navController = navController,
+                    authState = authState,
+                    onLogout =  { authViewModel.logout() }
                 )
             }
 
@@ -97,7 +99,10 @@ fun ChessPlayRoot() {
                 )
             }
             composable(Route.Auth.route) {
-                AuthScreenRoute(navController = navController)
+                AuthScreenRoute(
+                    navController = navController,
+                    viewModel = authViewModel
+                    )
             }
         }
 }

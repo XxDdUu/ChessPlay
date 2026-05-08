@@ -128,7 +128,9 @@ fun AuthScreen(
                 Text((state as AuthState.Error).message)
             }
 
-            AuthState.Unauthenticated -> TODO()
+            AuthState.Unauthenticated -> {
+                Text((state as AuthState.Error).message)
+            }
         }
     }
 }

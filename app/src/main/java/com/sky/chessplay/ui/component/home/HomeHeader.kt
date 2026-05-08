@@ -13,10 +13,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,8 +34,13 @@ import coil.compose.AsyncImage
 fun HomeHeader(
     username: String,
     avatarUrl: String?,
-    onSettingsClick: () -> Unit
+    onLogout: () -> Unit
 ) {
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,19 +49,23 @@ fun HomeHeader(
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(16.dp),
+
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        // Avatar
         if (avatarUrl != null) {
-            AsyncImage( // Coil
+
+            AsyncImage(
                 model = avatarUrl,
                 contentDescription = null,
+
                 modifier = Modifier
                     .size(48.dp)
                     .background(Color.Gray, CircleShape)
             )
+
         } else {
+
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -60,14 +75,57 @@ fun HomeHeader(
 
         Spacer(Modifier.width(12.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(username, color = Color.White, fontWeight = FontWeight.Bold)
-            Text("990 ♟️   💎1", color = Color.LightGray)
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+
+            Text(
+                username,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                "990 ♟️   💎1",
+                color = Color.LightGray
+            )
         }
 
-        IconButton(onClick = onSettingsClick) {
-            Icon(Icons.Default.Settings, contentDescription = null, tint = Color.White)
+        Box {
+
+            IconButton(
+                onClick = {
+                    expanded = true
+                }
+            ) {
+
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+
+                DropdownMenuItem(
+                    text = {
+                        Text("Logout")
+                    },
+
+                    onClick = {
+
+                        expanded = false
+
+                        onLogout()
+                    }
+                )
+            }
         }
     }
 }
-

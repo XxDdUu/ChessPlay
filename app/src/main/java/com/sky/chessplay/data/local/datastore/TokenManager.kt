@@ -12,7 +12,6 @@ import javax.inject.Inject
 class TokenManager @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
-
     suspend fun saveToken(token: String?) {
         dataStore.edit {
             if (token != null) {
@@ -33,6 +32,13 @@ class TokenManager @Inject constructor(
             getToken()
         }
     }
+    suspend fun clearToken() {
+
+        dataStore.edit {
+            it.remove(TOKEN_KEY)
+        }
+    }
+
 
     companion object {
         val TOKEN_KEY = stringPreferencesKey("auth_token")

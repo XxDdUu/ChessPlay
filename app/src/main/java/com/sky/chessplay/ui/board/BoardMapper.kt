@@ -1,7 +1,7 @@
 package com.sky.chessplay.ui.board
 
 import androidx.compose.ui.geometry.Offset
-import com.sky.chessplay.domain.model.Position
+import com.sky.chessplay.domain.model.chess.Position
 
 object BoardMapper {
 

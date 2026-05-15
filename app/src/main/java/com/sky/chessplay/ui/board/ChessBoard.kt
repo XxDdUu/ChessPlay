@@ -20,10 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.sky.chessplay.domain.model.File
-import com.sky.chessplay.domain.model.Position
-import com.sky.chessplay.domain.model.Promotion
-import com.sky.chessplay.domain.model.Rank
+import com.sky.chessplay.domain.model.chess.File
+import com.sky.chessplay.domain.model.chess.Position
+import com.sky.chessplay.domain.model.chess.Promotion
+import com.sky.chessplay.domain.model.chess.Rank
 import com.sky.chessplay.ui.board.decorator.PromotionSelection
 import com.sky.chessplay.ui.state.UiState
 import model.board.Square

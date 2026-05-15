@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sky.chessplay.domain.model.File
-import com.sky.chessplay.domain.model.Rank
+import com.sky.chessplay.domain.model.chess.File
+import com.sky.chessplay.domain.model.chess.Rank
 import model.board.Square
 
 object LabelDecorator : SquareDecorator {

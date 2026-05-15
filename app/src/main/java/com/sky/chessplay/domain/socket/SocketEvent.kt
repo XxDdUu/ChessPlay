@@ -1,6 +1,7 @@
 package com.sky.chessplay.domain.socket
 
-import com.sky.chessplay.domain.model.Side
+import com.sky.chessplay.domain.model.chat.ChatMessage
+import com.sky.chessplay.domain.model.chess.Side
 
 sealed class SocketEvent {
 
@@ -14,7 +15,10 @@ sealed class SocketEvent {
         val opponentId: Long,
         val opponentName: String?,
         val opponentRating: Int?,
-        val history: List<String>? = null
+        val timeWhite: Int = 600,
+        val timeBlack: Int = 600,
+        val history: List<String>? = null,
+        val chatHistory: List<ChatMessage> = emptyList(),
     ) : SocketEvent()
 
     data class Move(
@@ -40,7 +44,15 @@ sealed class SocketEvent {
         PLAYING,
         FINISHED
     }
+    data class RoomCreated(
+        val code: String
+    ) : SocketEvent()
     enum class GameResult {
         WHITE_WIN, BLACK_WIN, DRAW
     }
+    data class ChatMessageReceived(
+        val senderId: Long,
+        val senderName: String,
+        val message: String,
+    ) : SocketEvent()
 }

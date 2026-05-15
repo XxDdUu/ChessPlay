@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -29,9 +30,11 @@ fun AppScaffold(
     navController: NavHostController,
     title: String = "",
     showFab: Boolean = false,
+    showChatAction: Boolean = false,
     showBottomBar: Boolean = false,
+    onChatClick: () -> Unit = {},
     onFabClick: () -> Unit = {},
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
@@ -42,10 +45,32 @@ fun AppScaffold(
             if (title.isNotEmpty()) {
                 TopAppBar(
                     title = { Text(title) },
+
                     navigationIcon = {
                         if (currentRoute != "home") {
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = null)
+                            IconButton(
+                                onClick = { navController.popBackStack() }
+                            ) {
+                                Icon(
+                                    Icons.Default.ArrowBack,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    },
+
+                    actions = {
+
+                        if (showChatAction) {
+
+                            IconButton(
+                                onClick = onChatClick
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.Chat,
+                                    contentDescription = "Chat"
+                                )
                             }
                         }
                     }

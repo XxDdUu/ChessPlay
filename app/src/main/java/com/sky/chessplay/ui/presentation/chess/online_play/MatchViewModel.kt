@@ -65,6 +65,11 @@ class MatchViewModel @Inject constructor(
         private set
     var gameId: String? = null
 
+    var roomCode by mutableStateOf<String?>(null)
+        private set
+    var joinRoomCode by mutableStateOf("")
+        private set
+
     private var confirmJob: Job? = null
     private var gameCountdownJob: Job? = null
 
@@ -79,7 +84,7 @@ class MatchViewModel @Inject constructor(
         gameCountdownJob?.cancel()
 
         socketClient.disconnect()
-
+        roomCode = null
         opponent = null
         status = ""
         confirmCountdown = 10
@@ -98,6 +103,43 @@ class MatchViewModel @Inject constructor(
             socketClient.connect(token)
 
             repo.joinMatchmaking(userId)
+        }
+    }
+    fun updateJoinRoomCode(code: String) {
+        joinRoomCode = code.uppercase()
+    }
+    fun joinRoom() {
+
+        if (joinRoomCode.isBlank()) return
+
+        status = "Joining room..."
+
+        viewModelScope.launch {
+
+            val token = tokenManager.getToken() ?: return@launch
+
+            socketClient.connect(token)
+
+            delay(500)
+
+            socketClient.joinRoom(joinRoomCode)
+        }
+    }
+
+    fun createRoom(matchType: String = "RAPID") {
+
+        matchState = MatchState.SEARCHING
+        status = "Creating room..."
+
+        viewModelScope.launch {
+
+            val token = tokenManager.getToken() ?: return@launch
+
+            socketClient.connect(token)
+
+            delay(500)
+
+            socketClient.createRoom(matchType)
         }
     }
     fun acceptMatch() {
@@ -130,7 +172,11 @@ class MatchViewModel @Inject constructor(
                 gameInitEvent = event
                 navigateToGame = true
             }
-
+            is SocketEvent.RoomCreated -> {
+                roomCode = event.code
+                status = "Waiting for opponent..."
+                matchState = MatchState.SEARCHING
+            }
             else -> Unit
         }
     }

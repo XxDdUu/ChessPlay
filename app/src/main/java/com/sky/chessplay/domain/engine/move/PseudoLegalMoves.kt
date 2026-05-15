@@ -1,9 +1,9 @@
 package model.service.move
 
-import com.sky.chessplay.domain.model.Capture
-import com.sky.chessplay.domain.model.Move
-import com.sky.chessplay.domain.model.Position
-import com.sky.chessplay.domain.model.StandardMove
+import com.sky.chessplay.domain.model.chess.Capture
+import com.sky.chessplay.domain.model.chess.Move
+import com.sky.chessplay.domain.model.chess.Position
+import com.sky.chessplay.domain.model.chess.StandardMove
 import model.board.Bishop
 import model.board.King
 import model.board.Knight

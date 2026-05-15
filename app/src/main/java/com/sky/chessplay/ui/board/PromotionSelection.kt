@@ -33,9 +33,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.sky.chessplay.domain.model.Promotion
-import com.sky.chessplay.domain.model.Rank
-import com.sky.chessplay.domain.model.Side
+import com.sky.chessplay.domain.model.chess.Promotion
+import com.sky.chessplay.domain.model.chess.Rank
+import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.ui.graphics.SvgCache
 import com.sky.chessplay.ui.state.UiState
 import model.board.Queen

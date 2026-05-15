@@ -84,9 +84,6 @@ fun ChessPlayRoot() {
             composable(Route.OnlineGameMode.route) {
                 OnlineGameModeScreen(
                     navController = navController,
-                    onJoinRoom = {},
-                    onAutoMatch = {},
-                    onCreateRoom = {},
                     authState = authState,
                     matchViewModel = matchViewModel
                 )
@@ -95,7 +92,9 @@ fun ChessPlayRoot() {
             composable(Route.OnlinePlay.route) {
                 OnlinePlayScreen(
                     viewModel = chessViewModel,
-                    matchViewModel = matchViewModel
+                    matchViewModel = matchViewModel,
+                    navController = navController,
+                    authState = authState
                 )
             }
             composable(Route.Auth.route) {

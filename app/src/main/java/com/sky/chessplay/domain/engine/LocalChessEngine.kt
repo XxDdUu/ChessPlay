@@ -1,7 +1,7 @@
 package com.sky.chessplay.domain.engine
 
-import com.sky.chessplay.domain.model.Move
-import com.sky.chessplay.domain.model.Position
+import com.sky.chessplay.domain.model.chess.Move
+import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.rules.MoveValidator.legalMoves
 import com.sky.chessplay.domain.socket.SocketEvent
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,15 +1,15 @@
 package model.state
 
-import com.sky.chessplay.domain.model.Board
-import com.sky.chessplay.domain.model.BoardSnapshot
-import com.sky.chessplay.domain.model.File
-import com.sky.chessplay.domain.model.Move
-import com.sky.chessplay.domain.model.Position
-import com.sky.chessplay.domain.model.Promotion
-import com.sky.chessplay.domain.model.Rank
-import com.sky.chessplay.domain.model.Side
-import com.sky.chessplay.domain.model.Side.BLACK
-import com.sky.chessplay.domain.model.Side.WHITE
+import com.sky.chessplay.domain.model.chess.Board
+import com.sky.chessplay.domain.model.chess.BoardSnapshot
+import com.sky.chessplay.domain.model.chess.File
+import com.sky.chessplay.domain.model.chess.Move
+import com.sky.chessplay.domain.model.chess.Position
+import com.sky.chessplay.domain.model.chess.Promotion
+import com.sky.chessplay.domain.model.chess.Rank
+import com.sky.chessplay.domain.model.chess.Side
+import com.sky.chessplay.domain.model.chess.Side.BLACK
+import com.sky.chessplay.domain.model.chess.Side.WHITE
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.socket.SocketEvent.GameStatus
 import model.board.Bishop

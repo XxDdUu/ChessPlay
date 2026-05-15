@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import com.sky.chessplay.domain.model.Position
+import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.ui.state.UiState
 import model.board.Square
 import view.board.decorator.ActivePieceDecorator

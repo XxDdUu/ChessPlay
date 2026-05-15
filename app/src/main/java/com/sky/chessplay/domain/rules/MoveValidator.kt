@@ -1,7 +1,7 @@
 package com.sky.chessplay.domain.rules
 
-import com.sky.chessplay.domain.model.Move
-import com.sky.chessplay.domain.model.Side
+import com.sky.chessplay.domain.model.chess.Move
+import com.sky.chessplay.domain.model.chess.Side
 import model.service.applyMove
 import model.state.GameState
 

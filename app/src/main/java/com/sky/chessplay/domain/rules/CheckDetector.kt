@@ -1,7 +1,7 @@
 package com.sky.chessplay.domain.rules
 
-import com.sky.chessplay.domain.model.Capture
-import com.sky.chessplay.domain.model.Side
+import com.sky.chessplay.domain.model.chess.Capture
+import com.sky.chessplay.domain.model.chess.Side
 import model.board.King
 import model.service.move.pseudoLegalMoves
 import model.state.GameState

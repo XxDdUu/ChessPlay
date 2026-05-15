@@ -1,8 +1,8 @@
 package com.sky.chessplay.data.engine
 
 import com.sky.chessplay.domain.engine.ChessEngine
-import com.sky.chessplay.domain.model.Move
-import com.sky.chessplay.domain.model.Position
+import com.sky.chessplay.domain.model.chess.Move
+import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.rules.MoveValidator.legalMoves
 import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.socket.SocketEvent

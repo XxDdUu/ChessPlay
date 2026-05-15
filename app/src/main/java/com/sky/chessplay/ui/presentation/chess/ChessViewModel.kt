@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
-import com.sky.chessplay.domain.model.Position
-import com.sky.chessplay.domain.model.Promotion
-import com.sky.chessplay.domain.model.Side
+import com.sky.chessplay.domain.model.chess.Position
+import com.sky.chessplay.domain.model.chess.Promotion
+import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel

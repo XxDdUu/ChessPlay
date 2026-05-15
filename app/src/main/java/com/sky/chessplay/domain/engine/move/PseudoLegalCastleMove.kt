@@ -1,10 +1,10 @@
 package model.service.move
 
-import com.sky.chessplay.domain.model.File
-import com.sky.chessplay.domain.model.KingSideCastle
-import com.sky.chessplay.domain.model.Move
-import com.sky.chessplay.domain.model.Position
-import com.sky.chessplay.domain.model.QueenSideCastle
+import com.sky.chessplay.domain.model.chess.File
+import com.sky.chessplay.domain.model.chess.KingSideCastle
+import com.sky.chessplay.domain.model.chess.Move
+import com.sky.chessplay.domain.model.chess.Position
+import com.sky.chessplay.domain.model.chess.QueenSideCastle
 import model.board.King
 import model.board.Rook
 import model.state.GameState

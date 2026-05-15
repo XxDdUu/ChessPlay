@@ -16,6 +16,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -28,13 +32,13 @@ import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
 import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.presentation.chess.online_play.modal.JoinRoomDialog
+import com.sky.chessplay.ui.presentation.chess.online_play.modal.MatchMakingModal
+import com.sky.chessplay.ui.presentation.chess.online_play.modal.RoomWaitingModal
 
 @Composable
 fun OnlineGameModeScreen(
     navController: NavHostController,
-    onAutoMatch: () -> Unit,
-    onCreateRoom: () -> Unit,
-    onJoinRoom: () -> Unit,
     matchViewModel: MatchViewModel,
     authState: AuthState
 ) {
@@ -50,10 +54,13 @@ fun OnlineGameModeScreen(
             matchViewModel.onNavigated()
         }
     }
+    var showJoinDialog by remember {
+        mutableStateOf(false)
+    }
     AppScaffold(
         navController = navController,
         showBottomBar = false,
-        showFab = false
+        showFab = false,
     ) {
 
         Box(
@@ -115,7 +122,6 @@ fun OnlineGameModeScreen(
                         onClick = {
                             (authState as? AuthState.Authenticated)?.user?.let { user ->
                                 matchViewModel.start(user.id)
-                                onAutoMatch()
                             }
                         }
                     )
@@ -124,18 +130,46 @@ fun OnlineGameModeScreen(
                         title = "Create Room",
                         subtitle = "Invite friends to join your game",
                         colors = listOf(Color(0xFF6D5BFF), Color(0xFF4F46E5)),
-                        onClick = onCreateRoom
+                        onClick = { matchViewModel.createRoom() }
+
                     )
 
                     GradientButton(
                         title = "Join Room",
                         subtitle = "Enter a room code",
                         colors = listOf(Color(0xFF8B5CF6), Color(0xFF6D28D9)),
-                        onClick = onJoinRoom
+                        onClick = { showJoinDialog = true }
                     )
                 }
             }
             MatchMakingModal(viewModel = matchViewModel)
+            RoomWaitingModal(
+                roomCode = matchViewModel.roomCode,
+                status = matchViewModel.status,
+                onCancel = {
+                    matchViewModel.cancelSearch()
+                }
+            )
+            if (showJoinDialog) {
+
+                JoinRoomDialog(
+
+                    roomCode = matchViewModel.joinRoomCode,
+
+                    onRoomCodeChange = {
+                        matchViewModel.updateJoinRoomCode(it)
+                    },
+
+                    onJoinClick = {
+                        matchViewModel.joinRoom()
+                        showJoinDialog = false
+                    },
+
+                    onDismiss = {
+                        showJoinDialog = false
+                    }
+                )
+            }
         }
     }
 }

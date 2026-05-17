@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.sky.chessplay.navigation.Route
 import com.sky.chessplay.ui.component.BottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +94,11 @@ fun AppScaffold(
 
         bottomBar = {
             if (showBottomBar) {
-                BottomBar()
+                BottomBar(
+                    onCommunityClick = {
+                        navController.navigate(Route.Friend.route)
+                    }
+                )
             }
         }
 

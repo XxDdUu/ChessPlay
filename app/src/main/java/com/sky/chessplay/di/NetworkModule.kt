@@ -2,6 +2,7 @@ package com.sky.chessplay.di
 
 import com.sky.chessplay.BuildConfig
 import com.sky.chessplay.data.remote.api.AuthApi
+import com.sky.chessplay.data.remote.api.FriendApi
 import com.sky.chessplay.data.remote.api.MatchApi
 import dagger.Module
 import dagger.Provides
@@ -34,5 +35,10 @@ object NetworkModule {
     @Singleton
     fun provideMatchApi(retrofit: Retrofit): MatchApi {
         return retrofit.create(MatchApi::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideFriendApi(retrofit: Retrofit): FriendApi {
+        return retrofit.create(FriendApi::class.java)
     }
 }

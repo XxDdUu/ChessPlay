@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BottomBar() {
+fun BottomBar(
+    onCommunityClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -24,16 +27,34 @@ fun BottomBar() {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        BottomItem("🎨", "Appearance")
-        BottomItem("🎁", "Rewards")
-        BottomItem("🎯", "Missions")
-        BottomItem("📣", "Community")
+        BottomItem("🎨",
+            "Appearance",
+            ) {}
+        BottomItem("🎁",
+            "Rewards",
+            ) {}
+        BottomItem("🎯",
+            "Missions",
+            ) {}
+        BottomItem(
+            "📣",
+            "Community",
+            ) {
+            onCommunityClick
+        }
     }
 }
 
 @Composable
-fun BottomItem(icon: String, text: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+fun BottomItem(
+    icon: String,
+    text: String,
+    onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable {
+            onClick()
+        }) {
         Text(icon, fontSize = 24.sp)
         Text(text, color = Color.White, fontSize = 12.sp)
     }

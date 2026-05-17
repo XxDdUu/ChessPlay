@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import com.sky.chessplay.ui.presentation.chess.offline_play.OfflinePlayScreen
 import com.sky.chessplay.ui.presentation.chess.online_play.MatchViewModel
 import com.sky.chessplay.ui.presentation.chess.online_play.OnlineGameModeScreen
 import com.sky.chessplay.ui.presentation.chess.online_play.OnlinePlayScreen
+import com.sky.chessplay.ui.presentation.community.FriendRoute
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 
 @Composable
@@ -102,6 +104,28 @@ fun ChessPlayRoot() {
                     navController = navController,
                     viewModel = authViewModel
                     )
+            }
+            composable(Route.Friend.route) {
+
+                when (val state = authState) {
+
+                    is AuthState.Authenticated -> {
+
+                        FriendRoute(
+                            userId = state.user.id,
+                            onNavigateToDiscover = {
+                                navController.navigate("friend_discover")
+                            }
+                        )
+                    }
+
+                    else -> {
+
+                        LaunchedEffect(Unit) {
+                            navController.navigate(Route.Auth.route)
+                        }
+                    }
+                }
             }
         }
 }

@@ -1,7 +1,9 @@
 package com.sky.chessplay.di
 
+import com.sky.chessplay.data.repository.FriendRepositoryImpl
 import com.sky.chessplay.data.repository.MatchRepositoryImpl
 import com.sky.chessplay.domain.repository.AuthRepository
+import com.sky.chessplay.domain.repository.FriendRepository
 import com.sky.chessplay.domain.repository.MatchRepository
 import dagger.Binds;
 import dagger.Module;
@@ -23,4 +25,9 @@ abstract class RepositoryModule {
     abstract fun bindMatchRepository(
         impl: MatchRepositoryImpl
     ): MatchRepository
+    @Binds
+    @Singleton
+    abstract fun bindFriendRepository(
+        impl: FriendRepositoryImpl
+    ): FriendRepository
 }

@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -16,10 +16,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.sky.chessplay.navigation.Route
@@ -29,29 +31,41 @@ import com.sky.chessplay.ui.component.BottomBar
 @Composable
 fun AppScaffold(
     navController: NavHostController,
-    title: String = "",
-    showFab: Boolean = false,
-    showChatAction: Boolean = false,
-    showBottomBar: Boolean = false,
-    onChatClick: () -> Unit = {},
-    onFabClick: () -> Unit = {},
-    content: @Composable (PaddingValues) -> Unit,
+    config: AppScaffoldConfig,
+    content: @Composable (PaddingValues) -> Unit
 ) {
+
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
 
     Scaffold(
 
         topBar = {
-            if (title.isNotEmpty()) {
+
+            if (config.showTopBar && config.title.isNotEmpty())  {
+
                 TopAppBar(
-                    title = { Text(title) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFF0D0B2A),
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    ),
+
+                    title = {
+                        Text(config.title)
+                    },
 
                     navigationIcon = {
-                        if (currentRoute != "home") {
+
+                        if (currentRoute != Route.Home.route) {
+
                             IconButton(
-                                onClick = { navController.popBackStack() }
+                                onClick = {
+                                    navController.popBackStack()
+                                }
                             ) {
+
                                 Icon(
                                     Icons.Default.ArrowBack,
                                     contentDescription = null
@@ -62,16 +76,35 @@ fun AppScaffold(
 
                     actions = {
 
-                        if (showChatAction) {
+                        config.actions.forEach { action ->
 
-                            IconButton(
-                                onClick = onChatClick
-                            ) {
+                            when (action) {
 
-                                Icon(
-                                    imageVector = Icons.Default.Chat,
-                                    contentDescription = "Chat"
-                                )
+                                is TopBarAction.Chat -> {
+
+                                    IconButton(
+                                        onClick = action.onClick
+                                    ) {
+
+                                        Icon(
+                                            Icons.Default.Chat,
+                                            contentDescription = "Chat"
+                                        )
+                                    }
+                                }
+
+                                is TopBarAction.AddFriend -> {
+
+                                    IconButton(
+                                        onClick = action.onClick
+                                    ) {
+
+                                        Icon(
+                                            Icons.Default.PersonAdd,
+                                            contentDescription = "Add Friend"
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -80,12 +113,19 @@ fun AppScaffold(
         },
 
         floatingActionButton = {
-            if (showFab) {
+
+            config.fab?.let { fab ->
+
                 FloatingActionButton(
-                    onClick = onFabClick,
+                    onClick = fab.onClick,
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Icon(Icons.Default.Add, null, tint = Color.White)
+
+                    Icon(
+                        imageVector = fab.icon,
+                        contentDescription = fab.contentDescription,
+                        tint = Color.White
+                    )
                 }
             }
         },
@@ -93,7 +133,9 @@ fun AppScaffold(
         floatingActionButtonPosition = FabPosition.Center,
 
         bottomBar = {
-            if (showBottomBar) {
+
+            if (config.showBottomBar) {
+
                 BottomBar(
                     onCommunityClick = {
                         navController.navigate(Route.Friend.route)
@@ -103,8 +145,34 @@ fun AppScaffold(
         }
 
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+
+        Box(
+            modifier = Modifier.padding(padding)
+        ) {
+
             content(padding)
         }
     }
+}
+data class AppScaffoldConfig(
+    val title: String = "",
+    val fab: FabConfig? = null,
+    val actions: List<TopBarAction> = emptyList(),
+    val showBottomBar: Boolean = false,
+    val showTopBar: Boolean = true
+)
+data class FabConfig(
+    val onClick: () -> Unit,
+    val icon: ImageVector,
+    val contentDescription: String = ""
+)
+sealed class TopBarAction {
+
+    data class Chat(
+        val onClick: () -> Unit
+    ) : TopBarAction()
+
+    data class AddFriend(
+        val onClick: () -> Unit
+    ) : TopBarAction()
 }

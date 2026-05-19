@@ -6,12 +6,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 
 @Composable
 fun FriendRoute(
     viewModel: FriendViewModel = hiltViewModel(),
     userId: Long,
-    onNavigateToDiscover: () -> Unit
+    onNavigateToDiscover: () -> Unit,
+    navController: NavHostController
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -29,6 +31,7 @@ fun FriendRoute(
     FriendScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onNavigateToDiscover = onNavigateToDiscover
+        onNavigateToDiscover = onNavigateToDiscover,
+        navController = navController
     )
 }

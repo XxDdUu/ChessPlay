@@ -107,25 +107,29 @@ fun ChessPlayRoot() {
             }
             composable(Route.Friend.route) {
 
-                when (val state = authState) {
+                if (authState !is AuthState.Authenticated) {
 
-                    is AuthState.Authenticated -> {
-
-                        FriendRoute(
-                            userId = state.user.id,
-                            onNavigateToDiscover = {
-                                navController.navigate("friend_discover")
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Route.Auth.route) {
+                            popUpTo(Route.Friend.route) {
+                                inclusive = true
                             }
-                        )
-                    }
-
-                    else -> {
-
-                        LaunchedEffect(Unit) {
-                            navController.navigate(Route.Auth.route)
+                            launchSingleTop = true
                         }
                     }
+
+                    return@composable
                 }
+
+                val state = authState as AuthState.Authenticated
+
+                FriendRoute(
+                    userId = state.user.id,
+                    onNavigateToDiscover = {
+                        navController.navigate("friend_discover")
+                    },
+                    navController = navController
+                )
             }
         }
 }

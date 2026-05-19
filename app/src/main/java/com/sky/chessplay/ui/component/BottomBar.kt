@@ -40,7 +40,7 @@ fun BottomBar(
             "📣",
             "Community",
             ) {
-            onCommunityClick
+            onCommunityClick()
         }
     }
 }

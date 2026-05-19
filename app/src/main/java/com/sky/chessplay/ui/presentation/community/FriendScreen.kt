@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Mail
@@ -20,23 +23,46 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.state.FriendState
 import com.sky.chessplay.ui.component.friend.FriendActionCard
 import com.sky.chessplay.ui.component.friend.FriendItem
+import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.layout.AppScaffoldConfig
+import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
 
 @Composable
 fun FriendScreen(
     state: FriendState,
     onEvent: (FriendEvent) -> Unit,
-    onNavigateToDiscover: () -> Unit
+    onNavigateToDiscover: () -> Unit,
+    navController: NavHostController
 ) {
-
+    var showPendingModal by remember {
+        mutableStateOf(false)
+    }
+    val pendingCount =
+        (state as? FriendState.PendingLoaded)
+            ?.pendingRequests
+            ?.size ?: 0
+    AppScaffold(
+        navController = navController,
+        config = AppScaffoldConfig(
+            title = "👥 Bạn bè",
+            showTopBar = true
+        )
+    ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,12 +90,39 @@ fun FriendScreen(
                 modifier = Modifier.weight(1f)
             )
 
-            FriendActionCard(
-                title = "Tìm bạn",
-                icon = Icons.Default.Search,
-                onClick = onNavigateToDiscover,
+            Box(
                 modifier = Modifier.weight(1f)
-            )
+            ) {
+
+                FriendActionCard(
+                    title = "Tìm bạn",
+                    icon = Icons.Default.Search,
+                    onClick = {
+                        showPendingModal = true
+                    }
+                )
+
+                if (pendingCount > 0) {
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = (-4).dp, y = 4.dp)
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(Color.Red),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Text(
+                            text = pendingCount.toString(),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -134,11 +187,6 @@ fun FriendScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-
-                    items(state.pendingRequests) { friend ->
-
-                        FriendItem(friend)
-                    }
                 }
             }
 
@@ -157,6 +205,19 @@ fun FriendScreen(
                     color = Color.Red
                 )
             }
+        }
+    }
+        if (
+            showPendingModal &&
+            state is FriendState.PendingLoaded
+        ) {
+
+            PendingFriendModal(
+                requests = state.pendingRequests,
+                onDismiss = {
+                    showPendingModal = false
+                }
+            )
         }
     }
 }

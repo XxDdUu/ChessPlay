@@ -22,6 +22,7 @@ import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.home.HomeMenuButton
 import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.layout.AppScaffoldConfig
 
 @Composable
 fun HomeScreen(
@@ -34,9 +35,15 @@ fun HomeScreen(
 ) {
     val user = (authState as? AuthState.Authenticated)?.user
     AppScaffold(
+
         navController = navController,
-        showBottomBar = true,
-        showFab = false
+
+        config = AppScaffoldConfig(
+            showTopBar = false,
+            showBottomBar = true,
+            fab = null
+        )
+
     ) { padding ->
 
         Column(

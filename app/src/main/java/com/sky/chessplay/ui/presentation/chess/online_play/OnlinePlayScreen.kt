@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.presentation.chess.online_play
 
+import FriendEvent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +36,11 @@ import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.ui.component.online_play.OnlineInfoPanel
 import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.layout.AppScaffoldConfig
+import com.sky.chessplay.ui.layout.TopBarAction
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import com.sky.chessplay.ui.presentation.chess.online_play.chat.ChatPanel
+import com.sky.chessplay.ui.presentation.community.FriendViewModel
 import view.board.ChessBoard
 
 @Composable
@@ -44,6 +48,7 @@ fun OnlinePlayScreen(
     viewModel: ChessViewModel,
     matchViewModel: MatchViewModel,
     chatViewModel: ChatViewModel = hiltViewModel(),
+    friendViewModel: FriendViewModel = hiltViewModel(),
     navController: NavHostController,
     authState: AuthState
 ) {
@@ -73,12 +78,32 @@ fun OnlinePlayScreen(
         }
     }
     AppScaffold(
+
         navController = navController,
-        title = "Online Match",
-        showChatAction = true,
-        onChatClick = {
-            showChat = true
-        },
+
+        config = AppScaffoldConfig(
+
+            title = "Online Match",
+
+            actions = listOf(
+
+                TopBarAction.Chat {
+
+                    showChat = true
+                },
+                TopBarAction.AddFriend(
+                    onClick = {
+                        friendViewModel.onEvent(
+                            FriendEvent.SendFriendRequest(
+                                senderId = user?.id ?: 0,
+                                receiverId = gameInit?.opponentId ?: 0
+                            )
+                        )
+                    }
+                )
+            )
+        )
+
     ) { padding ->
         Surface(
             modifier = Modifier.fillMaxSize(),

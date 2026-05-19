@@ -32,6 +32,7 @@ import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
 import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.presentation.chess.online_play.modal.JoinRoomDialog
 import com.sky.chessplay.ui.presentation.chess.online_play.modal.MatchMakingModal
 import com.sky.chessplay.ui.presentation.chess.online_play.modal.RoomWaitingModal
@@ -58,9 +59,14 @@ fun OnlineGameModeScreen(
         mutableStateOf(false)
     }
     AppScaffold(
+
         navController = navController,
-        showBottomBar = false,
-        showFab = false,
+
+        config = AppScaffoldConfig(
+            showBottomBar = false,
+            fab = null
+        )
+
     ) {
 
         Box(

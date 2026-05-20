@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-private fun MoveHistoryCard(
+fun MoveHistoryCard(
     history: List<String>
 ) {
 

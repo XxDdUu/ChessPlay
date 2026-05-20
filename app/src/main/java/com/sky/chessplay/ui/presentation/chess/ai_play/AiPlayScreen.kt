@@ -25,6 +25,9 @@ import com.sky.chessplay.data.remote.dto.response.AiModelInfo
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.domain.model.chess.Side
+import com.sky.chessplay.ui.component.ai.AiControlPanel
+import com.sky.chessplay.ui.component.ai.MoveHistoryCard
+import com.sky.chessplay.ui.component.ai.StatusCard
 import com.sky.chessplay.ui.state.UiState
 import model.state.GameState
 import view.board.ChessBoard

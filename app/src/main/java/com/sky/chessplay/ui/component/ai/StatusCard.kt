@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-private fun StatusCard(
+fun StatusCard(
     text: String,
     isThinking: Boolean
 ) {

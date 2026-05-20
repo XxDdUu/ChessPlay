@@ -17,7 +17,7 @@ import com.sky.chessplay.data.remote.dto.response.AiModelInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExposedDropdownMenuBoxSample(
+fun ExposedDropdownMenuBoxSample(
     aiModels: List<AiModelInfo>,
     selectedModel: String,
     enabled: Boolean,

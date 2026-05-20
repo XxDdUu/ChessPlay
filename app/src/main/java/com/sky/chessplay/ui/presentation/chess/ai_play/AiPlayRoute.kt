@@ -1,5 +1,6 @@
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sky.chessplay.ui.presentation.chess.ai_play.AiPlayScreen
 import com.sky.chessplay.ui.presentation.chess.ai_play.AiPlayViewModel
 
 @Composable

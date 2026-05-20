@@ -1,14 +1,17 @@
 package com.sky.chessplay.di
 
 import com.sky.chessplay.BuildConfig
+import com.sky.chessplay.data.local.datastore.TokenManager
+import com.sky.chessplay.data.remote.api.AiApi
 import com.sky.chessplay.data.remote.api.AuthApi
 import com.sky.chessplay.data.remote.api.FriendApi
 import com.sky.chessplay.data.remote.api.MatchApi
+import com.sky.chessplay.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -19,9 +22,18 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideOkHttpClient(tokenManager: TokenManager): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor { tokenManager.getTokenSync() })
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -31,14 +43,23 @@ object NetworkModule {
     fun provideAuthApi(retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
     }
+
     @Provides
     @Singleton
     fun provideMatchApi(retrofit: Retrofit): MatchApi {
         return retrofit.create(MatchApi::class.java)
     }
+
     @Provides
     @Singleton
     fun provideFriendApi(retrofit: Retrofit): FriendApi {
         return retrofit.create(FriendApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideAiApi(retrofit: Retrofit): AiApi {
+        return retrofit.create(AiApi::class.java)
+    }
 }
+

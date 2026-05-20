@@ -1,8 +1,10 @@
 package com.sky.chessplay.di
 
+import com.sky.chessplay.data.engine.AiChessEngine
 import com.sky.chessplay.data.engine.RemoteChessEngine
 import com.sky.chessplay.domain.engine.ChessEngine
 import com.sky.chessplay.domain.engine.LocalChessEngine
+import com.sky.chessplay.domain.repository.AiRepository
 import com.sky.chessplay.domain.socket.ChessSocket
 import dagger.Module
 import dagger.Provides
@@ -26,4 +28,13 @@ object EngineModule {
     fun provideLocalEngine(): ChessEngine {
         return LocalChessEngine()
     }
+
+    @AiEngine
+    @Provides
+    fun provideAiEngine(
+        aiRepository: AiRepository
+    ): ChessEngine {
+        return AiChessEngine(aiRepository)
+    }
 }
+

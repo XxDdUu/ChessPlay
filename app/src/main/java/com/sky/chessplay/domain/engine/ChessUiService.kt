@@ -34,10 +34,9 @@ interface ChessUiService {
     fun cancelPromotion()
     fun onSquareSizeChanged(squareSize: Int)
     fun updateOnStateChanges(onState: GameStateObserver)
-
     fun initLocal()
-
     fun initOnline(gameInit: SocketEvent.GameInit)
+    fun initAi(gameInit: SocketEvent.GameInit)
 }
 
 typealias GameStateObserver = (GameState) -> Unit
@@ -47,10 +46,8 @@ class DefaultChessUiService @Inject constructor(
 ) : ChessUiService {
     override var uiState = UiState()
         private set
-
     override var gameState = GameState()
     private val observers = HashSet<GameStateObserver>()
-
     private lateinit var engine: ChessEngine
 
     override fun initLocal() {
@@ -77,6 +74,20 @@ class DefaultChessUiService @Inject constructor(
 
         engine.loadGame(gameInit)
     }
+
+    override fun initAi(gameInit: SocketEvent.GameInit) {
+        engine = engineFactory.createAi()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            engine.gameStateFlow.collect {
+                gameState = it
+                update()
+            }
+        }
+
+        engine.loadGame(gameInit)
+    }
+
 
 
     override fun onClick(position: Position) {

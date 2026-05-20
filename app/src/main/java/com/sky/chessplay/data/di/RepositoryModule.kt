@@ -1,7 +1,9 @@
 package com.sky.chessplay.di
 
+import com.sky.chessplay.data.repository.AiRepositoryImpl
 import com.sky.chessplay.data.repository.FriendRepositoryImpl
 import com.sky.chessplay.data.repository.MatchRepositoryImpl
+import com.sky.chessplay.domain.repository.AiRepository
 import com.sky.chessplay.domain.repository.AuthRepository
 import com.sky.chessplay.domain.repository.FriendRepository
 import com.sky.chessplay.domain.repository.MatchRepository
@@ -30,4 +32,10 @@ abstract class RepositoryModule {
     abstract fun bindFriendRepository(
         impl: FriendRepositoryImpl
     ): FriendRepository
+    @Binds
+    @Singleton
+    abstract fun bindAiRepository(
+        impl: AiRepositoryImpl
+    ): AiRepository
 }
+

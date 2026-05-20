@@ -9,3 +9,8 @@ annotation class OnlineEngine
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class OfflineEngine
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AiEngine
+

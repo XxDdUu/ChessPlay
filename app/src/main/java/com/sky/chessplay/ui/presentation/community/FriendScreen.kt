@@ -2,6 +2,7 @@ package com.sky.chessplay.ui.presentation.community
 
 import FriendEvent
 import FriendEvent.RemoveFriend
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,10 +150,9 @@ fun FriendScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
+        Log.d("FRIEND STATE DEBUG", state.toString())
         when (state) {
-
-            FriendState.Idle -> {
+            is FriendState.Idle -> {
 
                 Text(
                     text = "Không có dữ liệu",
@@ -178,7 +178,6 @@ fun FriendScreen(
                 ) {
 
                     items(state.friends) { friend ->
-
                         FriendItem(
                             friend = friend,
                             onRemoveFriend = {
@@ -232,6 +231,15 @@ fun FriendScreen(
                 requests = state.pendingRequests,
                 onDismiss = {
                     showPendingModal = false
+                },
+                onAccept = { friend ->
+
+                    onEvent(
+                        FriendEvent.AcceptFriendRequest(
+                            user1 = friend.userId,
+                            user2 = currentUserId
+                        )
+                    )
                 }
             )
         }

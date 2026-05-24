@@ -25,10 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun HomeHeader(
@@ -53,23 +54,24 @@ fun HomeHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        if (avatarUrl != null) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF6C5CE7)),
+            contentAlignment = Alignment.Center
+        ) {
 
-            AsyncImage(
-                model = avatarUrl,
-                contentDescription = null,
+            Text(
+                text = username
+                    .firstOrNull()
+                    ?.uppercase() ?: "?",
 
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.Gray, CircleShape)
-            )
+                color = Color.White,
 
-        } else {
+                fontSize = 20.sp,
 
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.Gray, CircleShape)
+                fontWeight = FontWeight.Bold
             )
         }
 

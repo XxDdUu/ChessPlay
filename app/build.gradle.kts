@@ -136,6 +136,7 @@ dependencies {
     // Networking
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
 
     // Storage
     implementation(libs.androidx.datastore.preferences)

@@ -46,7 +46,6 @@ class FriendRepositoryImpl @Inject constructor(
         user2: Long
     ): String {
         val response = api.acceptRequest(user1, user2)
-
         if (response.isSuccessful) {
             return response.body() ?: "Success"
         } else {

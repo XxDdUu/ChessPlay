@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.presentation.community
 
 import FriendEvent
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -87,7 +88,7 @@ class FriendViewModel @Inject constructor(
 
                 val friends =
                     repository.getFriends(userId)
-
+                Log.d("LOAD FRIEND DEBUG", friends.toString())
                 _state.value =
                     FriendState.FriendsLoaded(friends)
 
@@ -174,6 +175,9 @@ class FriendViewModel @Inject constructor(
                     user1,
                     user2
                 )
+                onEvent(
+                    FriendEvent.LoadFriends(user1)
+                )
 
             } catch (e: Exception) {
 
@@ -200,6 +204,9 @@ class FriendViewModel @Inject constructor(
 
                 _state.value =
                     FriendState.Success(message)
+                onEvent(
+                    FriendEvent.LoadFriends(user1)
+                )
 
             } catch (e: Exception) {
 

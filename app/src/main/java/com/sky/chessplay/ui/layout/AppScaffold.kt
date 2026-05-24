@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -86,22 +89,50 @@ fun AppScaffold(
                                         onClick = action.onClick
                                     ) {
 
-                                        Icon(
-                                            Icons.Default.Chat,
-                                            contentDescription = "Chat"
-                                        )
+                                        BadgedBox(
+
+                                            badge = {
+
+                                                if (action.unreadCount > 0) {
+
+                                                    Badge {
+
+                                                        Text(
+                                                            text =
+                                                                if (action.unreadCount > 99) "99+"
+                                                                else action.unreadCount.toString()
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        ) {
+
+                                            Icon(
+                                                Icons.Default.Chat,
+                                                contentDescription = "Chat"
+                                            )
+                                        }
                                     }
                                 }
 
                                 is TopBarAction.AddFriend -> {
 
                                     IconButton(
-                                        onClick = action.onClick
+                                        onClick = action.onClick,
+                                        enabled = !action.isRequestSent
                                     ) {
 
                                         Icon(
-                                            Icons.Default.PersonAdd,
-                                            contentDescription = "Add Friend"
+                                            imageVector = if (action.isRequestSent) {
+                                                Icons.Default.Check
+                                            } else {
+                                                Icons.Default.PersonAdd
+                                            },
+                                            contentDescription = if (action.isRequestSent) {
+                                                "Friend Request Sent"
+                                            } else {
+                                                "Add Friend"
+                                            }
                                         )
                                     }
                                 }
@@ -169,10 +200,12 @@ data class FabConfig(
 sealed class TopBarAction {
 
     data class Chat(
+        val unreadCount: Int = 0,
         val onClick: () -> Unit
     ) : TopBarAction()
 
     data class AddFriend(
+        val isRequestSent: Boolean = false,
         val onClick: () -> Unit
     ) : TopBarAction()
 }

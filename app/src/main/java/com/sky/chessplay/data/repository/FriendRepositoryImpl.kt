@@ -34,7 +34,6 @@ class FriendRepositoryImpl @Inject constructor(
         receiverId: Long
     ): String {
         val response = api.sendRequest(senderId, receiverId)
-
         if (response.isSuccessful) {
             return response.body() ?: "Success"
         } else {
@@ -47,11 +46,27 @@ class FriendRepositoryImpl @Inject constructor(
         user2: Long
     ): String {
         val response = api.acceptRequest(user1, user2)
-
         if (response.isSuccessful) {
             return response.body() ?: "Success"
         } else {
             throw Exception("Failed to accept friend request")
+        }
+    }
+    override suspend fun removeFriend(
+        user1: Long,
+        user2: Long
+    ): String {
+        val response = api.removeFriend(
+            user1,
+            user2
+        )
+        if (response.isSuccessful) {
+
+            return response.body() ?: "Success"
+
+        } else {
+
+            throw Exception("Failed to remove friend")
         }
     }
 }

@@ -1,10 +1,15 @@
 package com.sky.chessplay.ui.presentation.community
 
 import FriendEvent
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.domain.repository.FriendRepository
 import com.sky.chessplay.domain.state.FriendState
+import com.sky.chessplay.domain.state.FriendUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +25,8 @@ class FriendViewModel @Inject constructor(
         MutableStateFlow<FriendState>(FriendState.Idle)
 
     val state: StateFlow<FriendState> = _state
+    var uiState by mutableStateOf(FriendUiState())
+        private set
 
     fun onEvent(event: FriendEvent) {
 
@@ -62,6 +69,12 @@ class FriendViewModel @Inject constructor(
             is FriendEvent.ConnectFriend -> {
 
             }
+            is FriendEvent.RemoveFriend -> {
+                removeFriend(
+                    event.user1,
+                    event.user2
+                )
+            }
         }
     }
 
@@ -75,7 +88,7 @@ class FriendViewModel @Inject constructor(
 
                 val friends =
                     repository.getFriends(userId)
-
+                Log.d("LOAD FRIEND DEBUG", friends.toString())
                 _state.value =
                     FriendState.FriendsLoaded(friends)
 
@@ -113,32 +126,61 @@ class FriendViewModel @Inject constructor(
         }
     }
 
-    private fun sendFriendRequest(
+    fun sendFriendRequest(
         senderId: Long,
         receiverId: Long
     ) {
 
+        if (uiState.isSendingRequest) return
+
         viewModelScope.launch {
 
-            _state.value = FriendState.Loading
+            uiState = uiState.copy(
+                isSendingRequest = true
+            )
 
             try {
 
-                val message =
-                    repository.sendFriendRequest(
-                        senderId,
-                        receiverId
-                    )
+                val message = repository.sendFriendRequest(
+                    senderId,
+                    receiverId
+                )
 
-                _state.value =
-                    FriendState.Success(message)
+                uiState = uiState.copy(
+                    isSendingRequest = false,
+                    friendRequestSent = true,
+                    statusMessage = message
+                )
 
             } catch (e: Exception) {
 
-                _state.value =
-                    FriendState.Error(
-                        e.message ?: "Unknown error"
-                    )
+                uiState = uiState.copy(
+                    isSendingRequest = false,
+                    statusMessage = e.message
+                        ?: "Failed to send friend request."
+                )
+            }
+        }
+    }
+    private fun removeFriend(
+        user1: Long,
+        user2: Long
+    ) {
+
+        viewModelScope.launch {
+
+            try {
+
+                repository.removeFriend(
+                    user1,
+                    user2
+                )
+                onEvent(
+                    FriendEvent.LoadFriends(user1)
+                )
+
+            } catch (e: Exception) {
+
             }
         }
     }
@@ -162,6 +204,9 @@ class FriendViewModel @Inject constructor(
 
                 _state.value =
                     FriendState.Success(message)
+                onEvent(
+                    FriendEvent.LoadFriends(user1)
+                )
 
             } catch (e: Exception) {
 
@@ -171,5 +216,11 @@ class FriendViewModel @Inject constructor(
                     )
             }
         }
+    }
+    fun clearStatusMessage() {
+
+        uiState = uiState.copy(
+            statusMessage = null
+        )
     }
 }

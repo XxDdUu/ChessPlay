@@ -243,6 +243,9 @@ class MatchViewModel @Inject constructor(
                 startGameCountdown()
             }
             MatchEvent.Searching -> TODO()
+            is MatchEvent.RematchAccepted -> TODO()
+            is MatchEvent.RematchOffered -> TODO()
+            MatchEvent.RematchRejected -> TODO()
         }
     }
     private fun startConfirmCountdown() {

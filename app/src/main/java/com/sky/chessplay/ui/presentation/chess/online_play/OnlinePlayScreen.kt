@@ -2,6 +2,7 @@ package com.sky.chessplay.ui.presentation.chess.online_play
 
 import FriendEvent
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,12 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
 import com.sky.chessplay.domain.state.AuthState
+import com.sky.chessplay.domain.state.FriendState
 import com.sky.chessplay.ui.component.online_play.OnlineInfoPanel
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
@@ -49,9 +53,11 @@ fun OnlinePlayScreen(
     matchViewModel: MatchViewModel,
     chatViewModel: ChatViewModel = hiltViewModel(),
     friendViewModel: FriendViewModel = hiltViewModel(),
+    onlineGameViewModel: OnlineGameViewModel = hiltViewModel(),
     navController: NavHostController,
     authState: AuthState
 ) {
+    val friendState by friendViewModel.state.collectAsState()
     val user = (authState as? AuthState.Authenticated)?.user
     var showChat by remember {
         mutableStateOf(false)
@@ -59,10 +65,27 @@ fun OnlinePlayScreen(
     val gameState = viewModel.gameState
     val uiState = viewModel.uiState
     val gameInit = matchViewModel.gameInitEvent
-
     val configuration = LocalConfiguration.current
+    val rematchOffered = onlineGameViewModel.rematchOffered
+    val rematchSent = onlineGameViewModel.rematchSent
+    val unreadCount = chatViewModel.unreadCount
+    val friendUiState = friendViewModel.uiState
     val isLandscape =
         configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val context = LocalContext.current
+    LaunchedEffect(friendUiState.statusMessage) {
+
+        friendUiState.statusMessage?.let {
+
+            Toast.makeText(
+                context,
+                it,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            friendViewModel.clearStatusMessage()
+        }
+    }
 
     LaunchedEffect(gameInit, user?.id) {
         gameInit?.let { init ->
@@ -87,11 +110,16 @@ fun OnlinePlayScreen(
 
             actions = listOf(
 
-                TopBarAction.Chat {
-
-                    showChat = true
-                },
+                TopBarAction.Chat(
+                    unreadCount = unreadCount,
+                    onClick = {
+                        showChat = true
+                        chatViewModel.isChatOpened = true
+                        chatViewModel.markAsRead()
+                    }
+                ),
                 TopBarAction.AddFriend(
+                    isRequestSent = friendState is FriendState.FriendRequestSent,
                     onClick = {
                         friendViewModel.onEvent(
                             FriendEvent.SendFriendRequest(
@@ -198,6 +226,7 @@ fun OnlinePlayScreen(
             Dialog(
                 onDismissRequest = {
                     showChat = false
+                    chatViewModel.isChatOpened = false
                 }
             ) {
 

@@ -79,7 +79,8 @@ fun AuthScreenRoute(
             launcher.launch(googleClient.signInIntent)
         },
 
-        state = state
+        state = state,
+        navController = navController
     )
 }
 

@@ -17,4 +17,8 @@ interface FriendRepository {
         user1: Long,
         user2: Long
     ): String
+    suspend fun removeFriend(
+        user1: Long,
+        user2: Long
+    ): String
 }

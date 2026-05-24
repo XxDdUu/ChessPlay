@@ -26,6 +26,7 @@ import com.sky.chessplay.ui.component.friend.PendingFriendItem
 @Composable
 fun PendingFriendModal(
     requests: List<FriendResponse>,
+    onAccept: (FriendResponse) -> Unit,
     onDismiss: () -> Unit
 ) {
 
@@ -62,7 +63,9 @@ fun PendingFriendModal(
 
                         PendingFriendItem(
                             friend,
-                            onAccept = {},
+                            onAccept = {
+                                onAccept(friend)
+                            },
                             onReject = {}
                             )
                     }

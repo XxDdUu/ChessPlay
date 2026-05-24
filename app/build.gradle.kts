@@ -51,7 +51,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://10.0.2.2:8080/\""
+                "\"http://10.0.2.2:8087/\""
             )
 
             buildConfigField(
@@ -86,6 +86,9 @@ android {
             )
             manifestPlaceholders["app_name"] = "ChessPlay"
         }
+    }
+    kotlinOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 
 }
@@ -133,6 +136,7 @@ dependencies {
     // Networking
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
 
     // Storage
     implementation(libs.androidx.datastore.preferences)

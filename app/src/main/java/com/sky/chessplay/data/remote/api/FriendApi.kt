@@ -29,4 +29,9 @@ interface FriendApi {
         @Query("user1") user1: Long,
         @Query("user2") user2: Long
     ): Response<String>
+    @POST("api/friends/remove")
+    suspend fun removeFriend(
+        @Query("user1") user1: Long,
+        @Query("user2") user2: Long
+    ): Response<String>
 }

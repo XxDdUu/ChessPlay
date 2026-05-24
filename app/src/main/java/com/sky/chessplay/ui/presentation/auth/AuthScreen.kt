@@ -28,8 +28,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.sky.chessplay.R
 import com.sky.chessplay.domain.state.AuthState
+import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.layout.AppScaffoldConfig
 
 
 @Composable
@@ -38,98 +42,108 @@ fun AuthScreen(
     onEmailChange: (String) -> Unit,
     onNextClick: () -> Unit,
     onGoogleClick: () -> Unit,
-    state: AuthState
+    state: AuthState,
+    navController: NavHostController
     ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center
-
-    ) {
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = onEmailChange,
-            label = { Text("Email") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email
-            )
+    AppScaffold(
+        navController = navController,
+        config = AppScaffoldConfig(
+            title = "Authentication",
+            showTopBar = true,
+            showBottomBar = false
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onNextClick,
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center
+
         ) {
-            Text("Next")
-        }
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            HorizontalDivider(
-                modifier = Modifier.weight(1f),
-                thickness = DividerDefaults.Thickness,
-                color = DividerDefaults.color
-            )
-            Text(
-                text = "  Or  ",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            HorizontalDivider(
-                modifier = Modifier.weight(1f),
-                thickness = DividerDefaults.Thickness,
-                color = DividerDefaults.color
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        OutlinedButton(
-            onClick = onGoogleClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.auth_android_light_rd_na),
-                contentDescription = null,
-                modifier = Modifier.size(50.dp),
-                tint = Color.Unspecified,
-
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = { Text("Email") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                )
             )
 
-            Text("Continue with Google")
-        }
-        when (state) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-            is AuthState.Idle -> {}
-
-            is AuthState.Loading -> {
-                CircularProgressIndicator()
+            Button(
+                onClick = onNextClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) {
+                Text("Next")
             }
 
-            is AuthState.Authenticated -> {
-                Text("Login success!")
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    thickness = DividerDefaults.Thickness,
+                    color = DividerDefaults.color
+                )
+                Text(
+                    text = "  Or  ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White
+                )
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    thickness = DividerDefaults.Thickness,
+                    color = DividerDefaults.color
+                )
             }
 
-            is AuthState.Error -> {
-                Text((state as AuthState.Error).message)
-            }
+            Spacer(modifier = Modifier.height(24.dp))
 
-            AuthState.Unauthenticated -> {
-                Text((state as AuthState.Error).message)
+            OutlinedButton(
+                onClick = onGoogleClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.auth_android_light_rd_na),
+                    contentDescription = null,
+                    modifier = Modifier.size(50.dp),
+                    tint = Color.Unspecified,
+
+                    )
+
+                Text("Continue with Google")
+            }
+            when (state) {
+
+                is AuthState.Idle -> {}
+
+                is AuthState.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is AuthState.Authenticated -> {
+                    Text("Login success!")
+                }
+
+                is AuthState.Error -> {
+                    Text((state as AuthState.Error).message)
+                }
+
+                AuthState.Unauthenticated -> {
+                }
             }
         }
     }
@@ -142,6 +156,7 @@ fun AuthScreenPreview() {
         {},
         {},
         {},
-        state = AuthState.Idle
+        state = AuthState.Idle,
+        navController = rememberNavController()
     )
 }

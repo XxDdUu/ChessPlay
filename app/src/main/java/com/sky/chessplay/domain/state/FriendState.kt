@@ -15,7 +15,9 @@ sealed class FriendState {
     data class PendingLoaded(
         val pendingRequests: List<FriendResponse>
     ) : FriendState()
-
+    data class FriendRequestSent(
+        val message: String
+    ) : FriendState()
     data class Success(
         val message: String
     ) : FriendState()

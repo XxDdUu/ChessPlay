@@ -53,7 +53,7 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         this.lastToken = token
         reconnectAttempts = 0
         val request = Request.Builder()
-            .url("ws://10.0.2.2:8080/ws?token=$token")
+            .url("ws://10.0.2.2:8087/ws?token=$token")
             .build()
         webSocket = OkHttpClient().newWebSocket(request, socketListener)
     }
@@ -82,6 +82,27 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
             .put("gameId", gameId)
             .put("text", message)
         Log.d("message DEBUG", json.toString())
+        webSocket?.send(json.toString())
+    }
+    override fun sendRematchOffer(gameId: String) {
+
+        val json = JSONObject()
+            .put("type", "REMATCH_OFFER")
+            .put("gameId", gameId)
+
+        webSocket?.send(json.toString())
+    }
+
+    override fun sendRematchResponse(
+        gameId: String,
+        accepted: Boolean
+    ) {
+
+        val json = JSONObject()
+            .put("type", "REMATCH_RESPONSE")
+            .put("gameId", gameId)
+            .put("accepted", accepted)
+
         webSocket?.send(json.toString())
     }
 
@@ -296,6 +317,16 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                         opponentName = json.getString("opponentName"),
                         opponentRating = json.optInt("opponentRating")
                     )
+
+                    "REMATCH_OFFERED" -> {
+                        MatchEvent.RematchOffered(
+                            gameId = json.getString("gameId")
+                        )
+                    }
+
+                    "REMATCH_REJECTED" -> {
+                        MatchEvent.RematchRejected
+                    }
 
                     "ERROR" -> MatchEvent.Error(
                         message = json.optString("message", "Unknown error")

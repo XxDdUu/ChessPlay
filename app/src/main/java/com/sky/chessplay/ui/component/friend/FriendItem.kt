@@ -12,11 +12,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,8 +38,65 @@ import com.sky.chessplay.data.remote.dto.response.FriendResponse
 @Composable
 fun FriendItem(
     friend: FriendResponse,
-    onChallengeClick: (() -> Unit)? = null
+    onChallengeClick: (() -> Unit)? = null,
+    onRemoveFriend: (() -> Unit)? = null,
 ) {
+
+    var showRemoveDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (showRemoveDialog) {
+
+        AlertDialog(
+
+            onDismissRequest = {
+                showRemoveDialog = false
+            },
+
+            title = {
+                Text("Xóa bạn")
+            },
+
+            text = {
+                Text(
+                    "Bạn có chắc chắn muốn xóa ${friend.username} khỏi danh sách bạn bè?"
+                )
+            },
+
+            confirmButton = {
+
+                TextButton(
+
+                    onClick = {
+
+                        showRemoveDialog = false
+
+                        onRemoveFriend?.invoke()
+                    }
+                ) {
+
+                    Text(
+                        "Xóa",
+                        color = Color.Red
+                    )
+                }
+            },
+
+            dismissButton = {
+
+                TextButton(
+
+                    onClick = {
+                        showRemoveDialog = false
+                    }
+                ) {
+
+                    Text("Hủy")
+                }
+            }
+        )
+    }
 
     Card(
         colors = CardDefaults.cardColors(
@@ -44,6 +110,7 @@ fun FriendItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -52,6 +119,7 @@ fun FriendItem(
                     .size(54.dp)
                     .clip(CircleShape)
                     .background(Color.DarkGray),
+
                 contentAlignment = Alignment.Center
             ) {
 
@@ -114,15 +182,35 @@ fun FriendItem(
                     fontWeight = FontWeight.Bold
                 )
 
-                if (onChallengeClick != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    if (onChallengeClick != null) {
 
-                    TextButton(
-                        onClick = onChallengeClick
-                    ) {
+                        TextButton(
+                            onClick = onChallengeClick
+                        ) {
 
-                        Text("Thách đấu")
+                            Text("Thách đấu")
+                        }
+                    }
+
+                    if (onRemoveFriend != null) {
+
+                        IconButton(
+
+                            onClick = {
+                                showRemoveDialog = true
+                            }
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Remove Friend",
+                                tint = Color.Red
+                            )
+                        }
                     }
                 }
             }

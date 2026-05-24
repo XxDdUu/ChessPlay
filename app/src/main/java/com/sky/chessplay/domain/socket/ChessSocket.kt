@@ -12,6 +12,11 @@ interface ChessSocket {
     fun createRoom(matchType: String)
     fun joinRoom(code: String)
     fun sendChatMessage(gameId: String?, message: String)
+    fun sendRematchOffer(gameId: String)
+    fun sendRematchResponse(
+        gameId: String,
+        accepted: Boolean
+    )
     val events: SharedFlow<MatchEvent>
     val socketEvents: SharedFlow<SocketEvent>
 }

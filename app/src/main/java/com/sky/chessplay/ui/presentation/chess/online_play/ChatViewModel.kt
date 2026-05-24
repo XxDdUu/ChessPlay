@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.presentation.chess.online_play
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,9 @@ class ChatViewModel @Inject constructor(
 
     var input by mutableStateOf("")
         private set
+    var unreadCount by mutableIntStateOf(0)
+        private set
+    var isChatOpened by mutableStateOf(false)
 
     fun setCurrentUser(userId: Long) {
         myUserId = userId
@@ -33,6 +37,7 @@ class ChatViewModel @Inject constructor(
         }
     }
     init {
+
 
         viewModelScope.launch {
 
@@ -46,7 +51,14 @@ class ChatViewModel @Inject constructor(
                             senderId = event.senderId,
                             senderName = event.senderName,
                             message = event.message,
-                            isMine = event.senderId == myUserId                        )
+                            isMine = event.senderId == myUserId
+                        )
+
+                        val isMyMessage = event.senderId == myUserId
+
+                        if (!isMyMessage && !isChatOpened) {
+                            unreadCount++
+                        }
                     }
                     is SocketEvent.GameInit -> {
                         if(event.chatHistory.isNotEmpty()) {
@@ -54,10 +66,14 @@ class ChatViewModel @Inject constructor(
                         }
                     }
 
+
                     else -> Unit
                 }
             }
         }
+    }
+    fun markAsRead() {
+        unreadCount = 0
     }
     fun updateInput(text: String) {
         input = text

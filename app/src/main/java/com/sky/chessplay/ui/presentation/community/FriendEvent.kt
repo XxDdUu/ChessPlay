@@ -17,6 +17,10 @@ sealed class FriendEvent {
         val user1: Long,
         val user2: Long
     ) : FriendEvent()
+    data class RemoveFriend(
+        val user1: Long,
+        val user2: Long
+    ) : FriendEvent()
 
     data class SearchFriend(
         val query: String

@@ -31,6 +31,7 @@ fun FriendRoute(
     FriendScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        currentUserId = userId,
         onNavigateToDiscover = onNavigateToDiscover,
         navController = navController
     )

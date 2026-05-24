@@ -35,6 +35,15 @@ sealed class SocketEvent {
     object DrawRejected : SocketEvent()
 
     data class Error(val message: String) : SocketEvent()
+    data class RematchOffered(
+        val gameId: String
+    ) : SocketEvent()
+
+    object RematchRejected : SocketEvent()
+
+    data class RematchAccepted(
+        val newGameId: String
+    ) : SocketEvent()
     data class Opponent(
         val name: String,
         val rating: Int

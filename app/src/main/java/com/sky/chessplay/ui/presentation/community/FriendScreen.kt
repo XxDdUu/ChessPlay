@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.presentation.community
 
 import FriendEvent
+import FriendEvent.RemoveFriend
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,7 @@ import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
 @Composable
 fun FriendScreen(
     state: FriendState,
+    currentUserId: Long,
     onEvent: (FriendEvent) -> Unit,
     onNavigateToDiscover: () -> Unit,
     navController: NavHostController
@@ -177,7 +179,19 @@ fun FriendScreen(
 
                     items(state.friends) { friend ->
 
-                        FriendItem(friend)
+                        FriendItem(
+                            friend = friend,
+                            onRemoveFriend = {
+
+                                onEvent(
+
+                                    RemoveFriend(
+                                        user1 = currentUserId,
+                                        user2 = friend.userId
+                                    )
+                                )
+                            }
+                        )
                     }
                 }
             }
@@ -205,6 +219,8 @@ fun FriendScreen(
                     color = Color.Red
                 )
             }
+
+            is FriendState.FriendRequestSent -> TODO()
         }
     }
         if (

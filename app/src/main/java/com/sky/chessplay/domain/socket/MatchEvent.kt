@@ -39,6 +39,16 @@ sealed class MatchEvent {
         val opponentName: String,
         val opponentRating: Int?
     ) : MatchEvent()
+    data class RematchOffered(
+        val gameId: String
+    ) : MatchEvent()
+
+    object RematchRejected : MatchEvent()
+
+    data class RematchAccepted(
+        val newGameId: String
+    ) : MatchEvent()
+
 
     data class Error(
         val message: String

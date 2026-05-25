@@ -39,6 +39,12 @@ class  RemoteChessEngine(
                     }
                 }
 
+                is SocketEvent.GameOver -> {
+                    val current = _gameState.value
+                    _gameState.value = current.copy(
+                        status = SocketEvent.GameStatus.FINISHED
+                    )
+                }
 
                 else -> Unit
             }

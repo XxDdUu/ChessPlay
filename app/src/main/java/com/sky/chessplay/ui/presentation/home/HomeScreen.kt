@@ -31,6 +31,7 @@ fun HomeScreen(
     onPlayClick: () -> Unit,
     onMultiplayerClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onAIPlayClick: () -> Unit,
     onLogout: () -> Unit
 ) {
     val user = (authState as? AuthState.Authenticated)?.user
@@ -92,7 +93,7 @@ fun HomeScreen(
 
                 HomeMenuButton(
                     text = "YOU vs AI",
-                    onClick = {}
+                    onClick = onAIPlayClick
                 )
 
                 HomeMenuButton(

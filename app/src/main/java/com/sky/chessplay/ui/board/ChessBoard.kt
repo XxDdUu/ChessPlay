@@ -40,6 +40,7 @@ fun ChessBoard(
     onSquareSizeChanged: (Int) -> Unit,
     applyPromotion: (Promotion) -> Unit,
     cancelPromotion: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val squaresByPosition = Position.entries.associateWith { Square(it, gameState) }
     val isFlipped = uiState.isFlipped
@@ -48,8 +49,7 @@ fun ChessBoard(
     val files = if (isFlipped) File.entries.reversed() else File.entries
 
     Box(
-        modifier = Modifier
-            .aspectRatio(1f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier
@@ -146,6 +146,7 @@ fun PreviewChessBoard() {
         onDrag = {},
         onDragEnd = {},
         applyPromotion = {},
+        cancelPromotion = {},
         onSquareSizeChanged = {}
-    ) { }
+    )
 }

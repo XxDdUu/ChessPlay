@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.root
 
+import AiPlayRoute
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -70,6 +71,9 @@ fun ChessPlayRoot() {
                         }
                     },
                     onSettingsClick = {},
+                    onAIPlayClick = {
+                        navController.navigate(Route.AIPlay.route)
+                    },
                     navController = navController,
                     authState = authState,
                     onLogout =  { authViewModel.logout() }
@@ -128,6 +132,25 @@ fun ChessPlayRoot() {
                     onNavigateToDiscover = {
                         navController.navigate("friend_discover")
                     },
+                    navController = navController
+                )
+            }
+            composable(Route.AIPlay.route) {
+                if (authState !is AuthState.Authenticated) {
+
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Route.Auth.route) {
+                            popUpTo(Route.AIPlay.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+
+                    return@composable
+                }
+
+                AiPlayRoute(
                     navController = navController
                 )
             }

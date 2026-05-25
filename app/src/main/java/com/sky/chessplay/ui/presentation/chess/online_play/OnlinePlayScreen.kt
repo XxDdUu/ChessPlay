@@ -14,11 +14,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,9 +41,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
+import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.domain.state.FriendState
+import com.sky.chessplay.ui.component.online_play.BottomActions
 import com.sky.chessplay.ui.component.online_play.OnlineInfoPanel
+import com.sky.chessplay.ui.component.online_play.PlayerSection
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.layout.TopBarAction
@@ -187,8 +195,8 @@ fun OnlinePlayScreen(
 
                         Column(
                             modifier = Modifier
-                                .wrapContentHeight()
-                                .fillMaxWidth(),
+                                .fillMaxSize()
+                                .padding(bottom = 8.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -202,7 +210,9 @@ fun OnlinePlayScreen(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Box(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth(),
                                 contentAlignment = Alignment.Center
                             ) {
                                 ChessBoard(
@@ -217,6 +227,33 @@ fun OnlinePlayScreen(
                                     onSquareSizeChanged = viewModel::onSquareSizeChanged
                                 )
                             }
+
+                            PlayerSection(
+                                gameState = gameState,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            BottomActions(
+                                rematchOffered = rematchOffered,
+                                rematchSent = rematchSent,
+                                onChatClick = {
+                                    showChat = true
+                                    chatViewModel.isChatOpened = true
+                                    chatViewModel.markAsRead()
+                                },
+                                onOfferRematch = {
+                                    matchViewModel.gameId?.let(onlineGameViewModel::offerRematch)
+                                },
+                                onAcceptRematch = {
+                                    matchViewModel.gameId?.let(onlineGameViewModel::acceptRematch)
+                                },
+                                onRejectRematch = {
+                                    matchViewModel.gameId?.let(onlineGameViewModel::rejectRematch)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 }
@@ -249,6 +286,123 @@ fun OnlinePlayScreen(
                             .fillMaxWidth()
                             .height(500.dp)
                     )
+                }
+            }
+        }
+
+        if (gameState.status == SocketEvent.GameStatus.FINISHED) {
+            Dialog(
+                onDismissRequest = { /* No-op to prevent dismissal */ }
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color(0xFF111827),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "GAME OVER",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+
+                        val statusMsg = buildString {
+                            append("Finished")
+                            val reason = onlineGameViewModel.gameOverReason
+                            val result = onlineGameViewModel.gameOverResult
+                            if (!reason.isNullOrBlank() || !result.isNullOrBlank()) {
+                                append(": ")
+                                if (!reason.isNullOrBlank()) append(reason)
+                                if (!result.isNullOrBlank()) append(" ($result)")
+                            }
+                        }
+
+                        Text(
+                            text = statusMsg,
+                            fontSize = 16.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        if (rematchOffered) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Opponent offered a rematch!",
+                                    color = Color(0xFF4ADE80),
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    textAlign = TextAlign.Center
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            matchViewModel.gameId?.let { onlineGameViewModel.acceptRematch(it) }
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(48.dp)
+                                    ) {
+                                        Text("Accept")
+                                    }
+                                    OutlinedButton(
+                                        onClick = {
+                                            matchViewModel.gameId?.let { onlineGameViewModel.rejectRematch(it) }
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(48.dp)
+                                    ) {
+                                        Text("Decline")
+                                    }
+                                }
+                            }
+                        } else if (rematchSent) {
+                            Text(
+                                text = "Rematch offer sent...",
+                                color = Color.Gray,
+                                fontSize = 15.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        } else {
+                            Button(
+                                onClick = {
+                                    matchViewModel.gameId?.let { onlineGameViewModel.offerRematch(it) }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(48.dp)
+                            ) {
+                                Text("Offer Rematch")
+                            }
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(48.dp)
+                        ) {
+                            Text("Leave Match")
+                        }
+                    }
                 }
             }
         }

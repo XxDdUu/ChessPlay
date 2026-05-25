@@ -1,15 +1,35 @@
 package com.sky.chessplay.ui.component.online_play
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
@@ -21,37 +41,289 @@ fun OnlineInfoPanel(
     viewModel: ChessViewModel,
     modifier: Modifier = Modifier
 ) {
-
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        MatchHeader(
+            statusText = viewModel.buildStatusText(gameState),
+            isMyTurn = gameState.isMyTurn,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OpponentSection(
+            gameState = gameState,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun MatchHeader(
+    statusText: String,
+    isMyTurn: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 4.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = if (isMyTurn) "Your move" else "Opponent move",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = statusText,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+            ) {
+                Text(
+                    text = if (isMyTurn) "ACTIVE" else "WAITING",
+                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OpponentSection(
+    gameState: GameState,
+    modifier: Modifier = Modifier
+) {
+    val opponentSide =
+        gameState.mySide
+            ?.opposite
+            ?.name
+            ?: "--"
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
 
-        Text(
-            text = "Opponent: ${gameState.opponent?.name ?: "..."}",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        Text(
-            text = "Rating: ${gameState.opponent?.rating ?: "--"}",
-            fontSize = 16.sp
-        )
+            // Avatar
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
 
-        Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = gameState.opponent
+                        ?.name
+                        ?.firstOrNull()
+                        ?.uppercase() ?: "?",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
-        Text(
-            text = "Your Side: ${gameState.mySide}",
-            fontSize = 16.sp
-        )
+            Spacer(modifier = Modifier.width(12.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
+            // Name + rating
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
 
-        Text(
-            text = viewModel.buildStatusText(gameState),
-            fontSize = 16.sp,
-            color = if (gameState.isMyTurn) Color.Green else Color.Gray
-        )
+                Text(
+                    text = gameState.opponent?.name
+                        ?: "Waiting...",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+
+                Text(
+                    text = "${gameState.opponent?.rating ?: "--"} • $opponentSide",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // Online indicator
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(
+                            Color(0xFF4CAF50),
+                            CircleShape
+                        )
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "LIVE",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF4CAF50)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerSection(
+    gameState: GameState,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "You",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Side: ${gameState.mySide?.name ?: "Unknown"}",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Text(
+                text = if (gameState.mySide == null) "Waiting" else "Ready",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+fun BottomActions(
+    rematchOffered: Boolean,
+    rematchSent: Boolean,
+    onChatClick: () -> Unit,
+    onOfferRematch: () -> Unit,
+    onAcceptRematch: () -> Unit,
+    onRejectRematch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Button(
+                onClick = onChatClick,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(48.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Chat, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Chat")
+            }
+            OutlinedButton(
+                onClick = onOfferRematch,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(48.dp),
+                enabled = !rematchSent && !rematchOffered
+            ) {
+                Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Rematch")
+            }
+        }
+
+        if (rematchOffered) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = onAcceptRematch,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(48.dp)
+                ) {
+                    Text("Accept")
+                }
+                OutlinedButton(
+                    onClick = onRejectRematch,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(48.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Reject")
+                }
+            }
+            Text(
+                text = "Opponent offered a rematch.",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+        } else if (rematchSent) {
+            Text(
+                text = "Rematch request sent.",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+        }
     }
 }

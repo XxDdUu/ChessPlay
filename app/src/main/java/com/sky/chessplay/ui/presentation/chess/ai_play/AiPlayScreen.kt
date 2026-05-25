@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.sky.chessplay.data.remote.dto.response.AiModelInfo
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
@@ -28,6 +29,8 @@ import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.ui.component.ai.AiControlPanel
 import com.sky.chessplay.ui.component.ai.MoveHistoryCard
 import com.sky.chessplay.ui.component.ai.StatusCard
+import com.sky.chessplay.ui.layout.AppScaffold
+import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.state.UiState
 import model.state.GameState
 import view.board.ChessBoard
@@ -36,6 +39,7 @@ import view.board.ChessBoard
 fun AiPlayScreen(
     gameState: GameState,
     uiState: UiState,
+    navController: NavHostController,
 
     isThinking: Boolean,
     isLoading: Boolean,
@@ -68,7 +72,14 @@ fun AiPlayScreen(
 
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-
+    AppScaffold(
+        navController = navController,
+        config = AppScaffoldConfig(
+            title = "AI PLAY",
+            showTopBar = true,
+            showBottomBar = false
+        )
+    ) { padding ->
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -200,5 +211,6 @@ fun AiPlayScreen(
                 }
             )
         }
+    }
     }
 }

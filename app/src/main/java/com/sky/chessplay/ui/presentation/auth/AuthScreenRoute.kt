@@ -24,7 +24,14 @@ fun AuthScreenRoute(
     viewModel: AuthViewModel
 ) {
     val state by viewModel.authState.collectAsStateWithLifecycle()
-    val email by viewModel.email.collectAsState()
+    val currentStep by viewModel.currentStep.collectAsStateWithLifecycle()
+    val isLoginMode by viewModel.isLoginMode.collectAsStateWithLifecycle()
+
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val password by viewModel.password.collectAsStateWithLifecycle()
+    val username by viewModel.username.collectAsStateWithLifecycle()
+    val confirmPassword by viewModel.confirmPassword.collectAsStateWithLifecycle()
+    val countryCode by viewModel.countryCode.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
@@ -35,6 +42,7 @@ fun AuthScreenRoute(
             }
         }
     }
+
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
@@ -49,9 +57,7 @@ fun AuthScreenRoute(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-
         try {
             val account = task.getResult(ApiException::class.java)
             val idToken = account.idToken
@@ -63,24 +69,33 @@ fun AuthScreenRoute(
             } else {
                 Log.e("GOOGLE", "Token NULL 💀")
             }
-
         } catch (e: ApiException) {
             Log.e("GOOGLE", "Login failed code=${e.statusCode}", e)
         }
     }
 
-
     AuthScreen(
+        currentStep = currentStep,
+        isLoginMode = isLoginMode,
         email = email,
+        password = password,
+        username = username,
+        confirmPassword = confirmPassword,
+        countryCode = countryCode,
         onEmailChange = { viewModel.onEmailChange(it) },
+        onPasswordChange = { viewModel.onPasswordChange(it) },
+        onUsernameChange = { viewModel.onUsernameChange(it) },
+        onConfirmPasswordChange = { viewModel.onConfirmPasswordChange(it) },
+        onCountryCodeChange = { viewModel.onCountryCodeChange(it) },
+        onLoginModeChange = { viewModel.setLoginMode(it) },
         onNextClick = { viewModel.onNextClick() },
-
+        onLoginClick = { viewModel.onLoginClick() },
+        onRegisterClick = { viewModel.onRegisterClick() },
+        onBackClick = { viewModel.goBack() },
         onGoogleClick = {
             launcher.launch(googleClient.signInIntent)
         },
-
         state = state,
         navController = navController
     )
 }
-

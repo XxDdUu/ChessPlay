@@ -1,15 +1,18 @@
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.sky.chessplay.ui.presentation.chess.ai_play.AiPlayScreen
 import com.sky.chessplay.ui.presentation.chess.ai_play.AiPlayViewModel
 
 @Composable
 fun AiPlayRoute(
-    viewModel: AiPlayViewModel = hiltViewModel()
+    viewModel: AiPlayViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     AiPlayScreen(
         gameState = viewModel.gameState,
         uiState = viewModel.uiState,
+        navController = navController,
         isThinking = viewModel.isThinking,
         isLoading = viewModel.isLoading,
         apiError = viewModel.apiError,

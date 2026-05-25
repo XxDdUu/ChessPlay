@@ -51,7 +51,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://10.0.2.2:8087/\""
+                "\"https://chess.caelestial.store/\""
             )
 
             buildConfigField(
@@ -62,7 +62,7 @@ android {
             buildConfigField(
                 "String",
                 "GOOGLE_WEB_CLIENT_ID",
-                "\"818283934941-pkc6070np750322csfe1n6efpo1j1fsl.apps.googleusercontent.com\""
+                "\"599331175768-2rk7fdpri16ncb3iu3sbful0hslehdq7.apps.googleusercontent.com\""
             )
             manifestPlaceholders["app_name"] = "Chess Play (Dev)"
         }
@@ -72,7 +72,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://api.myapp.com\""
+                "\"https://chess.caelestial.store/\""
             )
             buildConfigField(
                 "String",
@@ -82,7 +82,7 @@ android {
             buildConfigField(
                 "String",
                 "GOOGLE_WEB_CLIENT_ID",
-                "\"818283934941-pkc6070np750322csfe1n6efpo1j1fsl.apps.googleusercontent.com\""
+                "\"599331175768-2rk7fdpri16ncb3iu3sbful0hslehdq7.apps.googleusercontent.com\""
             )
             manifestPlaceholders["app_name"] = "ChessPlay"
         }

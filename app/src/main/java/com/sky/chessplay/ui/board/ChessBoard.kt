@@ -45,8 +45,13 @@ fun ChessBoard(
     val squaresByPosition = Position.entries.associateWith { Square(it, gameState) }
     val isFlipped = uiState.isFlipped
 
-    val ranks = if (isFlipped) Rank.entries else Rank.entries.reversed()
-    val files = if (isFlipped) File.entries.reversed() else File.entries
+    val ranks =
+        if (isFlipped) Rank.entries
+        else Rank.entries.reversed()
+
+    val files =
+        if (isFlipped) File.entries.reversed()
+        else File.entries
 
     Box(
         modifier = modifier.aspectRatio(1f)

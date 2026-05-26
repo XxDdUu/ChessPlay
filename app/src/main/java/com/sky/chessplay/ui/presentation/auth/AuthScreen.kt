@@ -524,7 +524,7 @@ fun AuthScreen(
                         tint = Color.Unspecified
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Tiếp tục với Google", fontWeight = FontWeight.Bold)
+                    Text("Continue with Google", fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

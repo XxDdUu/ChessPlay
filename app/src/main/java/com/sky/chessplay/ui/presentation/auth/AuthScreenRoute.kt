@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -36,9 +35,28 @@ fun AuthScreenRoute(
     val context = LocalContext.current
 
     LaunchedEffect(state) {
+
         if (state is AuthState.Authenticated) {
-            navController.navigate(Route.OnlineGameMode.route) {
-                popUpTo(Route.Auth.route) { inclusive = true }
+
+            val previousEntry = navController.previousBackStackEntry
+
+            val shouldOpenAi =
+                previousEntry
+                    ?.savedStateHandle
+                    ?.get<Boolean>("open_ai_after_auth") == true
+
+            if (shouldOpenAi) {
+
+                previousEntry.savedStateHandle["auth_success"] = true
+
+                navController.popBackStack()
+            } else {
+
+                navController.navigate(Route.OnlineGameMode.route) {
+                    popUpTo(Route.Auth.route) {
+                        inclusive = true
+                    }
+                }
             }
         }
     }

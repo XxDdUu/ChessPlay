@@ -18,7 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.sky.chessplay.data.remote.dto.response.AiModelInfo
+import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.state.AuthState
+import com.sky.chessplay.ui.component.ai.AiSetupModal
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.home.HomeMenuButton
 import com.sky.chessplay.ui.layout.AppScaffold
@@ -31,7 +34,22 @@ fun HomeScreen(
     onPlayClick: () -> Unit,
     onMultiplayerClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onAIPlayClick: () -> Unit,
+    showAiModal: Boolean,
+    isLoading: Boolean,
+
+    aiModels: List<AiModelInfo>,
+    selectedModel: String,
+    difficulty: Int,
+    playerColor: Side,
+
+    onOpenAiModal: () -> Unit,
+    onDismissAiModal: () -> Unit,
+
+    onSelectModel: (String) -> Unit,
+    onDifficultyChange: (Int) -> Unit,
+    onPlayerColorChange: (Side) -> Unit,
+
+    onStartAiGame: () -> Unit,
     onLogout: () -> Unit
 ) {
     val user = (authState as? AuthState.Authenticated)?.user
@@ -93,7 +111,7 @@ fun HomeScreen(
 
                 HomeMenuButton(
                     text = "YOU vs AI",
-                    onClick = onAIPlayClick
+                    onClick = onOpenAiModal
                 )
 
                 HomeMenuButton(
@@ -107,6 +125,27 @@ fun HomeScreen(
                 )
             }
         }
+        AiSetupModal(
+            show = showAiModal,
+
+            aiModels = aiModels,
+            selectedModel = selectedModel,
+            difficulty = difficulty,
+            playerColor = playerColor,
+
+            isLoading = isLoading,
+
+            onDismiss = onDismissAiModal,
+
+            onSelectModel = onSelectModel,
+            onDifficultyChange = onDifficultyChange,
+            onPlayerColorChange = onPlayerColorChange,
+
+            onStartGame = {
+                onDismissAiModal()
+                onStartAiGame()
+            }
+        )
     }
 }
 

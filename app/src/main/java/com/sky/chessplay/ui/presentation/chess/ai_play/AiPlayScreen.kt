@@ -22,12 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.sky.chessplay.data.remote.dto.response.AiModelInfo
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
-import com.sky.chessplay.domain.model.chess.Side
-import com.sky.chessplay.ui.component.ai.AiControlPanel
 import com.sky.chessplay.ui.component.ai.MoveHistoryCard
+import com.sky.chessplay.ui.component.ai.ResignSection
 import com.sky.chessplay.ui.component.ai.StatusCard
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
@@ -37,27 +35,21 @@ import view.board.ChessBoard
 
 @Composable
 fun AiPlayScreen(
+
     gameState: GameState,
     uiState: UiState,
+
     navController: NavHostController,
 
     isThinking: Boolean,
     isLoading: Boolean,
     apiError: String?,
 
-    aiModels: List<AiModelInfo>,
-    selectedModel: String,
-    difficulty: Int,
-    playerColor: Side,
     gameId: String?,
+
     statusText: String,
     history: List<String>,
 
-    onSelectModel: (String) -> Unit,
-    onDifficultyChange: (Int) -> Unit,
-    onPlayerColorChange: (Side) -> Unit,
-
-    onStartGame: () -> Unit,
     onResignGame: () -> Unit,
     onDismissError: () -> Unit,
 
@@ -65,8 +57,10 @@ fun AiPlayScreen(
     onDragStart: (Position) -> Unit,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
+
     onApplyPromotion: (Promotion) -> Unit,
     onCancelPromotion: () -> Unit,
+
     onSquareSizeChanged: (Int) -> Unit
 ) {
 
@@ -100,20 +94,6 @@ fun AiPlayScreen(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-
-                    AiControlPanel(
-                        aiModels = aiModels,
-                        selectedModel = selectedModel,
-                        difficulty = difficulty,
-                        playerColor = playerColor,
-                        gameStarted = gameId != null,
-                        isLoading = isLoading,
-                        onSelectModel = onSelectModel,
-                        onDifficultyChange = onDifficultyChange,
-                        onPlayerColorChange = onPlayerColorChange,
-                        onStartGame = onStartGame,
-                        onResignGame = onResignGame
-                    )
 
                     StatusCard(
                         text = statusText,
@@ -175,21 +155,9 @@ fun AiPlayScreen(
                         onSquareSizeChanged = onSquareSizeChanged
                     )
                 }
-
-                AiControlPanel(
-                    aiModels = aiModels,
-                    selectedModel = selectedModel,
-                    difficulty = difficulty,
-                    playerColor = playerColor,
-                    gameStarted = gameId != null,
-                    isLoading = isLoading,
-                    onSelectModel = onSelectModel,
-                    onDifficultyChange = onDifficultyChange,
-                    onPlayerColorChange = onPlayerColorChange,
-                    onStartGame = onStartGame,
+                ResignSection(
                     onResignGame = onResignGame
                 )
-
                 MoveHistoryCard(history)
             }
         }

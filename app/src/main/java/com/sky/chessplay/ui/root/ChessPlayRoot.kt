@@ -11,9 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.sky.chessplay.data.remote.GoogleAuthClient
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
@@ -26,6 +28,7 @@ import com.sky.chessplay.ui.presentation.chess.online_play.OnlineGameModeScreen
 import com.sky.chessplay.ui.presentation.chess.online_play.OnlinePlayScreen
 import com.sky.chessplay.ui.presentation.community.FriendRoute
 import com.sky.chessplay.ui.presentation.home.HomeScreen
+import com.sky.chessplay.ui.presentation.home.HomeViewModel
 
 @Composable
 fun ChessPlayRoot() {
@@ -36,8 +39,7 @@ fun ChessPlayRoot() {
     val googleAuthClient = remember { GoogleAuthClient(context) }
     val matchViewModel: MatchViewModel = hiltViewModel()
     val chessViewModel: ChessViewModel = hiltViewModel()
-
-
+    val homeViewModel: HomeViewModel = hiltViewModel()
     rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -57,6 +59,25 @@ fun ChessPlayRoot() {
             startDestination = Route.Home.route,
         ) {
             composable(Route.Home.route) {
+                val savedStateHandle =
+                    navController.currentBackStackEntry?.savedStateHandle
+
+                val shouldOpenAi =
+                    savedStateHandle?.get<Boolean>("open_ai_after_auth") == true
+
+                val authSuccess =
+                    savedStateHandle?.get<Boolean>("auth_success") == true
+
+                LaunchedEffect(authSuccess, shouldOpenAi) {
+
+                    if (authSuccess && shouldOpenAi) {
+
+                        homeViewModel.openAiModal()
+
+                        savedStateHandle.remove<Boolean>("auth_success")
+                        savedStateHandle.remove<Boolean>("open_ai_after_auth")
+                    }
+                }
                 HomeScreen(
                     onPlayClick = {
                         navController.navigate(Route.OfflinePlay.route)
@@ -71,12 +92,49 @@ fun ChessPlayRoot() {
                         }
                     },
                     onSettingsClick = {},
-                    onAIPlayClick = {
-                        navController.navigate(Route.AIPlay.route)
-                    },
                     navController = navController,
                     authState = authState,
-                    onLogout =  { authViewModel.logout() }
+                    onLogout =  { authViewModel.logout() },
+                    showAiModal = homeViewModel.showAiModal,
+
+                    aiModels = homeViewModel.aiModels,
+                    selectedModel = homeViewModel.selectedModel,
+                    difficulty = homeViewModel.difficulty,
+                    playerColor = homeViewModel.playerColor,
+
+                    isLoading = homeViewModel.isLoading,
+
+                    onOpenAiModal = {
+                        if (authState is AuthState.Authenticated) {
+                            homeViewModel.openAiModal()
+                        } else {
+
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("open_ai_after_auth", true)
+
+                            navController.navigate(Route.Auth.route)
+                        }
+                    },
+                    onDismissAiModal = homeViewModel::closeAiModal,
+
+                    onSelectModel = homeViewModel::selectModel,
+                    onDifficultyChange = homeViewModel::changeDifficulty,
+                    onPlayerColorChange = homeViewModel::changePlayerColor,
+
+                    onStartAiGame = {
+
+                        val config = homeViewModel.buildAiConfig()
+
+                        navController.navigate(
+                            Route.AIPlay.createRoute(
+                                model = config.model,
+                                difficulty = config.difficulty,
+                                side = config.side.name
+                            )
+                        )
+                    }
+
                 )
             }
 
@@ -135,21 +193,24 @@ fun ChessPlayRoot() {
                     navController = navController
                 )
             }
-            composable(Route.AIPlay.route) {
-                if (authState !is AuthState.Authenticated) {
+            composable(
+                route = Route.AIPlay.route,
 
-                    LaunchedEffect(Unit) {
-                        navController.navigate(Route.Auth.route) {
-                            popUpTo(Route.AIPlay.route) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
+                arguments = listOf(
+
+                    navArgument("model") {
+                        type = NavType.StringType
+                    },
+
+                    navArgument("difficulty") {
+                        type = NavType.IntType
+                    },
+
+                    navArgument("side") {
+                        type = NavType.StringType
                     }
-
-                    return@composable
-                }
-
+                )
+            ) {
                 AiPlayRoute(
                     navController = navController
                 )

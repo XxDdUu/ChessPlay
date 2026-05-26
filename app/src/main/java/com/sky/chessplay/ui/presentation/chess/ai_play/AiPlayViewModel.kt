@@ -1,9 +1,12 @@
 package com.sky.chessplay.ui.presentation.chess.ai_play
 
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.data.engine.AiChessEngine
@@ -15,28 +18,47 @@ import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.repository.AiRepository
 import com.sky.chessplay.domain.socket.SocketEvent
-import com.sky.chessplay.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import model.service.ChessUiService
-import model.state.GameState
 import javax.inject.Inject
 
 @HiltViewModel
 class AiPlayViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val aiRepository: AiRepository,
     private val uiService: ChessUiService,
     @AiEngine private val aiEngine: ChessEngine
 ) : ViewModel() {
-
     private val aiChessEngine = aiEngine as AiChessEngine
+
+    var playerColor by mutableStateOf(
+        Side.valueOf(
+            savedStateHandle.get<String>("side")
+                ?: "WHITE"
+        )
+    )
+        private set
 
     var gameState by mutableStateOf(uiService.gameState)
         private set
 
-    var uiState by mutableStateOf(uiService.uiState)
+    var uiState by mutableStateOf(
+        uiService.uiState.copy(
+            isFlipped = playerColor == Side.BLACK,
+            canInteract = { square ->
+                if (gameState.mySide == null) {
+                    square.piece?.side == gameState.sideToPlay
+                } else {
+                    square.piece?.side == gameState.mySide && gameState.isMyTurn
+                }
+            },
+            shouldAnimate = { square ->
+                if (gameState.mySide == null) true
+                else square.piece?.side == gameState.mySide
+            }
+        )
+    )
         private set
 
     var isThinking by mutableStateOf(false)
@@ -51,9 +73,17 @@ class AiPlayViewModel @Inject constructor(
     // Configuration Settings
     var aiModels by mutableStateOf<List<AiModelInfo>>(emptyList())
         private set
-    var selectedModel by mutableStateOf("best_model")
-    var difficulty by mutableStateOf(3) // Default to 3
-    var playerColor by mutableStateOf(Side.WHITE)
+    var selectedModel by mutableStateOf(
+        savedStateHandle.get<String>("model")
+            ?: "best_model"
+    )
+        private set
+
+    var difficulty by mutableIntStateOf(
+        savedStateHandle.get<Int>("difficulty")
+            ?: 3
+    )
+        private set
 
     var gameId by mutableStateOf<String?>(null)
         private set
@@ -64,7 +94,20 @@ class AiPlayViewModel @Inject constructor(
     init {
         uiService.updateOnStateChanges {
             gameState = it
-            uiState = uiService.uiState
+            uiState = uiService.uiState.copy(
+                isFlipped = playerColor == Side.BLACK,
+                canInteract = { square ->
+                    if (gameState.mySide == null) {
+                        square.piece?.side == gameState.sideToPlay
+                    } else {
+                        square.piece?.side == gameState.mySide && gameState.isMyTurn
+                    }
+                },
+                shouldAnimate = { square ->
+                    if (gameState.mySide == null) true
+                    else square.piece?.side == gameState.mySide
+                }
+            )
         }
 
         // Collect engine state flows
@@ -82,23 +125,96 @@ class AiPlayViewModel @Inject constructor(
                 apiError = error
             }
         }
-
-        loadModels()
-        checkActiveGame()
+        initializeGame()
     }
-
-    private fun loadModels() {
+    private fun initializeGame() {
         viewModelScope.launch {
+
+            isLoading = true
+
             try {
-                val response = aiRepository.getAvailableModels()
-                aiModels = response.models ?: emptyList()
-                selectedModel = response.default ?: response.models?.firstOrNull()?.key ?: "best_model"
+
+                val active = aiRepository.checkActiveGame()
+
+                if (active != null) {
+
+                    gameId = active.gameId
+                    selectedModel = active.aiModel
+                    difficulty = active.difficulty
+
+                    playerColor =
+                        if (active.playerColor.uppercase() == "WHITE") {
+                            Side.WHITE
+                        } else {
+                            Side.BLACK
+                        }
+
+                    gameHistory = active.history ?: emptyList()
+                    Log.d("HISTORY_DEBUG", "checkActiveGame history = ${active.history}")
+                    val gameInit = SocketEvent.GameInit(
+                        gameId = active.gameId,
+                        side = playerColor,
+                        fen = active.fen,
+                        opponentId = 0,
+                        opponentName = active.aiModel,
+                        opponentRating = 1500 + active.difficulty * 100,
+                        history = active.history
+                    )
+
+                    uiService.initAi(gameInit)
+
+                } else {
+
+                    startGameInternal()
+                }
+
             } catch (e: Exception) {
-                aiModels = listOf(AiModelInfo("best_model", "Default Best Model"))
-                selectedModel = "best_model"
+
+                apiError = e.message
+
+            } finally {
+
+                isLoading = false
             }
         }
     }
+    fun startGame() {
+        viewModelScope.launch {
+            startGameInternal()
+        }
+    }
+    private suspend fun startGameInternal() {
+        apiError = null
+
+        try {
+
+            val response = aiRepository.startGame(
+                selectedModel,
+                difficulty,
+                playerColor.name
+            )
+
+            gameId = response.gameId
+            gameHistory = response.history ?: emptyList()
+
+            val gameInit = SocketEvent.GameInit(
+                gameId = response.gameId,
+                side = playerColor,
+                fen = response.fen,
+                opponentId = 0,
+                opponentName = response.aiModel,
+                opponentRating = 1500 + response.difficulty * 100,
+                history = response.history
+            )
+
+            uiService.initAi(gameInit)
+
+        } catch (e: Exception) {
+
+            apiError = e.message ?: "Failed to start match"
+        }
+    }
+
 
     private fun checkActiveGame() {
         viewModelScope.launch {
@@ -127,34 +243,6 @@ class AiPlayViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 // Ignore initial active game check failures silently
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    fun startGame() {
-        viewModelScope.launch {
-            isLoading = true
-            apiError = null
-            try {
-                val colorStr = playerColor.name
-                val response = aiRepository.startGame(selectedModel, difficulty, colorStr)
-                gameId = response.gameId
-                gameHistory = response.history ?: emptyList()
-
-                val gameInit = SocketEvent.GameInit(
-                    gameId = response.gameId,
-                    side = playerColor,
-                    fen = response.fen,
-                    opponentId = 0,
-                    opponentName = response.aiModel,
-                    opponentRating = 1500 + response.difficulty * 100,
-                    history = response.history
-                )
-                uiService.initAi(gameInit)
-            } catch (e: Exception) {
-                apiError = e.message ?: "Failed to start match"
             } finally {
                 isLoading = false
             }

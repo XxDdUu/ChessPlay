@@ -10,6 +10,7 @@ import com.sky.chessplay.domain.model.chess.Move
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.domain.model.chess.Rank
+import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.state.UiState
 import kotlinx.coroutines.CoroutineScope
@@ -91,6 +92,7 @@ class DefaultChessUiService @Inject constructor(
 
 
     override fun onClick(position: Position) {
+        if (!::engine.isInitialized) return
         if (gameState.promotionSelection.isNotEmpty()) return
         val activePosition = gameState.activePosition
         val piece = gameState.piecesByPosition[position]
@@ -120,6 +122,7 @@ class DefaultChessUiService @Inject constructor(
     }
 
     override fun onDragStart(position: Position) {
+        if (!::engine.isInitialized) return
         if (gameState.promotionSelection.isNotEmpty()) return
 
         val squareSize = uiState.squareSize
@@ -128,20 +131,25 @@ class DefaultChessUiService @Inject constructor(
             activePosition = position,
             legalMoves = engine.getLegalMoves(gameState, position)
         )
+        val isFlipped = gameState.mySide == Side.BLACK
+        val col = if (isFlipped) 7 - position.file.ordinal else position.file.ordinal
+        val row = if (isFlipped) position.rank.ordinal else 7 - position.rank.ordinal
+
         uiState = uiState.copy(
             pieceMinDragOffset = Offset(
-                (-position.file.ordinal * squareSize - squareSize / 2).toFloat(),
-                (-(7 - position.rank.ordinal) * squareSize - squareSize / 2).toFloat(),
+                (-col * squareSize - squareSize / 2).toFloat(),
+                (-row * squareSize - squareSize / 2).toFloat(),
             ),
             pieceMaxDragOffset = Offset(
-                ((7 - position.file.ordinal) * squareSize + squareSize / 2).toFloat(),
-                (position.rank.ordinal * squareSize + squareSize / 2).toFloat(),
+                ((7 - col) * squareSize + squareSize / 2).toFloat(),
+                ((7 - row) * squareSize + squareSize / 2).toFloat(),
             ),
         )
         update()
     }
 
     override fun onDrag(offset: Offset) {
+        if (!::engine.isInitialized) return
         if (gameState.promotionSelection.isNotEmpty()) return
 
         val newOffset = uiState.pieceDragOffset + offset
@@ -158,12 +166,15 @@ class DefaultChessUiService @Inject constructor(
     }
 
     override fun onDragEnd() {
+        if (!::engine.isInitialized) return
         if (gameState.promotionSelection.isNotEmpty()) return
 
         val fromPosition = gameState.activePosition ?: error("Can only drag with active square")
+        val isFlipped = gameState.mySide == Side.BLACK
         val toPosition = fromPosition.getTargetPosition(
             offset = uiState.constrainedPieceDragOffset,
             squareSize = uiState.squareSize,
+            isFlipped = isFlipped
         )
 
         val move = gameState.legalMoves.find { it.from == gameState.activePosition && it.to == toPosition }
@@ -187,6 +198,7 @@ class DefaultChessUiService @Inject constructor(
     }
 
     override fun applyPromotion(promotion: Promotion) {
+        if (!::engine.isInitialized) return
         engine.makeMove(gameState, promotion)
         update()
     }
@@ -217,15 +229,32 @@ class DefaultChessUiService @Inject constructor(
     }
 
     private fun update() {
-        observers.forEach { it(gameState) }
+        val state = gameState
+        uiState = uiState.copy(
+            isFlipped = state.mySide == Side.BLACK,
+            canInteract = { square ->
+                if (state.mySide == null) {
+                    square.piece?.side == state.sideToPlay
+                } else {
+                    square.piece?.side == state.mySide && state.isMyTurn
+                }
+            },
+            shouldAnimate = { square ->
+                if (state.mySide == null) true
+                else square.piece?.side == state.mySide
+            }
+        )
+        observers.forEach { it(state) }
     }
 }
 
-fun Position.getTargetPosition(offset: Offset, squareSize: Int): Position? {
+fun Position.getTargetPosition(offset: Offset, squareSize: Int, isFlipped: Boolean): Position? {
     fun Float.addDirectionalHalf() = if (this > 0) this + 0.499 else this - 0.499
 
-    val addFiles = (offset.x / squareSize).addDirectionalHalf().toInt()
-    val addRanks = -(offset.y / squareSize).addDirectionalHalf().toInt()
+    val addCols = (offset.x / squareSize).addDirectionalHalf().toInt()
+    val addRows = (offset.y / squareSize).addDirectionalHalf().toInt()
+    val addFiles = if (isFlipped) -addCols else addCols
+    val addRanks = if (isFlipped) addRows else -addRows
     val newFileOrdinal = file.ordinal + addFiles
     val newRankOrdinal = rank.ordinal + addRanks
 

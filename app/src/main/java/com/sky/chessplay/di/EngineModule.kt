@@ -11,6 +11,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+import javax.inject.Singleton
+
 @Module
 @InstallIn(SingletonComponent::class)
 object EngineModule {
@@ -31,6 +33,7 @@ object EngineModule {
 
     @AiEngine
     @Provides
+    @Singleton
     fun provideAiEngine(
         aiRepository: AiRepository
     ): ChessEngine {

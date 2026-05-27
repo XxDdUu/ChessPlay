@@ -18,8 +18,8 @@ class AuthService @Inject constructor(
         return api.login(userData)
     }
 
-    suspend fun getMe(token: String): UserResponse {
-        return api.me("Bearer $token")
+    suspend fun getMe(): UserResponse {
+        return api.me()
     }
     suspend fun googleLogin(userData: GoogleLoginRequest): UserResponse {
         return api.googleLogin(userData)

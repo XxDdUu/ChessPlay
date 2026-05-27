@@ -16,8 +16,7 @@ interface AuthApi {
     @POST("api/auth/register")
     suspend fun  register(@Body req: RegisterRequest): UserResponse
     @GET("api/auth/me")
-    suspend fun me(@Header("Authorization") token: String
-    ): UserResponse
+    suspend fun me(): UserResponse
     @POST("api/auth/google")
     suspend fun googleLogin(
         @Body request: GoogleLoginRequest

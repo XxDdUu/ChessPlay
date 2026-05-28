@@ -52,8 +52,17 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         }
         this.lastToken = token
         reconnectAttempts = 0
+        val wsScheme = if (com.sky.chessplay.BuildConfig.BASE_URL.startsWith("https://")) "wss://" else "ws://"
+        val baseUrlWithoutScheme = com.sky.chessplay.BuildConfig.BASE_URL
+            .removePrefix("https://")
+            .removePrefix("http://")
+            .removeSuffix("/")
+        val wsUrl = "$wsScheme$baseUrlWithoutScheme/ws?token=$token"
+
+        Log.d("SOCKET", "Connecting to: $wsUrl")
+
         val request = Request.Builder()
-            .url("ws://10.0.2.2:8087/ws?token=$token")
+            .url(wsUrl)
             .build()
         webSocket = OkHttpClient().newWebSocket(request, socketListener)
     }

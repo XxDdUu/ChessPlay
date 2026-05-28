@@ -51,7 +51,7 @@ class AuthRepositoryImpl @Inject constructor(
                 return Result.failure(Exception("No token"))
             }
 
-            val res = service.getMe(token)
+            val res = service.getMe()
             val user = res.toDomain()
 
             Result.success(user)

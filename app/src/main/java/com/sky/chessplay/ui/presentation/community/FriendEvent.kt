@@ -26,12 +26,12 @@ sealed class FriendEvent {
         val query: String
     ) : FriendEvent()
 
-    data class SendChallenge(
-        val friendId: Long
-    ) : FriendEvent()
-
     data class ConnectFriend(
         val friendId: Long
+    ) : FriendEvent()
+    data class SendChallenge(
+        val friendId: Long,
+        val matchType: String
     ) : FriendEvent()
 
     data object ClearMessage : FriendEvent()

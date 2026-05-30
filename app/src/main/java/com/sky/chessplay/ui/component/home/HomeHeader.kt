@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.component.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 fun HomeHeader(
     username: String,
     avatarUrl: String?,
+    onProfileClick: () -> Unit,
     onLogout: () -> Unit
 ) {
 
@@ -45,6 +47,7 @@ fun HomeHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onProfileClick() }
             .background(
                 Color(0xFF2A2250),
                 shape = RoundedCornerShape(20.dp)

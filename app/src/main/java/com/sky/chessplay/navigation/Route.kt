@@ -8,6 +8,7 @@ sealed class Route(val route: String) {
     data object OnlineGameMode: Route ("online-gamemode")
     data object Auth : Route("authentication")
     data object Friend : Route("community-friend")
+    data object Profile : Route("profile")
     data object AIPlay : Route(
         "ai-play/{model}/{difficulty}/{side}"
     ) {

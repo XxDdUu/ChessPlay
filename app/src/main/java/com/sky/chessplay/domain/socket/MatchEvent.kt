@@ -49,6 +49,10 @@ sealed class MatchEvent {
         val newGameId: String
     ) : MatchEvent()
 
+    data class MatchInvite(
+        val hostId: Long,
+        val hostName: String
+    ) : MatchEvent()
 
     data class Error(
         val message: String

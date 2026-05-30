@@ -20,10 +20,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sky.chessplay.data.remote.dto.response.AiModelInfo
 import com.sky.chessplay.domain.model.chess.Side
+import com.sky.chessplay.domain.socket.MatchEvent
 import com.sky.chessplay.domain.state.AuthState
+import com.sky.chessplay.navigation.Route
 import com.sky.chessplay.ui.component.ai.AiSetupModal
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.home.HomeMenuButton
+import com.sky.chessplay.ui.component.online_play.MatchInvitePopup
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 
@@ -36,6 +39,7 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     showAiModal: Boolean,
     isLoading: Boolean,
+    incomingInvite: MatchEvent.MatchInvite?,
 
     aiModels: List<AiModelInfo>,
     selectedModel: String,
@@ -48,11 +52,15 @@ fun HomeScreen(
     onSelectModel: (String) -> Unit,
     onDifficultyChange: (Int) -> Unit,
     onPlayerColorChange: (Side) -> Unit,
+    onAcceptInvite: (Long) -> Unit,
+    onDismissInvite: () -> Unit,
 
     onStartAiGame: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+
 ) {
     val user = (authState as? AuthState.Authenticated)?.user
+    val invite = incomingInvite
     AppScaffold(
 
         navController = navController,
@@ -78,7 +86,10 @@ fun HomeScreen(
             HomeHeader(
                 username = user?.username ?: "Guest",
                 avatarUrl = user?.avatar,
-                onLogout = onLogout
+                onLogout = onLogout,
+                onProfileClick = {
+                    navController.navigate(Route.Profile.route)
+                }
             )
 
             Spacer(Modifier.height(24.dp))
@@ -145,6 +156,18 @@ fun HomeScreen(
                 onDismissAiModal()
                 onStartAiGame()
             }
+        )
+        MatchInvitePopup(
+            visible = invite != null,
+            hostName = invite?.hostName ?: "",
+
+            onAccept = {
+                incomingInvite?.let {
+                    onAcceptInvite(it.hostId)
+                }
+            },
+
+            onDismiss = onDismissInvite
         )
     }
 }

@@ -84,6 +84,12 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
             .put("gameId", activeGameId)
         webSocket?.send(json.toString())
     }
+    override fun sendResign(gameId: String) {
+        val json = JSONObject()
+            .put("type", "RESIGN")
+            .put("gameId", gameId)
+        webSocket?.send(json.toString())
+    }
 
     override fun sendChatMessage(gameId: String?, message: String) {
         val json = JSONObject()
@@ -101,6 +107,25 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
 
         webSocket?.send(json.toString())
     }
+    override fun inviteFriend(
+        friendId: Long,
+        matchType: String
+    ) {
+        val json = JSONObject()
+            .put("type", "INVITE_FRIEND")
+            .put("friendId", friendId)
+            .put("matchType", matchType)
+
+        webSocket?.send(json.toString())
+    }
+    override fun acceptInvite(hostId: Long) {
+
+        val json = JSONObject()
+            .put("type", "ACCEPT_INVITE")
+            .put("hostId", hostId)
+
+        webSocket?.send(json.toString())
+    }
 
     override fun sendRematchResponse(
         gameId: String,
@@ -109,6 +134,26 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
 
         val json = JSONObject()
             .put("type", "REMATCH_RESPONSE")
+            .put("gameId", gameId)
+            .put("accepted", accepted)
+
+        webSocket?.send(json.toString())
+    }
+
+    override fun sendDrawOffer(gameId: String) {
+        val json = JSONObject()
+            .put("type", "DRAW_OFFER")
+            .put("gameId", gameId)
+
+        webSocket?.send(json.toString())
+    }
+
+    override fun sendDrawResponse(
+        gameId: String,
+        accepted: Boolean
+    ) {
+        val json = JSONObject()
+            .put("type", "DRAW_RESPONSE")
             .put("gameId", gameId)
             .put("accepted", accepted)
 
@@ -280,7 +325,29 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                             message = json.getString("text")
                         )
                     }
-
+                    "DRAW_OFFER" -> {
+                        SocketEvent.DrawOffered(
+                            gameId = json.getString("gameId")
+                        )
+                    }
+                    "DRAW_RESPONSE" -> {
+                        SocketEvent.DrawResponse(
+                            gameId = json.getString("gameId"),
+                            accepted = json.optBoolean("accepted", false)
+                        )
+                    }
+                    "USER_ONLINE" -> {
+                        SocketEvent.FriendPresence(
+                            userId = json.getLong("userId"),
+                            online = true
+                        )
+                    }
+                    "USER_OFFLINE" -> {
+                        SocketEvent.FriendPresence(
+                            userId = json.getLong("userId"),
+                            online = false
+                        )
+                    }
                     else -> null
                 }
 
@@ -304,6 +371,12 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
 
                             lastPrepareGame = it
                         }
+                    }
+                    "MATCH_INVITE" -> {
+                        MatchEvent.MatchInvite(
+                            hostId = json.getLong("hostId"),
+                            hostName = json.getString("hostName")
+                        )
                     }
 
                     "MATCH_CANCELLED" -> MatchEvent.MatchCancelled(

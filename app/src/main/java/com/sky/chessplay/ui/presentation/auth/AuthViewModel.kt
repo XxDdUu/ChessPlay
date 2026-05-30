@@ -2,8 +2,10 @@ package com.sky.chessplay.ui.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sky.chessplay.data.local.datastore.TokenManager
 import com.sky.chessplay.data.remote.dto.request.LoginRequest
 import com.sky.chessplay.domain.repository.AuthRepository
+import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.remote.dto.request.RegisterRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +23,9 @@ enum class AuthStep {
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repo: AuthRepository
+    private val repo: AuthRepository,
+    private val tokenManager: TokenManager,
+    private val chessSocket: ChessSocket
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -151,6 +155,7 @@ class AuthViewModel @Inject constructor(
 
             _authState.value = result.fold(
                 onSuccess = { user ->
+                    connectSocket()
                     AuthState.Authenticated(user)
                 },
                 onFailure = {
@@ -171,9 +176,23 @@ class AuthViewModel @Inject constructor(
 
             val result = repo.login(request)
 
-            _authState.value = result.fold(
-                onSuccess = { AuthState.Authenticated(it) },
-                onFailure = { AuthState.Error(it.message ?: "Đăng nhập thất bại") }
+            result.fold(
+                onSuccess = {
+                    val meResult = repo.getMe()
+                    _authState.value = meResult.fold(
+                        onSuccess = { user ->
+                            connectSocket()
+                            AuthState.Authenticated(user)
+                        },
+                        onFailure = {
+                            AuthState.Error("GetMe failed")
+                        }
+                    )
+                },
+                onFailure = {
+                    _authState.value =
+                        AuthState.Error(it.message ?: "Google login failed")
+                }
             )
         }
     }
@@ -198,6 +217,16 @@ class AuthViewModel @Inject constructor(
                         val loginResult = repo.login(
                             LoginRequest(email = email, password = password)
                         )
+                        val meResult = repo.getMe()
+
+                        _authState.value = meResult.fold(
+                            onSuccess = { user ->
+                                AuthState.Authenticated(user)
+                            },
+                            onFailure = {
+                                AuthState.Error("GetMe failed")
+                            }
+                        )
                         loginResult.fold(
                             onSuccess = { AuthState.Authenticated(it) },
                             onFailure = { AuthState.Error(it.message ?: "Đăng ký thành công nhưng đăng nhập tự động thất bại") }
@@ -216,9 +245,18 @@ class AuthViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
+            chessSocket.disconnect()
             repo.logout()
             _authState.value = AuthState.Unauthenticated
             _currentStep.value = AuthStep.EMAIL
+        }
+    }
+
+    private fun connectSocket() {
+        viewModelScope.launch {
+            tokenManager.getToken()?.let { token ->
+                chessSocket.connect(token)
+            }
         }
     }
 
@@ -234,6 +272,7 @@ class AuthViewModel @Inject constructor(
 
                     _authState.value = meResult.fold(
                         onSuccess = { user ->
+                            connectSocket()
                             AuthState.Authenticated(user)
                         },
                         onFailure = {

@@ -5,7 +5,9 @@ import com.sky.chessplay.data.local.datastore.TokenManager
 import com.sky.chessplay.data.remote.api.AiApi
 import com.sky.chessplay.data.remote.api.AuthApi
 import com.sky.chessplay.data.remote.api.FriendApi
+import com.sky.chessplay.data.remote.api.GameApi
 import com.sky.chessplay.data.remote.api.MatchApi
+import com.sky.chessplay.data.remote.api.ProfileApi
 import com.sky.chessplay.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -58,6 +60,18 @@ object NetworkModule {
     @Singleton
     fun provideFriendApi(retrofit: Retrofit): FriendApi {
         return retrofit.create(FriendApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGameApi(retrofit: Retrofit): GameApi {
+        return retrofit.create(GameApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 
     @Provides

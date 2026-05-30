@@ -72,9 +72,10 @@ class MatchViewModel @Inject constructor(
 
     private var confirmJob: Job? = null
     private var gameCountdownJob: Job? = null
-
-    private var authToken: String? = null
     private var lastUserId: Long? = null
+
+    var incomingInvite by mutableStateOf<MatchEvent.MatchInvite?>(null)
+        private set
     fun onNavigated() {
         navigateToGame = false
     }
@@ -246,7 +247,19 @@ class MatchViewModel @Inject constructor(
             is MatchEvent.RematchAccepted -> Unit
             is MatchEvent.RematchOffered -> Unit
             MatchEvent.RematchRejected -> Unit
+            is MatchEvent.MatchInvite -> {
+                incomingInvite = event
+            }
         }
+    }
+    fun acceptInvite(hostId: Long) {
+
+        socketClient.acceptInvite(hostId)
+
+        clearInvite()
+    }
+    fun clearInvite() {
+        incomingInvite = null
     }
     private fun startConfirmCountdown() {
         confirmJob?.cancel()
@@ -270,5 +283,12 @@ class MatchViewModel @Inject constructor(
                 delay(1000)
             }
         }
+    }
+    fun resetMatchState() {
+        matchState = MatchState.INITIALIZING
+        opponent = null
+        confirmCountdown = 0
+        countdown = 0
+        status = ""
     }
 }

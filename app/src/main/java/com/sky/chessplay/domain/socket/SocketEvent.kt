@@ -33,6 +33,10 @@ sealed class SocketEvent {
 
     data class DrawOffered(val gameId: String) : SocketEvent()
     object DrawRejected : SocketEvent()
+    data class DrawResponse(
+        val gameId: String,
+        val accepted: Boolean
+    ) : SocketEvent()
 
     data class Error(val message: String) : SocketEvent()
     data class RematchOffered(
@@ -63,5 +67,14 @@ sealed class SocketEvent {
         val senderId: Long,
         val senderName: String,
         val message: String,
+    ) : SocketEvent()
+    data class FriendPresence(
+        val userId: Long,
+        val online: Boolean
+    ) : SocketEvent()
+
+    data class PresenceUpdate(
+        val userId: Long,
+        val online: Boolean
     ) : SocketEvent()
 }

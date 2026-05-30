@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -32,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import model.state.GameState
 
@@ -255,6 +258,8 @@ fun BottomActions(
     rematchOffered: Boolean,
     rematchSent: Boolean,
     onChatClick: () -> Unit,
+    onResign: () -> Unit,
+    onOfferDraw: () -> Unit,
     onOfferRematch: () -> Unit,
     onAcceptRematch: () -> Unit,
     onRejectRematch: () -> Unit,
@@ -265,29 +270,57 @@ fun BottomActions(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Button(
+            GradientButton(
+                title = "Chat",
+                icon = Icons.Default.Chat,
                 onClick = onChatClick,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(48.dp)
-            ) {
-                Icon(imageVector = Icons.Default.Chat, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Chat")
-            }
-            OutlinedButton(
+                colors = listOf(
+                    Color(0xFF4FACFE),
+                    Color(0xFF00F2FE)
+                )
+            )
+
+            GradientButton(
+                title = "Rematch",
+                icon = Icons.Default.Refresh,
                 onClick = onOfferRematch,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(48.dp),
-                enabled = !rematchSent && !rematchOffered
-            ) {
-                Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Rematch")
-            }
+                enabled = !rematchSent && !rematchOffered,
+                colors = listOf(
+                    Color(0xFF43E97B),
+                    Color(0xFF38F9D7)
+                )
+            )
         }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            GradientButton(
+                title = "Draw",
+                icon = Icons.Default.Handshake,
+                onClick = onOfferDraw,
+                modifier = Modifier.weight(1f),
+                colors = listOf(
+                    Color(0xFFFFC107),
+                    Color(0xFFFF9800)
+                )
+            )
+
+            GradientButton(
+                title = "Resign",
+                icon = Icons.Default.Flag,
+                onClick = onResign,
+                modifier = Modifier.weight(1f),
+                colors = listOf(
+                    Color(0xFFFF416C),
+                    Color(0xFFFF4B2B)
+                )
+            )
+        }
+    }
 
         if (rematchOffered) {
             Row(
@@ -324,6 +357,5 @@ fun BottomActions(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
-        }
     }
 }

@@ -48,6 +48,8 @@ fun OnlineGameModeScreen(
 
     LaunchedEffect(navigateToGame, gameInit) {
         if (navigateToGame && gameInit != null) {
+            matchViewModel.resetMatchState()
+
             navController.navigate(Route.OnlinePlay.route) {
                 popUpTo("online_mode") { inclusive = true }
             }
@@ -129,22 +131,24 @@ fun OnlineGameModeScreen(
                             (authState as? AuthState.Authenticated)?.user?.let { user ->
                                 matchViewModel.start(user.id)
                             }
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     GradientButton(
                         title = "Create Room",
                         subtitle = "Invite friends to join your game",
                         colors = listOf(Color(0xFF6D5BFF), Color(0xFF4F46E5)),
-                        onClick = { matchViewModel.createRoom() }
-
+                        onClick = { matchViewModel.createRoom() },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     GradientButton(
                         title = "Join Room",
                         subtitle = "Enter a room code",
                         colors = listOf(Color(0xFF8B5CF6), Color(0xFF6D28D9)),
-                        onClick = { showJoinDialog = true }
+                        onClick = { showJoinDialog = true },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

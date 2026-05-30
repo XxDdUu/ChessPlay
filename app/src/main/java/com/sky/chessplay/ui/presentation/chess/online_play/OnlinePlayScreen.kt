@@ -21,9 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,7 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -252,6 +252,12 @@ fun OnlinePlayScreen(
                                 onRejectRematch = {
                                     matchViewModel.gameId?.let(onlineGameViewModel::rejectRematch)
                                 },
+                                onResign = {
+                                    matchViewModel.gameId?.let(onlineGameViewModel::resign)
+                                },
+                                onOfferDraw = {
+                                    matchViewModel.gameId?.let(onlineGameViewModel::offerDraw)
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -286,6 +292,63 @@ fun OnlinePlayScreen(
                             .fillMaxWidth()
                             .height(500.dp)
                     )
+                }
+            }
+        }
+
+        if (onlineGameViewModel.drawOffered) {
+            Dialog(onDismissRequest = { /* prevent dismiss */ }) {
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color(0xFF111827),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "DRAW OFFER",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+
+                        Text(
+                            text = "Opponent offered a draw.",
+                            fontSize = 16.sp,
+                            color = Color.Gray
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    matchViewModel.gameId?.let { onlineGameViewModel.acceptDraw(it) }
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(48.dp)
+                            ) {
+                                Text("Accept")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    matchViewModel.gameId?.let { onlineGameViewModel.rejectDraw(it) }
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(48.dp)
+                            ) {
+                                Text("Decline")
+                            }
+                        }
+                    }
                 }
             }
         }

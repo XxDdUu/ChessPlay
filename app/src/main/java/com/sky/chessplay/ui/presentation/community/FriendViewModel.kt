@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.domain.repository.FriendRepository
+import com.sky.chessplay.domain.socket.ChessSocket
+import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.FriendState
 import com.sky.chessplay.domain.state.FriendUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FriendViewModel @Inject constructor(
-    private val repository: FriendRepository
+    private val repository: FriendRepository,
+    private val chessSocket: ChessSocket
 ) : ViewModel() {
 
     private val _state =
@@ -27,6 +30,16 @@ class FriendViewModel @Inject constructor(
     val state: StateFlow<FriendState> = _state
     var uiState by mutableStateOf(FriendUiState())
         private set
+
+    init {
+        viewModelScope.launch {
+            chessSocket.socketEvents.collect { event ->
+                if (event is SocketEvent.FriendPresence) {
+                    updateFriendPresence(event)
+                }
+            }
+        }
+    }
 
     fun onEvent(event: FriendEvent) {
 
@@ -63,7 +76,10 @@ class FriendViewModel @Inject constructor(
             }
 
             is FriendEvent.SendChallenge -> {
-
+                chessSocket.inviteFriend(
+                    friendId = event.friendId,
+                    matchType = event.matchType
+                )
             }
 
             is FriendEvent.ConnectFriend -> {
@@ -182,6 +198,21 @@ class FriendViewModel @Inject constructor(
             } catch (e: Exception) {
 
             }
+        }
+    }
+
+    private fun updateFriendPresence(presence: SocketEvent.FriendPresence) {
+        val currentState = _state.value
+        if (currentState is FriendState.FriendsLoaded) {
+            _state.value = currentState.copy(
+                friends = currentState.friends.map { friend ->
+                    if (friend.userId == presence.userId) {
+                        friend.copy(status = if (presence.online) "ONLINE" else "OFFLINE")
+                    } else {
+                        friend
+                    }
+                }
+            )
         }
     }
 

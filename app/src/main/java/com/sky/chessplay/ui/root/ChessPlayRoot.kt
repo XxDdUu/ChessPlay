@@ -29,6 +29,7 @@ import com.sky.chessplay.ui.presentation.chess.online_play.OnlinePlayScreen
 import com.sky.chessplay.ui.presentation.community.FriendRoute
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.home.HomeViewModel
+import com.sky.chessplay.ui.presentation.profile.ProfileRoute
 
 @Composable
 fun ChessPlayRoot() {
@@ -121,7 +122,14 @@ fun ChessPlayRoot() {
                     onSelectModel = homeViewModel::selectModel,
                     onDifficultyChange = homeViewModel::changeDifficulty,
                     onPlayerColorChange = homeViewModel::changePlayerColor,
+                    incomingInvite = matchViewModel.incomingInvite,
+                    onAcceptInvite = { hostId ->
+                        matchViewModel.acceptInvite(hostId)
+                    },
 
+                    onDismissInvite = {
+                        matchViewModel.clearInvite()
+                    },
                     onStartAiGame = {
 
                         val config = homeViewModel.buildAiConfig()
@@ -160,6 +168,19 @@ fun ChessPlayRoot() {
                     navController = navController,
                     authState = authState
                 )
+            }
+            composable(Route.Profile.route) {
+                if (authState !is AuthState.Authenticated) {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Route.Auth.route) {
+                            popUpTo(Route.Profile.route) { inclusive = true }
+                        }
+                    }
+
+                    return@composable
+                }
+
+                ProfileRoute(navController = navController, authViewModel = authViewModel)
             }
             composable(Route.Auth.route) {
                 AuthScreenRoute(

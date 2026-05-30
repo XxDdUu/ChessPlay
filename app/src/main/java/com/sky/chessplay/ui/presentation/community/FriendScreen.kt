@@ -2,7 +2,6 @@ package com.sky.chessplay.ui.presentation.community
 
 import FriendEvent
 import FriendEvent.RemoveFriend
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -150,7 +149,6 @@ fun FriendScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Log.d("FRIEND STATE DEBUG", state.toString())
         when (state) {
             is FriendState.Idle -> {
 
@@ -187,6 +185,14 @@ fun FriendScreen(
                                     RemoveFriend(
                                         user1 = currentUserId,
                                         user2 = friend.userId
+                                    )
+                                )
+                            },
+                            onChallengeClick = {
+                                onEvent(
+                                    FriendEvent.SendChallenge(
+                                        friend.userId,
+                                        "rapid"
                                     )
                                 )
                             }

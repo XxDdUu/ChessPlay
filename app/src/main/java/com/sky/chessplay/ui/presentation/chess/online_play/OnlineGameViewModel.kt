@@ -20,6 +20,12 @@ class OnlineGameViewModel @Inject constructor(
     var rematchOffered by mutableStateOf(false)
         private set
 
+    var drawOffered by mutableStateOf(false)
+        private set
+
+    var drawSent by mutableStateOf(false)
+        private set
+
     var rematchSent by mutableStateOf(false)
         private set
 
@@ -44,10 +50,7 @@ class OnlineGameViewModel @Inject constructor(
                         rematchSent = false
                     }
                     is MatchEvent.GameStart -> {
-                        rematchOffered = false
-                        rematchSent = false
-                        gameOverReason = null
-                        gameOverResult = null
+                        resetGameState()
                     }
                     else -> {}
                 }
@@ -62,10 +65,17 @@ class OnlineGameViewModel @Inject constructor(
                         gameOverResult = event.result
                     }
                     is SocketEvent.GameInit -> {
-                        rematchOffered = false
-                        rematchSent = false
-                        gameOverReason = null
-                        gameOverResult = null
+                        resetGameState()
+                    }
+                    is SocketEvent.DrawOffered -> {
+                        drawOffered = true
+                    }
+                    is SocketEvent.DrawResponse -> {
+                        // opponent responded to our draw offer
+                        if (event.accepted) {
+                            drawOffered = false
+                        }
+                        drawSent = false
                     }
                     else -> {}
                 }
@@ -73,9 +83,25 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
+
     fun offerRematch(gameId: String) {
         chessSocket.sendRematchOffer(gameId)
         rematchSent = true
+    }
+
+    fun offerDraw(gameId: String) {
+        chessSocket.sendDrawOffer(gameId)
+        drawSent = true
+    }
+
+    fun acceptDraw(gameId: String) {
+        chessSocket.sendDrawResponse(gameId, true)
+        drawOffered = false
+    }
+
+    fun rejectDraw(gameId: String) {
+        chessSocket.sendDrawResponse(gameId, false)
+        drawOffered = false
     }
 
     fun acceptRematch(gameId: String) {
@@ -87,6 +113,10 @@ class OnlineGameViewModel @Inject constructor(
         rematchOffered = false
     }
 
+    fun resign(gameId: String) {
+        chessSocket.sendResign(gameId)
+    }
+
     fun rejectRematch(gameId: String) {
         chessSocket.sendRematchResponse(
             gameId,
@@ -94,5 +124,15 @@ class OnlineGameViewModel @Inject constructor(
         )
 
         rematchOffered = false
+    }
+    private fun resetGameState() {
+        rematchOffered = false
+        rematchSent = false
+
+        drawOffered = false
+        drawSent = false
+
+        gameOverReason = null
+        gameOverResult = null
     }
 }

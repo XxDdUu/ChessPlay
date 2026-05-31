@@ -36,7 +36,6 @@ androidsvg = "1.4"
 accompanist = "0.34.0"
 appcompat = "1.7.1"
 
-
 # Google & Firebase Auth
 playServicesAuth = "21.3.0"
 material = "1.12.0"
@@ -80,7 +79,6 @@ androidx-compose-material3 = { group = "androidx.wear.compose", name = "compose-
 # Junit & test
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
-
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "testRunner" }
 

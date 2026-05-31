@@ -22,4 +22,5 @@ sealed class Route(val route: String) {
             return "ai-play/$model/$difficulty/$side"
         }
     }
+    data object Replay : Route("replay")
 }

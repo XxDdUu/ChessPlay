@@ -1,23 +1,24 @@
 package com.sky.chessplay.ui.component.profile
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -27,85 +28,86 @@ private val resultOptions = listOf("ALL", "WIN", "LOSS", "DRAW")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterPanel(
-    modifier: Modifier = Modifier,
+fun FilterModal(
     filterOpponent: String,
     filterResult: String,
     onFilterOpponentChange: (String) -> Unit,
     onFilterResultChange: (String) -> Unit,
-    onResetFilters: () -> Unit
+    onResetFilters: () -> Unit,
+    onDismiss: () -> Unit
 ) {
-    val expanded = remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    val resultOptions = listOf("Tất cả", "Thắng", "Thua", "Hòa") // Tùy chỉnh theo data thực tế
 
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF262421)
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                "Tìm kiếm ván đấu",
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = filterOpponent,
-                onValueChange = onFilterOpponentChange,
-                label = {
-                    Text("Đối thủ")
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            ExposedDropdownMenuBox(
-                expanded = expanded.value,
-                onExpandedChange = { expanded.value = it }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("Áp dụng")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onResetFilters()
+                    onDismiss()
+                }
+            ) {
+                Text("Xóa bộ lọc", color = Color.Gray)
+            }
+        },
+        title = {
+            Text("Tìm kiếm ván đấu", color = Color.White, fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
-                    value = filterResult,
-                    onValueChange = { },
-                    readOnly = true,
-                    label = {
-                        Text("Kết quả")
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value)
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                    value = filterOpponent,
+                    onValueChange = onFilterOpponentChange,
+                    label = { Text("Đối thủ") },
+                    placeholder = { Text("Nhập tên đối thủ...") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
-                androidx.compose.material3.DropdownMenu(
-                    expanded = expanded.value,
-                    onDismissRequest = { expanded.value = false }
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
                 ) {
-                    resultOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                onFilterResultChange(option)
-                                expanded.value = false
-                            }
-                        )
+                    OutlinedTextField(
+                        value = filterResult.ifEmpty { "Tất cả" },
+                        onValueChange = { },
+                        readOnly = true,
+                        label = { Text("Kết quả") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        resultOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    onFilterResultChange(if (option == "Tất cả") "" else option)
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
-
-            Spacer(Modifier.height(12.dp))
-
-            FilledTonalButton(
-                onClick = onResetFilters,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Thiết lập lại")
-            }
-        }
-    }
+        },
+        containerColor = Color(0xFF262421),
+        shape = RoundedCornerShape(16.dp)
+    )
 }

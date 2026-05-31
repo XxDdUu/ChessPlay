@@ -1,5 +1,7 @@
 package com.sky.chessplay.ui.component.profile
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sky.chessplay.domain.model.profile.GameHistoryItem
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MatchHistoryCard(
     username: String,

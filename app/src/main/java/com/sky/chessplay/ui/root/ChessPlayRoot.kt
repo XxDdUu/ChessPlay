@@ -2,8 +2,10 @@ package com.sky.chessplay.ui.root
 
 import AiPlayRoute
 import android.app.Activity
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,6 +33,7 @@ import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.home.HomeViewModel
 import com.sky.chessplay.ui.presentation.profile.ProfileRoute
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChessPlayRoot() {
     val context = LocalContext.current

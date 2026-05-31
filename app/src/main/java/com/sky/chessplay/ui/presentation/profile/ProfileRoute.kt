@@ -1,5 +1,7 @@
 package com.sky.chessplay.ui.presentation.profile
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -9,6 +11,7 @@ import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileRoute(
     viewModel: ProfileViewModel = hiltViewModel(),
@@ -35,7 +38,6 @@ fun ProfileRoute(
         onRefresh = { viewModel.loadProfile() },
         onViewFriends = { navController.navigate("community-friend") },
         navController = navController,
-        onReplayClick = { /* TODO: implement replay flow */ },
         onFilterOpponentChange = viewModel::onFilterOpponentChanged,
         onFilterResultChange = viewModel::onFilterResultChanged,
         onResetFilters = viewModel::resetFilters

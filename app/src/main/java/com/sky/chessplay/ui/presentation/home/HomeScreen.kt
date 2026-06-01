@@ -58,7 +58,7 @@ fun HomeScreen(
     onStartAiGame: () -> Unit,
     onLogout: () -> Unit,
 
-) {
+    ) {
     val user = (authState as? AuthState.Authenticated)?.user
     val invite = incomingInvite
     AppScaffold(
@@ -110,13 +110,13 @@ fun HomeScreen(
             ) {
 
                 HomeMenuButton(
-                    text = "Play Online",
+                    text = "Play Offline",
                     onClick = onPlayClick,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 HomeMenuButton(
-                    text = "Daily Puzzle",
+                    text = "Tournament",
                     onClick = {}
                 )
 
@@ -126,7 +126,7 @@ fun HomeScreen(
                 )
 
                 HomeMenuButton(
-                    text = "Play Human",
+                    text = "Play Online",
                     onClick = onMultiplayerClick
                 )
 

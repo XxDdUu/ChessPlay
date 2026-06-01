@@ -308,7 +308,8 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                     "OPPONENT_MOVE" -> {
                         SocketEvent.Move(
                             move = json.getString("move"),
-                            fen = json.optString("fen").takeIf { it.isNotBlank() }
+                            fen = json.optString("fen").takeIf { it.isNotBlank() },
+                            timeRemaining = json.optInt("timeRemaining", -1).takeIf { it >= 0 }
                         )
                     }
 

@@ -41,6 +41,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
+import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.domain.state.FriendState
@@ -81,6 +82,17 @@ fun OnlinePlayScreen(
     val isLandscape =
         configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val context = LocalContext.current
+
+    // --- Clock values ---
+    val mySide = gameState.mySide
+    val myTimeSeconds = if (mySide == Side.WHITE)
+        onlineGameViewModel.whiteTimeSeconds
+    else
+        onlineGameViewModel.blackTimeSeconds
+    val opponentTimeSeconds = if (mySide == Side.WHITE)
+        onlineGameViewModel.blackTimeSeconds
+    else
+        onlineGameViewModel.whiteTimeSeconds
     LaunchedEffect(friendUiState.statusMessage) {
 
         friendUiState.statusMessage?.let {
@@ -178,12 +190,13 @@ fun OnlinePlayScreen(
                         }
 
                         OnlineInfoPanel(
-                            gameState = gameState,
-                            viewModel = viewModel,
-                            modifier = Modifier
-                                .width(260.dp)
-                                .fillMaxHeight()
-                        )
+                                gameState = gameState,
+                                viewModel = viewModel,
+                                opponentTimeSeconds = opponentTimeSeconds,
+                                modifier = Modifier
+                                    .width(260.dp)
+                                    .fillMaxHeight()
+                            )
                     }
                 } else {
 
@@ -204,6 +217,7 @@ fun OnlinePlayScreen(
                             OnlineInfoPanel(
                                 gameState = gameState,
                                 viewModel = viewModel,
+                                opponentTimeSeconds = opponentTimeSeconds,
                                 modifier = Modifier.wrapContentWidth()
                             )
 
@@ -230,6 +244,7 @@ fun OnlinePlayScreen(
 
                             PlayerSection(
                                 gameState = gameState,
+                                myTimeSeconds = myTimeSeconds,
                                 modifier = Modifier.fillMaxWidth()
                             )
 

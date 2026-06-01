@@ -16,6 +16,7 @@ import model.board.Knight
 import model.board.Pawn
 import model.board.Queen
 import model.board.Rook
+import kotlin.math.abs
 
 fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? {
     val cleanMove = pgnMove.replace("+", "").replace("#", "")
@@ -51,7 +52,6 @@ fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? 
             sourceFileConstraint = File.entries.find { it.name == firstChar.toString() }
         }
     } else {
-        // Đối với quân lớn (ví dụ: Nfd2, R1e7), kiểm tra các ký tự ở giữa
         val remainder = cleanMove.drop(1).dropLast(2).replace("x", "")
         if (remainder.isNotEmpty()) {
             val charConstraint = remainder.first()
@@ -69,8 +69,36 @@ fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? 
             if (sourceFileConstraint != null && position.file != sourceFileConstraint) continue
             if (sourceRankConstraint != null && position.rank != sourceRankConstraint) continue
 
-            if (targetPieceClass == Pawn::class && !cleanMove.contains("x") && position.file != toFile) {
-                continue
+            val fileDelta = abs(position.file.ordinal - toFile.ordinal)
+            val rankDelta = abs(position.rank.ordinal - toRank.ordinal)
+
+            when (targetPieceClass) {
+                Knight::class -> {
+                    val isLMove = (fileDelta == 1 && rankDelta == 2) || (fileDelta == 2 && rankDelta == 1)
+                    if (!isLMove) continue
+                }
+
+                Pawn::class -> {
+                    if (cleanMove.contains("x")) {
+                        if (fileDelta != 1 || rankDelta != 1) continue
+                    } else {
+                        if (position.file != toFile) continue // Đi thẳng bắt buộc cùng cột
+                    }
+                }
+
+                Bishop::class -> {
+                    if (fileDelta != rankDelta) continue
+                }
+
+                Rook::class -> {
+                    if (fileDelta != 0 && rankDelta != 0) continue
+                }
+
+                Queen::class -> {
+                    val isStraight = (fileDelta == 0 || rankDelta == 0)
+                    val isDiagonal = (fileDelta == rankDelta)
+                    if (!isStraight && !isDiagonal) continue
+                }
             }
 
             val isCapture = cleanMove.contains("x") || board.containsKey(toPosition)

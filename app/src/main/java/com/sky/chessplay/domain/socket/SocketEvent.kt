@@ -23,7 +23,8 @@ sealed class SocketEvent {
 
     data class Move(
         val move: String,
-        val fen: String?
+        val fen: String?,
+        val timeRemaining: Int? = null
     ) : SocketEvent()
 
     data class GameOver(

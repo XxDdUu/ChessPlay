@@ -1,14 +1,18 @@
 package com.sky.chessplay.ui.presentation.chess.online_play
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.socket.MatchEvent
 import com.sky.chessplay.domain.socket.SocketEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +39,18 @@ class OnlineGameViewModel @Inject constructor(
     var gameOverResult by mutableStateOf<String?>(null)
         private set
 
+    // --- Clock State ---
+    var whiteTimeSeconds by mutableIntStateOf(600)
+        private set
+
+    var blackTimeSeconds by mutableIntStateOf(600)
+        private set
+
+    /** Which side's clock is currently ticking. Null = paused (game not PLAYING). */
+    private var activeSide: Side? = null
+
+    private var clockJob: Job? = null
+
     init {
         observeSocket()
     }
@@ -42,16 +58,10 @@ class OnlineGameViewModel @Inject constructor(
     private fun observeSocket() {
         viewModelScope.launch {
             chessSocket.events.collect { event ->
-                when(event) {
-                    is MatchEvent.RematchOffered -> {
-                        rematchOffered = true
-                    }
-                    is MatchEvent.RematchRejected -> {
-                        rematchSent = false
-                    }
-                    is MatchEvent.GameStart -> {
-                        resetGameState()
-                    }
+                when (event) {
+                    is MatchEvent.RematchOffered -> rematchOffered = true
+                    is MatchEvent.RematchRejected -> rematchSent = false
+                    is MatchEvent.GameStart -> resetGameState()
                     else -> {}
                 }
             }
@@ -59,30 +69,77 @@ class OnlineGameViewModel @Inject constructor(
 
         viewModelScope.launch {
             chessSocket.socketEvents.collect { event ->
-                when(event) {
+                when (event) {
                     is SocketEvent.GameOver -> {
                         gameOverReason = event.reason
                         gameOverResult = event.result
+                        stopClock()
                     }
                     is SocketEvent.GameInit -> {
                         resetGameState()
+                        whiteTimeSeconds = event.timeWhite
+                        blackTimeSeconds = event.timeBlack
+                        // Clock starts ticking from the side that plays first (always WHITE at init)
+                        startClock(Side.WHITE)
                     }
-                    is SocketEvent.DrawOffered -> {
-                        drawOffered = true
-                    }
+
+                    is SocketEvent.DrawOffered -> drawOffered = true
+
                     is SocketEvent.DrawResponse -> {
-                        // opponent responded to our draw offer
-                        if (event.accepted) {
-                            drawOffered = false
-                        }
+                        if (event.accepted) drawOffered = false
                         drawSent = false
                     }
+
+                    is SocketEvent.Move -> {
+                        // Opponent just moved — sync their remaining time and flip the ticking side
+                        val oppSide = activeSide?.opposite ?: return@collect
+                        event.timeRemaining?.let { remaining ->
+                            if (oppSide == Side.WHITE) whiteTimeSeconds = remaining
+                            else blackTimeSeconds = remaining
+                        }
+                        // Now it's our turn — start ticking our clock
+                        startClock(oppSide.opposite)
+                    }
+
                     else -> {}
                 }
             }
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Clock helpers
+    // -------------------------------------------------------------------------
+
+    private fun startClock(side: Side) {
+        stopClock()
+        activeSide = side
+        clockJob = viewModelScope.launch {
+            while (true) {
+                delay(1_000)
+                if (side == Side.WHITE) {
+                    whiteTimeSeconds = (whiteTimeSeconds - 1).coerceAtLeast(0)
+                } else {
+                    blackTimeSeconds = (blackTimeSeconds - 1).coerceAtLeast(0)
+                }
+            }
+        }
+    }
+
+    private fun stopClock() {
+        clockJob?.cancel()
+        clockJob = null
+        activeSide = null
+    }
+
+    /** Called when the local player successfully makes a move (flip the ticking side). */
+    fun onLocalMoveMade(nextTurnSide: Side) {
+        startClock(nextTurnSide)
+    }
+
+    // -------------------------------------------------------------------------
+    // Actions
+    // -------------------------------------------------------------------------
 
     fun offerRematch(gameId: String) {
         chessSocket.sendRematchOffer(gameId)
@@ -105,11 +162,7 @@ class OnlineGameViewModel @Inject constructor(
     }
 
     fun acceptRematch(gameId: String) {
-        chessSocket.sendRematchResponse(
-            gameId,
-            true
-        )
-
+        chessSocket.sendRematchResponse(gameId, true)
         rematchOffered = false
     }
 
@@ -118,21 +171,17 @@ class OnlineGameViewModel @Inject constructor(
     }
 
     fun rejectRematch(gameId: String) {
-        chessSocket.sendRematchResponse(
-            gameId,
-            false
-        )
-
+        chessSocket.sendRematchResponse(gameId, false)
         rematchOffered = false
     }
+
     private fun resetGameState() {
         rematchOffered = false
         rematchSent = false
-
         drawOffered = false
         drawSent = false
-
         gameOverReason = null
         gameOverResult = null
+        stopClock()
     }
 }

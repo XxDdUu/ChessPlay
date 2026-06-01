@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import model.state.GameState
@@ -42,6 +43,7 @@ import model.state.GameState
 fun OnlineInfoPanel(
     gameState: GameState,
     viewModel: ChessViewModel,
+    opponentTimeSeconds: Int,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -57,6 +59,7 @@ fun OnlineInfoPanel(
 
         OpponentSection(
             gameState = gameState,
+            opponentTimeSeconds = opponentTimeSeconds,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -115,8 +118,10 @@ fun MatchHeader(
 @Composable
 fun OpponentSection(
     gameState: GameState,
+    opponentTimeSeconds: Int,
     modifier: Modifier = Modifier
 ) {
+    val isOpponentTurn = !gameState.isMyTurn && gameState.status == SocketEvent.GameStatus.PLAYING
     val opponentSide =
         gameState.mySide
             ?.opposite
@@ -181,29 +186,12 @@ fun OpponentSection(
                 )
             }
 
-            // Online indicator
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Spacer(modifier = Modifier.width(8.dp))
 
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(
-                            Color(0xFF4CAF50),
-                            CircleShape
-                        )
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = "LIVE",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF4CAF50)
-                )
-            }
+            ChessClock(
+                seconds = opponentTimeSeconds,
+                isActive = isOpponentTurn
+            )
         }
     }
 }
@@ -211,8 +199,10 @@ fun OpponentSection(
 @Composable
 fun PlayerSection(
     gameState: GameState,
+    myTimeSeconds: Int,
     modifier: Modifier = Modifier
 ) {
+    val isMyTurn = gameState.isMyTurn && gameState.status == SocketEvent.GameStatus.PLAYING
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
@@ -243,11 +233,9 @@ fun PlayerSection(
                 )
             }
 
-            Text(
-                text = if (gameState.mySide == null) "Waiting" else "Ready",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
+            ChessClock(
+                seconds = myTimeSeconds,
+                isActive = isMyTurn
             )
         }
     }

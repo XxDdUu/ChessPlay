@@ -16,6 +16,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import androidx.compose.ui.unit.dp
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.ui.graphics.SvgCache
 import com.sky.chessplay.ui.state.UiState
@@ -75,8 +76,9 @@ fun Piece(
                 translationY = offset.y
 
                 if (isDragging) {
-                    scaleX = 1.2f
-                    scaleY = 1.2f
+                    scaleX = 2.8f
+                    scaleY = 2.8f
+                    shadowElevation = 8.dp.toPx()
                 } else {
                     scaleX = 2.5f
                     scaleY = 2.5f

@@ -147,14 +147,28 @@ fun ChessPlayRoot() {
                     }
 
                 )
-            }
+                    val navigateToGame = matchViewModel.navigateToGame
+                    val gameInit = matchViewModel.gameInitEvent
+
+                    LaunchedEffect(navigateToGame, gameInit) {
+                        if (navigateToGame && gameInit != null) {
+                            matchViewModel.resetMatchState()
+
+                            navController.navigate(Route.OnlinePlay.route) {
+                                popUpTo("online_mode") { inclusive = true }
+                            }
+
+                            matchViewModel.onNavigated()
+                        }
+                    }
+                }
 
             composable(Route.OfflinePlay.route) {
-                OfflinePlayScreen()
+                OfflinePlayScreen(navController = navController)
             }
 
             composable(Route.MultiplayerOfflinePlay.route) {
-                OfflinePlayScreen()
+                OfflinePlayScreen(navController = navController)
             }
             composable(Route.OnlineGameMode.route) {
                 OnlineGameModeScreen(

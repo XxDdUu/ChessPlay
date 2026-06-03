@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.domain.model.chess.Side
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -79,9 +80,9 @@ class ChessViewModel @Inject constructor(
 
     fun buildStatusText(state: GameState): String {
         return when (state.status) {
-            SocketEvent.GameStatus.WAITING -> "WAITING..."
-            SocketEvent.GameStatus.FINISHED -> "GAME OVER"
-            SocketEvent.GameStatus.PLAYING -> {
+            GameStatus.WAITING -> "WAITING..."
+            GameStatus.FINISHED -> "GAME OVER"
+            GameStatus.PLAYING -> {
                 if (state.isMyTurn) {
                     "(YOUR MOVE)"
                 } else {

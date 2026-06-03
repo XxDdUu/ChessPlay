@@ -40,6 +40,7 @@ fun ProfileRoute(
         navController = navController,
         onFilterOpponentChange = viewModel::onFilterOpponentChanged,
         onFilterResultChange = viewModel::onFilterResultChanged,
-        onResetFilters = viewModel::resetFilters
+        onResetFilters = viewModel::resetFilters,
+        onHistoryTypeChange = viewModel::setHistoryType
     )
 }

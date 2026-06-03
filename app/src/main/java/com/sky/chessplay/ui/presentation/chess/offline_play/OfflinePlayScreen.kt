@@ -52,6 +52,11 @@ import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import view.board.ChessBoard
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.text.style.TextAlign
+import com.sky.chessplay.domain.socket.GameStatus
+import androidx.compose.material3.OutlinedButton
+
 
 @Composable
 fun OfflinePlayScreen(
@@ -186,6 +191,78 @@ fun OfflinePlayScreen(
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
+                    }
+                }
+            }
+        }
+
+        if (gameState.status == GameStatus.FINISHED) {
+            Dialog(
+                onDismissRequest = { /* No-op to prevent dismissal */ }
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color(0xFF111827),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "GAME OVER",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+
+                        val statusMsg = buildString {
+                            append("Finished")
+                            val reason = gameState.reason
+                            val result = gameState.result
+                            if (!reason.isNullOrBlank() || !result.isNullOrBlank()) {
+                                append(": ")
+                                if (!reason.isNullOrBlank()) append(reason)
+                                if (!result.isNullOrBlank()) append(" ($result)")
+                            }
+                        }
+
+                        Text(
+                            text = statusMsg,
+                            fontSize = 16.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = { viewModel.startLocalGame() },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(48.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFE53935),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Play Again", fontWeight = FontWeight.Bold)
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(48.dp)
+                        ) {
+                            Text("Leave Match", color = Color.White)
+                        }
                     }
                 }
             }

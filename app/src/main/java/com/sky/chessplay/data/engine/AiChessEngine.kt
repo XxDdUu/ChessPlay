@@ -7,6 +7,7 @@ import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.domain.model.chess.toUci
 import com.sky.chessplay.domain.repository.AiRepository
 import com.sky.chessplay.domain.rules.MoveValidator.legalMoves
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,7 @@ class AiChessEngine @Inject constructor(
                 rating = gameInit.opponentRating ?: 1500
             ),
             mySide = gameInit.side,
-            status = SocketEvent.GameStatus.PLAYING
+            status = GameStatus.PLAYING
         )
     }
 
@@ -77,9 +78,9 @@ class AiChessEngine @Inject constructor(
             try {
                 val response = aiRepository.makeMove(activeGameId, uciMove)
                 val status = if (response.isGameOver) {
-                    SocketEvent.GameStatus.FINISHED
+                    GameStatus.FINISHED
                 } else {
-                    SocketEvent.GameStatus.PLAYING
+                    GameStatus.PLAYING
                 }
 
                 _gameState.value = GameState.fromFen(response.fen).copy(

@@ -10,8 +10,8 @@ import com.sky.chessplay.domain.model.chess.Rank
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.model.chess.Side.BLACK
 import com.sky.chessplay.domain.model.chess.Side.WHITE
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
-import com.sky.chessplay.domain.socket.SocketEvent.GameStatus
 import model.board.Bishop
 import model.board.King
 import model.board.Knight
@@ -35,6 +35,8 @@ data class GameState(
         )
     ),
     val promotionSelection: List<Promotion> = emptyList(),
+    val result: String? = null,
+    val reason: String? = null,
 ) {
     val isMyTurn: Boolean
         get() = mySide == sideToPlay

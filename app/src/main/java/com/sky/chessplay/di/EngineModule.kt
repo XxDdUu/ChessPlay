@@ -27,8 +27,10 @@ object EngineModule {
 
     @OfflineEngine
     @Provides
-    fun provideLocalEngine(): ChessEngine {
-        return LocalChessEngine()
+    fun provideLocalEngine(
+        localMatchRepository: com.sky.chessplay.domain.repository.LocalMatchRepository
+    ): ChessEngine {
+        return LocalChessEngine(localMatchRepository)
     }
 
     @AiEngine

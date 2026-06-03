@@ -112,8 +112,20 @@ fun ReplayScreen(
             IconButton(onClick = onCloseReplay) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = "Đóng", tint = Color.White)
             }
+            val isLocal = game.gameId.startsWith("local_")
+            val titleText = if (isLocal) {
+                val winnerText = when (game.result) {
+                    "1-0" -> "White wins"
+                    "0-1" -> "Black wins"
+                    else -> "Draw"
+                }
+                "Local Match: $winnerText"
+            } else {
+                "vs ${game.opponentName ?: "Unknown"} (${game.result})"
+            }
+
             Text(
-                text = "vs ${game.opponentName ?: "Unknown"} (${game.result})",
+                text = titleText,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp

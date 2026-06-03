@@ -49,26 +49,26 @@ sealed class SocketEvent {
     data class RematchAccepted(
         val newGameId: String
     ) : SocketEvent()
+    
     data class Opponent(
         val name: String,
         val rating: Int
     )
-    enum class GameStatus {
-        WAITING,
-        PLAYING,
-        FINISHED
-    }
-    data class RoomCreated(
-        val code: String
-    ) : SocketEvent()
+    
     enum class GameResult {
         WHITE_WIN, BLACK_WIN, DRAW
     }
+    
+    data class RoomCreated(
+        val code: String
+    ) : SocketEvent()
+    
     data class ChatMessageReceived(
         val senderId: Long,
         val senderName: String,
         val message: String,
     ) : SocketEvent()
+    
     data class FriendPresence(
         val userId: Long,
         val online: Boolean

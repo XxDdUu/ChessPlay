@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.presentation.profile
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.domain.model.auth.User
@@ -8,6 +9,7 @@ import com.sky.chessplay.domain.model.profile.UserStats
 import com.sky.chessplay.domain.repository.AuthRepository
 import com.sky.chessplay.domain.repository.FriendRepository
 import com.sky.chessplay.domain.repository.GameRepository
+import com.sky.chessplay.domain.repository.LocalMatchRepository
 import com.sky.chessplay.data.remote.api.ProfileApi
 import com.sky.chessplay.data.mapper.ProfileMapper.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +17,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+enum class HistoryType {
+    ONLINE, LOCAL
+}
 
 data class ProfileState(
     val isLoading: Boolean = false,
@@ -24,7 +30,9 @@ data class ProfileState(
     val friendsCount: Int = 0,
 
     val stats: UserStats? = null,
-    val history: List<GameHistoryItem> = emptyList(),
+    val historyType: HistoryType = HistoryType.ONLINE,
+    val onlineHistory: List<GameHistoryItem> = emptyList(),
+    val localHistory: List<GameHistoryItem> = emptyList(),
     val filteredHistory: List<GameHistoryItem> = emptyList(),
 
     val filterOpponent: String = "",
@@ -36,7 +44,8 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val profileApi: ProfileApi,
     private val gameRepository: GameRepository,
-    private val friendRepository: FriendRepository
+    private val friendRepository: FriendRepository,
+    private val localMatchRepository: LocalMatchRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -59,17 +68,46 @@ class ProfileViewModel @Inject constructor(
                 val user = authResult.getOrNull() ?: throw Exception("Empty user")
                 val statsResponse = profileApi.getProfile()
                 val stats = statsResponse.toDomain()
-                val historyResult = gameRepository.getHistory(user.id.toString())
-                val history = historyResult.getOrNull().orEmpty()
 
-                val filtered = applyFilters(history, _state.value.filterOpponent, _state.value.filterResult)
+                // Load online history
+                val historyResult = gameRepository.getHistory(user.id.toString())
+                val onlineHistory = historyResult.getOrNull().orEmpty()
+
+                // Load local history from Room
+                val localMatches = localMatchRepository.getLocalMatches()
+                val localHistory = localMatches.map { entity ->
+                    val dateStr = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        try {
+                            val instant = java.time.Instant.ofEpochMilli(entity.playedAt)
+                            val zonedDateTime = java.time.ZonedDateTime.ofInstant(instant, java.time.ZoneId.systemDefault())
+                            zonedDateTime.toString()
+                        } catch (e: Exception) {
+                            entity.playedAt.toString()
+                        }
+                    } else {
+                        entity.playedAt.toString()
+                    }
+
+                    GameHistoryItem(
+                        gameId = "local_${entity.id}",
+                        opponentName = "Player 2",
+                        myColor = "WHITE",
+                        result = entity.result,
+                        pgn = entity.moveHistory,
+                        playedAt = dateStr
+                    )
+                }
+
+                val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) onlineHistory else localHistory
+                val filtered = applyFilters(activeHistory, _state.value.filterOpponent, _state.value.filterResult)
                 val friends = friendRepository.getFriends(user.id)
 
                 _state.value = _state.value.copy(
                     user = user,
                     friendsCount = friends.size,
                     stats = stats,
-                    history = history,
+                    onlineHistory = onlineHistory,
+                    localHistory = localHistory,
                     filteredHistory = filtered,
                     isLoading = false
                 )
@@ -79,25 +117,36 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun setHistoryType(type: HistoryType) {
+        val activeHistory = if (type == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
+        _state.value = _state.value.copy(
+            historyType = type,
+            filteredHistory = applyFilters(activeHistory, _state.value.filterOpponent, _state.value.filterResult)
+        )
+    }
+
     fun onFilterOpponentChanged(value: String) {
+        val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
         _state.value = _state.value.copy(
             filterOpponent = value,
-            filteredHistory = applyFilters(_state.value.history, value, _state.value.filterResult)
+            filteredHistory = applyFilters(activeHistory, value, _state.value.filterResult)
         )
     }
 
     fun onFilterResultChanged(value: String) {
+        val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
         _state.value = _state.value.copy(
             filterResult = value,
-            filteredHistory = applyFilters(_state.value.history, _state.value.filterOpponent, value)
+            filteredHistory = applyFilters(activeHistory, _state.value.filterOpponent, value)
         )
     }
 
     fun resetFilters() {
+        val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
         _state.value = _state.value.copy(
             filterOpponent = "",
             filterResult = "ALL",
-            filteredHistory = _state.value.history
+            filteredHistory = activeHistory
         )
     }
 
@@ -110,9 +159,27 @@ class ProfileViewModel @Inject constructor(
             val opponentMatch = opponent.isBlank() || game.opponentName?.contains(opponent, ignoreCase = true) == true
             val resultMatch = when (result.uppercase()) {
                 "ALL" -> true
-                "WIN", "THẮNG" -> game.result.contains("WIN", ignoreCase = true)
-                "LOSS", "THUA" -> game.result.contains("LOSS", ignoreCase = true)
-                "DRAW", "HÒA" -> game.result.contains("DRAW", ignoreCase = true)
+                "WIN", "THẮNG" -> {
+                    if (game.gameId.startsWith("local_")) {
+                        game.result == "1-0"
+                    } else {
+                        game.result.contains("WIN", ignoreCase = true)
+                    }
+                }
+                "LOSS", "THUA" -> {
+                    if (game.gameId.startsWith("local_")) {
+                        game.result == "0-1"
+                    } else {
+                        game.result.contains("LOSS", ignoreCase = true)
+                    }
+                }
+                "DRAW", "HÒA" -> {
+                    if (game.gameId.startsWith("local_")) {
+                        game.result == "1/2-1/2" || game.result == "0.5-0.5"
+                    } else {
+                        game.result.contains("DRAW", ignoreCase = true)
+                    }
+                }
                 else -> true
             }
             opponentMatch && resultMatch

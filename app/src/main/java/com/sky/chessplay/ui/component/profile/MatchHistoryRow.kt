@@ -39,18 +39,28 @@ fun MatchHistoryRow(
 ) {
     Log.d("GAME HISTORY DEBUG", game.toString())
     val isWhite = game.myColor.equals("WHITE", ignoreCase = true)
+    val isLocal = game.gameId.startsWith("local_")
     val formattedScore = game.result.replace("-", " - ")
 
     val cleanResult = game.result.replace(" ", "")
-    val matchStatus = when {
-        cleanResult == "1/2-1/2" || cleanResult == "0.5-0.5" -> "DRAW"
-        cleanResult == "1-0" -> if (isWhite) "WIN" else "LOSS"
-        cleanResult == "0-1" -> if (isWhite) "LOSS" else "WIN"
-        else -> "UNKNOWN"
+    val matchStatus = if (isLocal) {
+        when (cleanResult) {
+            "1-0" -> "WHITE WIN"
+            "0-1" -> "BLACK WIN"
+            "1/2-1/2", "0.5-0.5" -> "DRAW"
+            else -> "UNKNOWN"
+        }
+    } else {
+        when {
+            cleanResult == "1/2-1/2" || cleanResult == "0.5-0.5" -> "DRAW"
+            cleanResult == "1-0" -> if (isWhite) "WIN" else "LOSS"
+            cleanResult == "0-1" -> if (isWhite) "LOSS" else "WIN"
+            else -> "UNKNOWN"
+        }
     }
 
-    val whitePlayer = if (isWhite) username else (game.opponentName ?: "AI")
-    val blackPlayer = if (isWhite) (game.opponentName ?: "AI") else username
+    val whitePlayer = if (isLocal) "Player 1 (White)" else if (isWhite) username else (game.opponentName ?: "AI")
+    val blackPlayer = if (isLocal) "Player 2 (Black)" else if (isWhite) (game.opponentName ?: "AI") else username
 
     val formattedDate = rememberFormattedDate(game.playedAt)
 
@@ -80,7 +90,7 @@ fun MatchHistoryRow(
                     Text(
                         text = whitePlayer,
                         color = Color.White,
-                        fontWeight = if (isWhite) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (isWhite && !isLocal) FontWeight.Bold else FontWeight.Normal,
                         fontSize = 15.sp
                     )
                 }
@@ -91,7 +101,7 @@ fun MatchHistoryRow(
                     Text(
                         text = blackPlayer,
                         color = Color.White,
-                        fontWeight = if (!isWhite) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (!isWhite && !isLocal) FontWeight.Bold else FontWeight.Normal,
                         fontSize = 15.sp
                     )
                 }
@@ -103,9 +113,9 @@ fun MatchHistoryRow(
             ) {
                 Text(
                     text = matchStatus,
-                    color = when (game.result.uppercase()) {
-                        "WIN" -> Color(0xFF4CAF50)
-                        "LOSS" -> Color(0xFFF44336)
+                    color = when (matchStatus) {
+                        "WIN", "WHITE WIN" -> Color(0xFF4CAF50)
+                        "LOSS", "BLACK WIN" -> Color(0xFFF44336)
                         else -> Color.LightGray
                     },
                     fontWeight = FontWeight.ExtraBold,
@@ -147,7 +157,18 @@ fun rememberFormattedDate(dateString: String): String {
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
             parsedDate.format(formatter)
         } catch (e: Exception) {
-            dateString
+            try {
+                if (dateString.toLongOrNull() != null) {
+                    val instant = java.time.Instant.ofEpochMilli(dateString.toLong())
+                    val zonedDateTime = ZonedDateTime.ofInstant(instant, java.time.ZoneId.systemDefault())
+                    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+                    zonedDateTime.format(formatter)
+                } else {
+                    dateString
+                }
+            } catch (ex: Exception) {
+                dateString
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.sky.chessplay.domain.engine.util
 
 import com.sky.chessplay.domain.model.chess.Board
 import com.sky.chessplay.domain.model.chess.Capture
+import com.sky.chessplay.domain.model.chess.CapturePromotion
 import com.sky.chessplay.domain.model.chess.File
 import com.sky.chessplay.domain.model.chess.KingSideCastle
 import com.sky.chessplay.domain.model.chess.Move
@@ -10,6 +11,7 @@ import com.sky.chessplay.domain.model.chess.QueenSideCastle
 import com.sky.chessplay.domain.model.chess.Rank
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.model.chess.StandardMove
+import com.sky.chessplay.domain.model.chess.StandardPromotion
 import model.board.Bishop
 import model.board.King
 import model.board.Knight
@@ -19,11 +21,21 @@ import model.board.Rook
 import kotlin.math.abs
 
 fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? {
-    val cleanMove = pgnMove.replace("+", "").replace("#", "")
+    var cleanMove = pgnMove.replace("+", "").replace("#", "")
     val currentSide = if (isWhiteTurn) Side.WHITE else Side.BLACK
 
     if (cleanMove == "O-O") return KingSideCastle(King(currentSide))
     if (cleanMove == "O-O-O") return QueenSideCastle(King(currentSide))
+
+    var promoPieceChar: Char? = null
+    if (cleanMove.endsWith("Q") || cleanMove.endsWith("R") || cleanMove.endsWith("B") || cleanMove.endsWith("N")) {
+        promoPieceChar = cleanMove.last()
+        cleanMove = if (cleanMove.contains("=")) {
+            cleanMove.substringBefore("=")
+        } else {
+            cleanMove.dropLast(1)
+        }
+    }
 
     val toFileChar = cleanMove.takeLast(2).first()
     val toRankChar = cleanMove.last()
@@ -102,11 +114,26 @@ fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? 
             }
 
             val isCapture = cleanMove.contains("x") || board.containsKey(toPosition)
+            val promoPiece = when (promoPieceChar) {
+                'Q' -> Queen(currentSide)
+                'R' -> Rook(currentSide)
+                'B' -> Bishop(currentSide)
+                'N' -> Knight(currentSide)
+                else -> Queen(currentSide)
+            }
             return if (isCapture) {
                 val captured = board[toPosition] ?: Pawn(if (isWhiteTurn) Side.BLACK else Side.WHITE)
-                Capture(piece, position, toPosition, captured)
+                if (promoPieceChar != null && piece is Pawn) {
+                    CapturePromotion(piece, position, toPosition, promoPiece, captured)
+                } else {
+                    Capture(piece, position, toPosition, captured)
+                }
             } else {
-                StandardMove(piece, position, toPosition)
+                if (promoPieceChar != null && piece is Pawn) {
+                    StandardPromotion(piece, position, toPosition, promoPiece)
+                } else {
+                    StandardMove(piece, position, toPosition)
+                }
             }
         }
     }

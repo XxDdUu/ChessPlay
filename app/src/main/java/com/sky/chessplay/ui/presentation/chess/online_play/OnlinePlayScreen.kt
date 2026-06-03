@@ -42,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
 import com.sky.chessplay.domain.model.chess.Side
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.domain.state.FriendState
@@ -368,7 +369,7 @@ fun OnlinePlayScreen(
             }
         }
 
-        if (gameState.status == SocketEvent.GameStatus.FINISHED) {
+        if (gameState.status == GameStatus.FINISHED) {
             Dialog(
                 onDismissRequest = { /* No-op to prevent dismissal */ }
             ) {

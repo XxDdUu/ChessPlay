@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
@@ -121,7 +122,7 @@ fun OpponentSection(
     opponentTimeSeconds: Int,
     modifier: Modifier = Modifier
 ) {
-    val isOpponentTurn = !gameState.isMyTurn && gameState.status == SocketEvent.GameStatus.PLAYING
+    val isOpponentTurn = !gameState.isMyTurn && gameState.status == GameStatus.PLAYING
     val opponentSide =
         gameState.mySide
             ?.opposite
@@ -202,7 +203,7 @@ fun PlayerSection(
     myTimeSeconds: Int,
     modifier: Modifier = Modifier
 ) {
-    val isMyTurn = gameState.isMyTurn && gameState.status == SocketEvent.GameStatus.PLAYING
+    val isMyTurn = gameState.isMyTurn && gameState.status == GameStatus.PLAYING
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),

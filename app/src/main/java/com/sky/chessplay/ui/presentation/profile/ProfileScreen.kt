@@ -42,6 +42,12 @@ import com.sky.chessplay.ui.component.profile.ProfileHeader
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.presentation.replay.ReplayScreen
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.ui.text.font.FontWeight
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -54,7 +60,8 @@ fun ProfileScreen(
     navController: NavHostController,
     onFilterOpponentChange: (String) -> Unit = {},
     onFilterResultChange: (String) -> Unit = {},
-    onResetFilters: () -> Unit = {}
+    onResetFilters: () -> Unit = {},
+    onHistoryTypeChange: (HistoryType) -> Unit = {}
 ) {
     var showSearchModal by remember { mutableStateOf(false) }
     var selectedGameForReplay by remember { mutableStateOf<GameHistoryItem?>(null) }
@@ -114,6 +121,32 @@ fun ProfileScreen(
                         tint = Color.White
                     )
                 }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            TabRow(
+                selectedTabIndex = state.historyType.ordinal,
+                containerColor = Color.Transparent,
+                contentColor = Color.White,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        Modifier.tabIndicatorOffset(tabPositions[state.historyType.ordinal]),
+                        color = Color(0xFFE53935)
+                    )
+                },
+                divider = {}
+            ) {
+                Tab(
+                    selected = state.historyType == HistoryType.ONLINE,
+                    onClick = { onHistoryTypeChange(HistoryType.ONLINE) },
+                    text = { Text("Online History", fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = state.historyType == HistoryType.LOCAL,
+                    onClick = { onHistoryTypeChange(HistoryType.LOCAL) },
+                    text = { Text("Local History", fontWeight = FontWeight.Bold) }
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

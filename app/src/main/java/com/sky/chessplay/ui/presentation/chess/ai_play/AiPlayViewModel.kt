@@ -17,6 +17,7 @@ import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.repository.AiRepository
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -228,7 +229,7 @@ class AiPlayViewModel @Inject constructor(
                     playerColor = if (active.playerColor.uppercase() == "WHITE") Side.WHITE else Side.BLACK
                     gameHistory = active.history ?: emptyList()
 
-                    val status = if (active.isGameOver) SocketEvent.GameStatus.FINISHED else SocketEvent.GameStatus.PLAYING
+                    val status = if (active.isGameOver) GameStatus.FINISHED else GameStatus.PLAYING
 
                     val gameInit = SocketEvent.GameInit(
                         gameId = active.gameId,
@@ -297,7 +298,7 @@ class AiPlayViewModel @Inject constructor(
     fun onSquareSizeChanged(size: Int) = uiService.onSquareSizeChanged(size)
 
     fun getStatusText(): String {
-        if (gameState.status == SocketEvent.GameStatus.FINISHED) {
+        if (gameState.status == GameStatus.FINISHED) {
             return "GAME OVER"
         }
         return if (isThinking) {

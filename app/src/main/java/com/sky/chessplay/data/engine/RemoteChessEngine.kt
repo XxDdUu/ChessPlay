@@ -5,6 +5,7 @@ import com.sky.chessplay.domain.model.chess.Move
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.rules.MoveValidator.legalMoves
 import com.sky.chessplay.domain.socket.ChessSocket
+import com.sky.chessplay.domain.socket.GameStatus
 import com.sky.chessplay.domain.socket.SocketEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +43,7 @@ class  RemoteChessEngine(
                 is SocketEvent.GameOver -> {
                     val current = _gameState.value
                     _gameState.value = current.copy(
-                        status = SocketEvent.GameStatus.FINISHED
+                        status = GameStatus.FINISHED
                     )
                 }
 
@@ -64,7 +65,7 @@ class  RemoteChessEngine(
                 rating = gameInit.opponentRating ?: 1200
             ),
             mySide = gameInit.side,
-            status = SocketEvent.GameStatus.PLAYING
+            status = GameStatus.PLAYING
         )
     }
 

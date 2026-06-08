@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -57,6 +58,8 @@ fun HomeScreen(
 
     onStartAiGame: () -> Unit,
     onLogout: () -> Unit,
+    onTournamentClick: () -> Unit,
+    onAdminClick: () -> Unit,
 
     ) {
     val user = (authState as? AuthState.Authenticated)?.user
@@ -76,9 +79,9 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0D0B2A))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 24.dp)
         ) {
 
             Spacer(Modifier.height(16.dp))
@@ -92,18 +95,17 @@ fun HomeScreen(
                 }
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
             Text(
-                text = "CHESS PLAY",
+                text = "Chess Play",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                fontSize = 34.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -117,7 +119,8 @@ fun HomeScreen(
 
                 HomeMenuButton(
                     text = "Tournament",
-                    onClick = {}
+                    onClick = onTournamentClick,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 HomeMenuButton(
@@ -128,6 +131,11 @@ fun HomeScreen(
                 HomeMenuButton(
                     text = "Play Online",
                     onClick = onMultiplayerClick
+                )
+
+                HomeMenuButton(
+                    text = "Admin Panel",
+                    onClick = onAdminClick
                 )
 
                 HomeMenuButton(

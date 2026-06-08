@@ -31,6 +31,7 @@ fun AuthScreenRoute(
     val username by viewModel.username.collectAsStateWithLifecycle()
     val confirmPassword by viewModel.confirmPassword.collectAsStateWithLifecycle()
     val countryCode by viewModel.countryCode.collectAsStateWithLifecycle()
+    val otp by viewModel.otp.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
@@ -100,15 +101,18 @@ fun AuthScreenRoute(
         username = username,
         confirmPassword = confirmPassword,
         countryCode = countryCode,
+        otp = otp,
         onEmailChange = { viewModel.onEmailChange(it) },
         onPasswordChange = { viewModel.onPasswordChange(it) },
         onUsernameChange = { viewModel.onUsernameChange(it) },
         onConfirmPasswordChange = { viewModel.onConfirmPasswordChange(it) },
         onCountryCodeChange = { viewModel.onCountryCodeChange(it) },
+        onOtpChange = { viewModel.onOtpChange(it) },
         onLoginModeChange = { viewModel.setLoginMode(it) },
         onNextClick = { viewModel.onNextClick() },
         onLoginClick = { viewModel.onLoginClick() },
         onRegisterClick = { viewModel.onRegisterClick() },
+        onVerifyOtpClick = { viewModel.onVerifyOtpClick() },
         onBackClick = { viewModel.goBack() },
         onGoogleClick = {
             launcher.launch(googleClient.signInIntent)

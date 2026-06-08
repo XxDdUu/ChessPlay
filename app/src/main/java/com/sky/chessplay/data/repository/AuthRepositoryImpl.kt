@@ -82,4 +82,13 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun logout() {
         tokenManager.clearToken()
     }
+
+    override suspend fun verifyOtp(email: String, otp: String): Result<Unit> {
+        return try {
+            service.verifyOtp(email, otp)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

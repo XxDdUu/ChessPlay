@@ -8,8 +8,8 @@ class MatchRepositoryImpl @Inject constructor(
     private val api: MatchApi
 ) : MatchRepository {
 
-    override suspend fun joinMatchmaking(userId: Long) {
-        api.joinMatch(userId)
+    override suspend fun joinMatchmaking(userId: Long, matchType: String) {
+        api.joinMatch(userId, matchType)
     }
 
     override suspend fun leaveMatchmaking(userId: Long) {

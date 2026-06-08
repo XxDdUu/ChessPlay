@@ -15,6 +15,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -25,10 +29,12 @@ import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
 import com.sky.chessplay.ui.component.ai.MoveHistoryCard
+import com.sky.chessplay.ui.component.ai.MoveHistoryDialog
 import com.sky.chessplay.ui.component.ai.ResignSection
 import com.sky.chessplay.ui.component.ai.StatusCard
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
+import com.sky.chessplay.ui.layout.TopBarAction
 import com.sky.chessplay.ui.state.UiState
 import model.state.GameState
 import view.board.ChessBoard
@@ -66,12 +72,17 @@ fun AiPlayScreen(
 
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    var showHistory by remember { mutableStateOf(false) }
+
     AppScaffold(
         navController = navController,
         config = AppScaffoldConfig(
             title = "AI PLAY",
             showTopBar = true,
-            showBottomBar = false
+            showBottomBar = false,
+            actions = listOf(
+                TopBarAction.History(onClick = { showHistory = true })
+            )
         )
     ) { padding ->
     Box(
@@ -100,7 +111,7 @@ fun AiPlayScreen(
                         isThinking = isThinking
                     )
 
-                    MoveHistoryCard(history)
+                    // MoveHistoryCard removed from inline layout: now accessible via top-bar history icon
                 }
 
                 // BOARD
@@ -158,7 +169,7 @@ fun AiPlayScreen(
                 ResignSection(
                     onResignGame = onResignGame
                 )
-                MoveHistoryCard(history)
+                // MoveHistoryCard removed from inline layout: use top-bar history icon to open dialog
             }
         }
 
@@ -178,6 +189,10 @@ fun AiPlayScreen(
                     }
                 }
             )
+        }
+
+        if (showHistory) {
+            MoveHistoryDialog(history = history, onDismiss = { showHistory = false })
         }
     }
     }

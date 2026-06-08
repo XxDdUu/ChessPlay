@@ -2,12 +2,14 @@ package com.sky.chessplay.di
 
 import com.sky.chessplay.BuildConfig
 import com.sky.chessplay.data.local.datastore.TokenManager
+import com.sky.chessplay.data.remote.api.AdminApi
 import com.sky.chessplay.data.remote.api.AiApi
 import com.sky.chessplay.data.remote.api.AuthApi
 import com.sky.chessplay.data.remote.api.FriendApi
 import com.sky.chessplay.data.remote.api.GameApi
 import com.sky.chessplay.data.remote.api.MatchApi
 import com.sky.chessplay.data.remote.api.ProfileApi
+import com.sky.chessplay.data.remote.api.TournamentApi
 import com.sky.chessplay.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -78,6 +80,20 @@ object NetworkModule {
     @Singleton
     fun provideAiApi(retrofit: Retrofit): AiApi {
         return retrofit.create(AiApi::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideTournamentApi(
+        retrofit: Retrofit
+    ): TournamentApi {
+        return retrofit.create(TournamentApi::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideAdminApi(
+        retrofit: Retrofit
+    ): AdminApi {
+        return retrofit.create(AdminApi::class.java)
     }
 }
 

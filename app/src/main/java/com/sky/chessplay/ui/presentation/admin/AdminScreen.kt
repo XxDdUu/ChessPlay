@@ -1,9 +1,20 @@
 package com.sky.chessplay.ui.presentation.admin
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -12,11 +23,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.state.AdminTab
+import com.sky.chessplay.ui.component.admin.AdminDashboardTab
+import com.sky.chessplay.ui.component.admin.AdminTournamentsTab
+import com.sky.chessplay.ui.component.admin.AdminUsersTab
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
-import com.sky.chessplay.ui.component.admin.AdminDashboardTab
-import com.sky.chessplay.ui.component.admin.AdminUsersTab
-import com.sky.chessplay.ui.component.admin.AdminTournamentsTab
 
 @Composable
 fun AdminScreen(
@@ -30,14 +41,13 @@ fun AdminScreen(
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = true,
-            title = "Admin Panel"
+            title = "\uD83D\uDEE1\uFE0F Admin Panel"
         )
     ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top
         ) {
             // Tab Navigation
             TabRow(
@@ -66,6 +76,7 @@ fun AdminScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp)
+                            .verticalScroll(rememberScrollState())
                     )
                 }
                 AdminTab.Users -> {

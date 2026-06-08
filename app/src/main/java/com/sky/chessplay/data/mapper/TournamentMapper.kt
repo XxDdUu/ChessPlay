@@ -18,8 +18,13 @@ fun TournamentResponse.toDomain(): Tournament {
     )
 }
 fun String?.toTournamentStatus(): TournamentStatus {
+    val normalized = when (this) {
+        "IN_PROGRESS" -> "ONGOING"
+        else -> this
+    }
+
     return try {
-        TournamentStatus.valueOf(this ?: "")
+        TournamentStatus.valueOf(normalized ?: "")
     } catch (_: Exception) {
         TournamentStatus.UNKNOWN
     }

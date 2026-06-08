@@ -6,8 +6,9 @@ import com.sky.chessplay.domain.model.tournament.Standing
 
 fun StandingResponse.toDomain(): Standing {
     return Standing(
-        playerId = playerId ?: 0L,
+        playerId = playerId ?: userId ?: 0L,
         username = username ?: "",
+        initialRating = initialRating ?: 0,
         currentScore = currentScore ?: 0.0,
         buchholz = buchholz ?: 0.0,
         sonnebornBerger = sonnebornBerger ?: 0.0,

@@ -1,9 +1,20 @@
 package com.sky.chessplay.ui.component.admin
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sky.chessplay.data.remote.dto.response.AdminDashboardResponse
 
@@ -33,12 +44,14 @@ fun AdminDashboardTab(
                 StatCard(
                     title = "Total Users",
                     value = stats.totalUsers.toString(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textColor = Color(0xFFE3F2FD)
                 )
                 StatCard(
                     title = "Total Games",
                     value = stats.totalGames.toString(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textColor = Color(0xFFE8F5E9)
                 )
             }
 
@@ -51,12 +64,14 @@ fun AdminDashboardTab(
                 StatCard(
                     title = "Tournaments",
                     value = stats.totalTournaments.toString(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textColor = Color.Red
                 )
                 StatCard(
                     title = "Online Now",
                     value = stats.onlinePlayersCount.toString(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textColor = Color.Green
                 )
             }
 
@@ -92,6 +107,7 @@ fun AdminDashboardTab(
 private fun StatCard(
     title: String,
     value: String,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(modifier = modifier) {
@@ -104,11 +120,13 @@ private fun StatCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
+                color = textColor,
+                fontWeight = FontWeight.Bold
             )
         }
     }

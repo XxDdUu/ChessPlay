@@ -12,18 +12,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sky.chessplay.data.remote.dto.response.AiModelInfo
+import com.sky.chessplay.domain.model.auth.Role
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.MatchEvent
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
+import com.sky.chessplay.ui.component.admin.RainbowButton
 import com.sky.chessplay.ui.component.ai.AiSetupModal
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.home.HomeMenuButton
@@ -133,10 +132,12 @@ fun HomeScreen(
                     onClick = onMultiplayerClick
                 )
 
-                HomeMenuButton(
-                    text = "Admin Panel",
-                    onClick = onAdminClick
-                )
+                if (user?.role == Role.ROLE_ADMIN) {
+                    RainbowButton(
+                        text = "👑 Admin Panel",
+                        onClick = onAdminClick
+                    )
+                }
 
                 HomeMenuButton(
                     text = "Settings",

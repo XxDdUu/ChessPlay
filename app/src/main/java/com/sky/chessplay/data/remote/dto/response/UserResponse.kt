@@ -15,6 +15,9 @@ data class UserResponse(
     val createdAt: String,
 
     val avatar: String?,
+    @SerializedName("isBanned")
+    val is_banned: Boolean = false,
+    val role: String?,
 
     val token: String?
 )

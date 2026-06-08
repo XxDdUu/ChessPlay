@@ -1,7 +1,6 @@
 package com.sky.chessplay.ui.component.tournament
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,13 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +27,6 @@ import com.sky.chessplay.domain.model.tournament.Tournament
 @Composable
 fun TournamentRow(
     tournament: Tournament,
-    onClick: (Long) -> Unit,
     onJoinClick: (Long) -> Unit = {},
     onStandingsClick: (Long) -> Unit = {}
 ) {
@@ -43,7 +37,7 @@ fun TournamentRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick(tournament.id) },
+            .clickable { showDetailDialog = true },
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF171332))
     ) {
@@ -97,56 +91,11 @@ fun TournamentRow(
     }
 
     if (showDetailDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showDetailDialog = false
-            },
-            title = {
-                Text(tournament.name)
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(tournament.description)
-                    Text("Rounds: ${tournament.totalRounds}")
-                    Text("Time Control: ${tournament.timeControl}")
-                    Text("Start Time: ${tournament.startTime}")
-                    Text("Organizer: ${tournament.createdByName}")
-                    TournamentStatusChip(status = tournament.status.name)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                onJoinClick(tournament.id)
-                                showDetailDialog = false
-                            },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E))
-                        ) {
-                            Text("Join")
-                        }
-                        OutlinedButton(
-                            onClick = {
-                                onStandingsClick(tournament.id)
-                                showDetailDialog = false
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Standings")
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                OutlinedButton(
-                    onClick = {
-                        showDetailDialog = false
-                    }
-                ) {
-                    Text("Close")
-                }
-            }
+        TournamentDetailDialog(
+            tournament = tournament,
+            onDismissRequest = { showDetailDialog = false },
+            onJoinClick = onJoinClick,
+            onStandingsClick = onStandingsClick
         )
     }
 }

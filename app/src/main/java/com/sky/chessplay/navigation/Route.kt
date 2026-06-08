@@ -24,6 +24,11 @@ sealed class Route(val route: String) {
     }
     data object Replay : Route("replay")
     data object Tournament : Route("tournament")
+    data object TournamentDetail : Route("tournament_detail/{tournamentId}") {
+        fun createRoute(tournamentId: Long): String {
+            return "tournament_detail/$tournamentId"
+        }
+    }
     data object TournamentStandings : Route("tournament_standings/{tournamentId}") {
         fun createRoute(tournamentId: Long): String {
             return "tournament_standings/$tournamentId"

@@ -4,6 +4,8 @@ import com.sky.chessplay.data.mapper.toDomain
 import com.sky.chessplay.data.remote.api.TournamentApi
 import com.sky.chessplay.domain.model.tournament.Standing
 import com.sky.chessplay.domain.model.tournament.Tournament
+import com.sky.chessplay.domain.model.tournament.TournamentPairing
+import com.sky.chessplay.domain.model.tournament.TournamentRound
 import com.sky.chessplay.domain.repository.TournamentRepository
 import javax.inject.Inject
 
@@ -28,6 +30,26 @@ class TournamentRepositoryImpl @Inject constructor(
                 )
             }
 
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getTournamentById(tournamentId: Long): Result<Tournament> {
+        return try {
+            val response = api.getTournamentById(tournamentId)
+
+            if (response.isSuccessful) {
+                val tournament = response.body()?.toDomain()
+
+                if (tournament != null) {
+                    Result.success(tournament)
+                } else {
+                    Result.failure(Exception("Tournament not found"))
+                }
+            } else {
+                Result.failure(Exception("Failed to load tournament detail"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -91,6 +113,45 @@ class TournamentRepositoryImpl @Inject constructor(
                 )
             }
 
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getRounds(tournamentId: Long): Result<List<TournamentRound>> {
+        return try {
+            val response = api.getRounds(tournamentId)
+
+            if (response.isSuccessful) {
+                val rounds = response.body()
+                    ?.map { it.toDomain() }
+                    ?: emptyList()
+
+                Result.success(rounds)
+            } else {
+                Result.failure(Exception("Failed to load tournament rounds"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getPairings(
+        tournamentId: Long,
+        roundId: Long
+    ): Result<List<TournamentPairing>> {
+        return try {
+            val response = api.getPairings(tournamentId, roundId)
+
+            if (response.isSuccessful) {
+                val pairings = response.body()
+                    ?.map { it.toDomain() }
+                    ?: emptyList()
+
+                Result.success(pairings)
+            } else {
+                Result.failure(Exception("Failed to load round pairings"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

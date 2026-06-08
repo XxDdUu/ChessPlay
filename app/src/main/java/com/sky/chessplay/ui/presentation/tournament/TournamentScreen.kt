@@ -1,6 +1,7 @@
 package com.sky.chessplay.ui.presentation.tournament
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,7 +42,6 @@ import com.sky.chessplay.ui.layout.AppScaffoldConfig
 fun TournamentScreen(
     viewModel: TournamentViewModel = hiltViewModel(),
     onTournamentClick: (Long) -> Unit,
-    onNavigateBack: () -> Unit,
     navController: NavHostController
 ) {
 
@@ -56,8 +56,8 @@ fun TournamentScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top
         ) {
             AnimatedContent(
                 targetState = uiState,
@@ -151,12 +151,14 @@ fun TournamentScreen(
 fun TournamentScreenCompact(
     viewModel: TournamentViewModel = hiltViewModel(),
     onTournamentClick: (Long) -> Unit,
-    onNavigateBack: () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top
+    ) {
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier
@@ -196,7 +198,8 @@ fun TournamentScreenCompact(
 
                     TournamentRow(
                         tournament = tournament,
-                        onClick = onTournamentClick
+                        onJoinClick = { viewModel.joinTournament(it) },
+                        onStandingsClick = onTournamentClick
                     )
 
                     HorizontalDivider()

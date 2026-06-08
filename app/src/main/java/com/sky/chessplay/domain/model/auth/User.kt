@@ -5,5 +5,7 @@ data class User(
     val username: String,
     val country_code: String,
     val createdAt: String,
+    val role: Role,
+    val is_banned: Boolean,
     val avatar: String?
 )

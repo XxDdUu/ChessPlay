@@ -21,6 +21,7 @@ import androidx.navigation.navArgument
 import com.sky.chessplay.data.remote.GoogleAuthClient
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
+import com.sky.chessplay.domain.model.auth.Role
 import com.sky.chessplay.ui.presentation.admin.AdminScreen
 import com.sky.chessplay.ui.presentation.auth.AuthScreenRoute
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
@@ -33,6 +34,7 @@ import com.sky.chessplay.ui.presentation.community.FriendRoute
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.home.HomeViewModel
 import com.sky.chessplay.ui.presentation.profile.ProfileRoute
+import com.sky.chessplay.ui.presentation.tournament.TournamentDetailScreen
 import com.sky.chessplay.ui.presentation.tournament.TournamentRoute
 import com.sky.chessplay.ui.presentation.tournament.TournamentStandingsScreen
 
@@ -298,11 +300,30 @@ fun ChessPlayRoot() {
             }
 
             composable(
+                route = Route.TournamentDetail.route,
+                arguments = listOf(
+                    navArgument("tournamentId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val tournamentId = backStackEntry.arguments?.getLong("tournamentId") ?: 0L
+                val currentUserId = (authState as? AuthState.Authenticated)?.user?.id
+
+                TournamentDetailScreen(
+                    tournamentId = tournamentId,
+                    currentUserId = currentUserId,
+                    navController = navController
+                )
+            }
+
+            composable(
                 route = Route.Admin.route
             ) {
-                if (authState !is AuthState.Authenticated) {
+                val adminUser = (authState as? AuthState.Authenticated)?.user
+                if (adminUser == null || adminUser.role != Role.ROLE_ADMIN) {
                     LaunchedEffect(Unit) {
-                        navController.navigate(Route.Auth.route) {
+                        navController.navigate(Route.Home.route) {
                             popUpTo(Route.Admin.route) { inclusive = true }
                         }
                     }

@@ -73,6 +73,7 @@ class MatchViewModel @Inject constructor(
     private var confirmJob: Job? = null
     private var gameCountdownJob: Job? = null
     private var lastUserId: Long? = null
+    private var currentMatchType: String = "RAPID"
 
     var incomingInvite by mutableStateOf<MatchEvent.MatchInvite?>(null)
         private set
@@ -93,8 +94,9 @@ class MatchViewModel @Inject constructor(
 
         matchState = MatchState.INITIALIZING
     }
-    fun start(userId: Long) {
+    fun start(userId: Long, matchType: String = "RAPID") {
         lastUserId = userId
+        currentMatchType = matchType
         matchState = MatchState.SEARCHING
         status = "Checking for active games..."
         viewModelScope.launch {
@@ -103,7 +105,7 @@ class MatchViewModel @Inject constructor(
 
             socketClient.connect(token)
 
-            repo.joinMatchmaking(userId)
+            repo.joinMatchmaking(userId, matchType)
         }
     }
     fun updateJoinRoomCode(code: String) {
@@ -161,7 +163,7 @@ class MatchViewModel @Inject constructor(
         viewModelScope.launch {
             delay(1000)
             lastUserId?.let {
-                repo.joinMatchmaking(it)
+                repo.joinMatchmaking(it, currentMatchType)
                 matchState = MatchState.SEARCHING
             }
         }

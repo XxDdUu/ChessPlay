@@ -35,7 +35,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sky.chessplay.domain.socket.GameStatus
-import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.ui.component.common.GradientButton
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import model.state.GameState
@@ -48,9 +47,11 @@ fun OnlineInfoPanel(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         MatchHeader(
             statusText = viewModel.buildStatusText(gameState),
@@ -81,7 +82,7 @@ fun MatchHeader(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 16.dp),
+                .padding(vertical = 16.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -90,13 +91,13 @@ fun MatchHeader(
             ) {
                 Text(
                     text = if (isMyTurn) "Your move" else "Opponent move",
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = statusText,
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -106,8 +107,8 @@ fun MatchHeader(
             ) {
                 Text(
                     text = if (isMyTurn) "ACTIVE" else "WAITING",
-                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp),
-                    fontSize = 12.sp,
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 14.dp),
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -130,7 +131,7 @@ fun OpponentSection(
             ?: "--"
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -139,14 +140,14 @@ fun OpponentSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             // Avatar
             Box(
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(48.dp)
                     .background(
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
                         CircleShape
@@ -166,7 +167,6 @@ fun OpponentSection(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Name + rating
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -177,12 +177,12 @@ fun OpponentSection(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 16.sp
                 )
 
                 Text(
                     text = "${gameState.opponent?.rating ?: "--"} • $opponentSide",
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -215,7 +215,7 @@ fun PlayerSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -224,12 +224,12 @@ fun PlayerSection(
             ) {
                 Text(
                     text = "You",
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "Side: ${gameState.mySide?.name ?: "Unknown"}",
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -256,7 +256,7 @@ fun BottomActions(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -267,8 +267,8 @@ fun BottomActions(
                 onClick = onChatClick,
                 modifier = Modifier.weight(1f),
                 colors = listOf(
-                    Color(0xFF4FACFE),
-                    Color(0xFF00F2FE)
+                    Color(0xFF3B82F6),
+                    Color(0xFF0891B2)
                 )
             )
 
@@ -279,8 +279,8 @@ fun BottomActions(
                 modifier = Modifier.weight(1f),
                 enabled = !rematchSent && !rematchOffered,
                 colors = listOf(
-                    Color(0xFF43E97B),
-                    Color(0xFF38F9D7)
+                    Color(0xFF22C55E),
+                    Color(0xFF14B8A6)
                 )
             )
         }
@@ -293,8 +293,8 @@ fun BottomActions(
                 onClick = onOfferDraw,
                 modifier = Modifier.weight(1f),
                 colors = listOf(
-                    Color(0xFFFFC107),
-                    Color(0xFFFF9800)
+                    Color(0xFFD97706),
+                    Color(0xFFB45309)
                 )
             )
 
@@ -304,8 +304,8 @@ fun BottomActions(
                 onClick = onResign,
                 modifier = Modifier.weight(1f),
                 colors = listOf(
-                    Color(0xFFFF416C),
-                    Color(0xFFFF4B2B)
+                    Color(0xFFDC2626),
+                    Color(0xFFB91C1C)
                 )
             )
         }
@@ -335,14 +335,14 @@ fun BottomActions(
             }
             Text(
                 text = "Opponent offered a rematch.",
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
         } else if (rematchSent) {
             Text(
                 text = "Rematch request sent.",
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )

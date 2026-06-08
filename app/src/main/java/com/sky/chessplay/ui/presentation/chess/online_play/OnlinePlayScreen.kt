@@ -40,6 +40,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.sky.chessplay.R
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.layout.size
 import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.GameStatus
@@ -387,22 +391,56 @@ fun OnlinePlayScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text(
-                            text = "GAME OVER",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        )
+                        val resultStr = onlineGameViewModel.gameOverResult?.uppercase() ?: ""
+                        val mySide = gameState.mySide
+                        val isWin = (mySide == Side.WHITE && resultStr == "WHITE_WIN") || 
+                                    (mySide == Side.BLACK && resultStr == "BLACK_WIN")
+                        val isLoss = (mySide == Side.WHITE && resultStr == "BLACK_WIN") || 
+                                     (mySide == Side.BLACK && resultStr == "WHITE_WIN")
+
+                        if (isWin) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_golden_cup),
+                                contentDescription = "Golden Cup",
+                                modifier = Modifier.size(100.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "YOU WON",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFFBBF24),
+                                textAlign = TextAlign.Center
+                            )
+                        } else if (isLoss) {
+                            val winnerText = if (resultStr == "WHITE_WIN") "White won" else "Black won"
+                            Text(
+                                text = winnerText,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            )
+                        } else {
+                            Text(
+                                text = "GAME OVER",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            )
+                        }
 
                         val statusMsg = buildString {
-                            append("Finished")
                             val reason = onlineGameViewModel.gameOverReason
                             val result = onlineGameViewModel.gameOverResult
                             if (!reason.isNullOrBlank() || !result.isNullOrBlank()) {
-                                append(": ")
                                 if (!reason.isNullOrBlank()) append(reason)
-                                if (!result.isNullOrBlank()) append(" ($result)")
+                                if (!result.isNullOrBlank()) {
+                                    if (reason.isNullOrBlank()) append(result) else append(" ($result)")
+                                }
+                            } else {
+                                append("Finished")
                             }
                         }
 

@@ -21,6 +21,7 @@ import androidx.navigation.navArgument
 import com.sky.chessplay.data.remote.GoogleAuthClient
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
+import com.sky.chessplay.ui.presentation.admin.AdminScreen
 import com.sky.chessplay.ui.presentation.auth.AuthScreenRoute
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
@@ -32,6 +33,8 @@ import com.sky.chessplay.ui.presentation.community.FriendRoute
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.home.HomeViewModel
 import com.sky.chessplay.ui.presentation.profile.ProfileRoute
+import com.sky.chessplay.ui.presentation.tournament.TournamentRoute
+import com.sky.chessplay.ui.presentation.tournament.TournamentStandingsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -144,6 +147,16 @@ fun ChessPlayRoot() {
                                 side = config.side.name
                             )
                         )
+                    },
+                    onTournamentClick = {
+                        navController.navigate(Route.Tournament.route)
+                    },
+                    onAdminClick = {
+                        if (authState is AuthState.Authenticated) {
+                            navController.navigate(Route.Admin.route)
+                        } else {
+                            navController.navigate(Route.Auth.route)
+                        }
                     }
 
                 )
@@ -250,6 +263,53 @@ fun ChessPlayRoot() {
                 )
             ) {
                 AiPlayRoute(
+                    navController = navController
+                )
+            }
+            composable(
+                route = Route.Tournament.route
+            ) {
+                if (authState !is AuthState.Authenticated) {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Route.Auth.route) {
+                            popUpTo(Route.Tournament.route) { inclusive = true }
+                        }
+                    }
+                    return@composable
+                }
+                TournamentRoute(
+                    navController = navController
+                )
+            }
+
+            composable(
+                route = Route.TournamentStandings.route,
+                arguments = listOf(
+                    navArgument("tournamentId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+
+                val tournamentId = backStackEntry.arguments?.getLong("tournamentId") ?: 0L
+                TournamentStandingsScreen(
+                    tournamentId = tournamentId
+                )
+            }
+
+            composable(
+                route = Route.Admin.route
+            ) {
+                if (authState !is AuthState.Authenticated) {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Route.Auth.route) {
+                            popUpTo(Route.Admin.route) { inclusive = true }
+                        }
+                    }
+                    return@composable
+                }
+
+                AdminScreen(
                     navController = navController
                 )
             }

@@ -70,15 +70,18 @@ fun AuthScreen(
     username: String,
     confirmPassword: String,
     countryCode: String,
+    otp: String,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onUsernameChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
     onCountryCodeChange: (String) -> Unit,
+    onOtpChange: (String) -> Unit,
     onLoginModeChange: (Boolean) -> Unit,
     onNextClick: () -> Unit,
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit,
+    onVerifyOtpClick: () -> Unit,
     onBackClick: () -> Unit,
     onGoogleClick: () -> Unit,
     state: AuthState,
@@ -443,6 +446,64 @@ fun AuthScreen(
                                 }
                             }
                         }
+
+                        AuthStep.VERIFY_OTP -> {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    IconButton(onClick = onBackClick) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = "Back",
+                                            tint = Color.White
+                                        )
+                                    }
+                                    Text(
+                                        text = email,
+                                        color = Color.White.copy(alpha = 0.7f),
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
+
+                                OutlinedTextField(
+                                    value = otp,
+                                    onValueChange = onOtpChange,
+                                    label = { Text("Verification Code (OTP)") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number
+                                    ),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedTextColor = Color.White,
+                                        unfocusedTextColor = Color.White,
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedLabelColor = Color.White.copy(alpha = 0.6f)
+                                    )
+                                )
+
+                                Button(
+                                    onClick = onVerifyOtpClick,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text("Submit OTP", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                }
+                            }
+                        }
                     }
 
                     // Handling states
@@ -457,6 +518,16 @@ fun AuthScreen(
                             Text(
                                 text = state.message,
                                 color = Color(0xFFEF4444),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                        is AuthState.Success -> {
+                            Text(
+                                text = state.message,
+                                color = Color(0xFF10B981),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
                                 textAlign = TextAlign.Center,
@@ -543,15 +614,18 @@ fun AuthScreenPreview() {
         username = "",
         confirmPassword = "",
         countryCode = "VN",
+        otp = "",
         onEmailChange = {},
         onPasswordChange = {},
         onUsernameChange = {},
         onConfirmPasswordChange = {},
         onCountryCodeChange = {},
+        onOtpChange = {},
         onLoginModeChange = {},
         onNextClick = {},
         onLoginClick = {},
         onRegisterClick = {},
+        onVerifyOtpClick = {},
         onBackClick = {},
         onGoogleClick = {},
         state = AuthState.Idle,

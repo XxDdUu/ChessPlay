@@ -21,4 +21,9 @@ interface AuthApi {
     suspend fun googleLogin(
         @Body request: GoogleLoginRequest
     ): UserResponse
+
+    @POST("api/auth/verify-otp")
+    suspend fun verifyOtp(
+        @Body req: com.sky.chessplay.data.remote.dto.request.VerifyOtpRequest
+    ): Unit
 }

@@ -18,7 +18,8 @@ import javax.inject.Inject
 enum class AuthStep {
     EMAIL,
     LOGIN_PASSWORD,
-    REGISTER_DETAILS
+    REGISTER_DETAILS,
+    VERIFY_OTP
 }
 
 @HiltViewModel
@@ -52,6 +53,9 @@ class AuthViewModel @Inject constructor(
     private val _countryCode = MutableStateFlow("VN")
     val countryCode: StateFlow<String> = _countryCode.asStateFlow()
 
+    private val _otp = MutableStateFlow("")
+    val otp: StateFlow<String> = _otp.asStateFlow()
+
     init {
         checkAuth()
     }
@@ -74,6 +78,10 @@ class AuthViewModel @Inject constructor(
 
     fun onCountryCodeChange(value: String) {
         _countryCode.value = value
+    }
+
+    fun onOtpChange(value: String) {
+        _otp.value = value
     }
 
     fun setLoginMode(isLogin: Boolean) {
@@ -213,24 +221,9 @@ class AuthViewModel @Inject constructor(
 
                 _authState.value = response.fold(
                     onSuccess = {
-                        // Registration success. Auto login.
-                        val loginResult = repo.login(
-                            LoginRequest(email = email, password = password)
-                        )
-                        val meResult = repo.getMe()
-
-                        _authState.value = meResult.fold(
-                            onSuccess = { user ->
-                                AuthState.Authenticated(user)
-                            },
-                            onFailure = {
-                                AuthState.Error("GetMe failed")
-                            }
-                        )
-                        loginResult.fold(
-                            onSuccess = { AuthState.Authenticated(it) },
-                            onFailure = { AuthState.Error(it.message ?: "Đăng ký thành công nhưng đăng nhập tự động thất bại") }
-                        )
+                        _otp.value = ""
+                        _currentStep.value = AuthStep.VERIFY_OTP
+                        AuthState.Success("Đăng ký thành công. Vui lòng nhập mã OTP gửi tới email của bạn.")
                     },
                     onFailure = { e ->
                         AuthState.Error(e.message ?: "Đăng ký thất bại")
@@ -240,6 +233,33 @@ class AuthViewModel @Inject constructor(
             } catch (e: Exception) {
                 _authState.value = AuthState.Error(e.message ?: "Đăng ký thất bại")
             }
+        }
+    }
+
+    fun onVerifyOtpClick() {
+        val emailVal = _email.value.trim()
+        val otpVal = _otp.value.trim()
+
+        if (otpVal.isBlank()) {
+            _authState.value = AuthState.Error("OTP không được để trống")
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = repo.verifyOtp(emailVal, otpVal)
+            _authState.value = result.fold(
+                onSuccess = {
+                    _email.value = emailVal
+                    _password.value = ""
+                    _isLoginMode.value = true
+                    _currentStep.value = AuthStep.EMAIL
+                    AuthState.Success("Xác thực OTP thành công! Vui lòng đăng nhập.")
+                },
+                onFailure = { e ->
+                    AuthState.Error(e.message ?: "Xác thực OTP thất bại")
+                }
+            )
         }
     }
 

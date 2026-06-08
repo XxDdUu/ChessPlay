@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -136,6 +137,17 @@ fun AppScaffold(
                                         )
                                     }
                                 }
+
+
+                                is TopBarAction.History -> {
+
+                                    IconButton(onClick = action.onClick) {
+                                        Icon(
+                                            Icons.Default.History,
+                                            contentDescription = "History"
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -206,6 +218,10 @@ sealed class TopBarAction {
 
     data class AddFriend(
         val isRequestSent: Boolean = false,
+        val onClick: () -> Unit
+    ) : TopBarAction()
+
+    data class History(
         val onClick: () -> Unit
     ) : TopBarAction()
 }

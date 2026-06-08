@@ -24,4 +24,8 @@ class AuthService @Inject constructor(
     suspend fun googleLogin(userData: GoogleLoginRequest): UserResponse {
         return api.googleLogin(userData)
     }
+
+    suspend fun verifyOtp(email: String, otp: String) {
+        api.verifyOtp(com.sky.chessplay.data.remote.dto.request.VerifyOtpRequest(email, otp))
+    }
 }

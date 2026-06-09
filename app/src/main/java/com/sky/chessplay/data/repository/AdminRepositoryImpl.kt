@@ -3,13 +3,13 @@ package com.sky.chessplay.data.repository
 import TournamentRequest
 import com.sky.chessplay.data.remote.api.AdminApi
 import com.sky.chessplay.data.remote.dto.response.AdminDashboardResponse
-import com.sky.chessplay.data.remote.dto.response.TournamentResponse as Tournament
 import com.sky.chessplay.data.remote.dto.response.UserAdminResponse
 import com.sky.chessplay.domain.repository.AdminRepository
 import javax.inject.Inject
+import com.sky.chessplay.data.remote.dto.response.TournamentResponse as Tournament
 
 class AdminRepositoryImpl @Inject constructor(
-    private val api: AdminApi
+    private val api: AdminApi,
 ) : AdminRepository {
 
     override suspend fun getDashboardStats(): Result<AdminDashboardResponse> {

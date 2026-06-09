@@ -1,5 +1,6 @@
 package com.sky.chessplay.domain.usecases
 
+import TournamentRequest
 import com.sky.chessplay.domain.repository.AdminRepository
 import javax.inject.Inject
 
@@ -13,6 +14,12 @@ class GetAdminUsersUseCase @Inject constructor(
     private val repository: AdminRepository
 ) {
     suspend operator fun invoke(query: String? = null) = repository.getUsers(query)
+}
+
+class CreateTournamentsUseCase @Inject constructor(
+    private val repository: AdminRepository
+) {
+    suspend operator fun invoke(query: TournamentRequest) = repository.createTournament(query)
 }
 
 class GetUserProfileAdminUseCase @Inject constructor(

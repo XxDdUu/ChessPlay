@@ -2,7 +2,7 @@ package com.sky.chessplay.domain.state
 
 import com.sky.chessplay.data.remote.dto.response.AdminDashboardResponse
 import com.sky.chessplay.data.remote.dto.response.UserAdminResponse
-import com.sky.chessplay.data.remote.dto.response.TournamentResponse as Tournament
+import com.sky.chessplay.domain.model.tournament.Tournament
 
 data class AdminUiState(
     val isLoading: Boolean = false,

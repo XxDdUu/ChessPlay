@@ -1,10 +1,19 @@
 package com.sky.chessplay.ui.presentation.admin
 
+import TournamentRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.domain.state.AdminTab
 import com.sky.chessplay.domain.state.AdminUiState
-import com.sky.chessplay.domain.usecases.*
+import com.sky.chessplay.domain.usecases.BanUserUseCase
+import com.sky.chessplay.domain.usecases.CancelTournamentUseCase
+import com.sky.chessplay.domain.usecases.CreateTournamentsUseCase
+import com.sky.chessplay.domain.usecases.FinishTournamentUseCase
+import com.sky.chessplay.domain.usecases.GetAdminDashboardUseCase
+import com.sky.chessplay.domain.usecases.GetAdminUsersUseCase
+import com.sky.chessplay.domain.usecases.GetTournamentsUseCase
+import com.sky.chessplay.domain.usecases.StartTournamentUseCase
+import com.sky.chessplay.domain.usecases.UnbanUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +25,8 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val getDashboardUseCase: GetAdminDashboardUseCase,
     private val getUsersUseCase: GetAdminUsersUseCase,
-    private val getTournamentsUseCase: GetAdminTournamentsUseCase,
+    private val getTournamentsUseCase: GetTournamentsUseCase,
+    private val createTournamentsUseCase: CreateTournamentsUseCase,
     private val banUserUseCase: BanUserUseCase,
     private val unbanUserUseCase: UnbanUserUseCase,
     private val finishTournamentUseCase: FinishTournamentUseCase,
@@ -76,6 +86,40 @@ class AdminViewModel @Inject constructor(
                     }
                 }
                 .onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message
+                        )
+                    }
+                }
+        }
+    }
+    fun createTournament(
+        request: TournamentRequest
+    ) {
+        viewModelScope.launch {
+
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
+
+            createTournamentsUseCase(request)
+                .onSuccess {
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    loadTournaments()
+                }
+                .onFailure { error ->
+
                     _uiState.update {
                         it.copy(
                             isLoading = false,

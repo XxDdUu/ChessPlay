@@ -28,7 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sky.chessplay.data.remote.dto.response.TournamentResponse as Tournament
+import com.sky.chessplay.domain.model.tournament.Tournament
+import com.sky.chessplay.domain.state.TournamentStatus
 
 @Composable
 fun AdminTournamentsTab(
@@ -114,7 +115,10 @@ private fun TournamentAdminItem(
                     modifier = Modifier
                         .weight(1f)
                         .height(36.dp),
-                    enabled = tournament.status != "STARTED" && tournament.status != "FINISHED"
+                    enabled = tournament.status !in listOf(
+                        TournamentStatus.ONGOING,
+                        TournamentStatus.FINISHED
+                    )
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
@@ -126,7 +130,10 @@ private fun TournamentAdminItem(
                     modifier = Modifier
                         .weight(1f)
                         .height(36.dp),
-                    enabled = tournament.status == "STARTED"
+                    enabled = tournament.status !in listOf(
+                        TournamentStatus.ONGOING,
+                        TournamentStatus.FINISHED
+                    )
                 ) {
                     Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
@@ -141,7 +148,9 @@ private fun TournamentAdminItem(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     ),
-                    enabled = tournament.status != "FINISHED"
+                    enabled = tournament.status !in listOf(
+                        TournamentStatus.FINISHED
+                    )
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))

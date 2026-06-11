@@ -6,12 +6,14 @@ import com.sky.chessplay.navigation.Route
 
 @Composable
 fun TournamentRoute(
-    navController: NavHostController
-) {
+    navController: NavHostController,
+    currentUserId: Long?,
+    ) {
     TournamentScreen(
         onTournamentClick = { tournamentId ->
             navController.navigate(Route.TournamentDetail.createRoute(tournamentId))
         },
+        currentUserId = currentUserId,
         navController = navController
     )
 }

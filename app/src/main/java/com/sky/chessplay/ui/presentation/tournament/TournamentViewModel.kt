@@ -70,11 +70,9 @@ class TournamentViewModel @Inject constructor(
 
             joinTournamentUseCase(tournamentId)
                 .onSuccess {
-
                     loadTournaments()
                 }
                 .onFailure { error ->
-
                     _uiState.update {
                         it.copy(
                             error = error.message

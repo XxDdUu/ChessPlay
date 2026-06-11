@@ -19,9 +19,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sky.chessplay.data.remote.GoogleAuthClient
+import com.sky.chessplay.domain.model.auth.Role
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
-import com.sky.chessplay.domain.model.auth.Role
 import com.sky.chessplay.ui.presentation.admin.AdminScreen
 import com.sky.chessplay.ui.presentation.auth.AuthScreenRoute
 import com.sky.chessplay.ui.presentation.auth.AuthViewModel
@@ -279,8 +279,11 @@ fun ChessPlayRoot() {
                     }
                     return@composable
                 }
+                val currentUserId = (authState as? AuthState.Authenticated)?.user?.id
+
                 TournamentRoute(
-                    navController = navController
+                    navController = navController,
+                    currentUserId = currentUserId
                 )
             }
 

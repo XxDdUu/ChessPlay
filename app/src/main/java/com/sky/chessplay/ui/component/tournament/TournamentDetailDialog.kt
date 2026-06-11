@@ -19,8 +19,10 @@ import com.sky.chessplay.domain.state.TournamentStatus
 @Composable
 fun TournamentDetailDialog(
     tournament: Tournament,
+    isRegistered: Boolean,
     onDismissRequest: () -> Unit,
     onJoinClick: (Long) -> Unit = {},
+    onLeaveClick: (Long) -> Unit = {},
     onStandingsClick: (Long) -> Unit = {}
 ) {
     AlertDialog(
@@ -42,15 +44,30 @@ fun TournamentDetailDialog(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (tournament.status == TournamentStatus.REGISTERING) {
-                        Button(
-                            onClick = {
-                                onJoinClick(tournament.id)
-                                onDismissRequest()
-                            },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E))
-                        ) {
-                            Text(text = "Join")
+
+                        if (isRegistered) {
+                            OutlinedButton(
+                                onClick = {
+                                    onLeaveClick(tournament.id)
+                                    onDismissRequest()
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Leave")
+                            }
+                        } else {
+                            Button(
+                                onClick = {
+                                    onJoinClick(tournament.id)
+                                    onDismissRequest()
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF22C55E)
+                                )
+                            ) {
+                                Text("Join")
+                            }
                         }
                     }
 

@@ -25,13 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sky.chessplay.domain.model.tournament.Tournament
+import com.sky.chessplay.domain.state.TournamentStatus
 
 @Composable
 fun TournamentItem(
     tournament: Tournament,
     onJoinClick: (Long) -> Unit,
     onStandingsClick: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isRegistered: Boolean,
+    onLeaveClick: (Long) -> Unit
 ) {
     var showDetailDialog by remember { mutableStateOf(false) }
 
@@ -80,14 +83,21 @@ fun TournamentItem(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(
-                    onClick = {
-                        onJoinClick(tournament.id)
+                if (tournament.status == TournamentStatus.REGISTERING) {
+                    if (isRegistered) {
+                        OutlinedButton(
+                            onClick = { onLeaveClick(tournament.id) }
+                        ) {
+                            Text("Leave")
+                        }
+                    } else {
+                        Button(
+                            onClick = { onJoinClick(tournament.id) }
+                        ) {
+                            Text("Join")
+                        }
                     }
-                ) {
-                    Text("Join")
                 }
-
                 OutlinedButton(
                     onClick = {
                         onStandingsClick(tournament.id)
@@ -104,7 +114,9 @@ fun TournamentItem(
             tournament = tournament,
             onDismissRequest = { showDetailDialog = false },
             onJoinClick = onJoinClick,
-            onStandingsClick = onStandingsClick
+            onStandingsClick = onStandingsClick,
+            onLeaveClick = onLeaveClick,
+            isRegistered = isRegistered
         )
     }
 }

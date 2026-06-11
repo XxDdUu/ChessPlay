@@ -41,6 +41,7 @@ import com.sky.chessplay.ui.layout.AppScaffoldConfig
 @Composable
 fun TournamentScreen(
     viewModel: TournamentViewModel = hiltViewModel(),
+    currentUserId: Long?,
     onTournamentClick: (Long) -> Unit,
     navController: NavHostController
 ) {
@@ -134,9 +135,12 @@ fun TournamentScreen(
                                 TournamentItem(
                                     tournament = tournament,
                                     onJoinClick = { viewModel.joinTournament(it) },
-                                    onStandingsClick = onTournamentClick
-                                )
-
+                                    onStandingsClick = onTournamentClick,
+                                    onLeaveClick = { viewModel.leaveTournament(it) },
+                                    isRegistered = uiState.standings.any {
+                                        currentUserId != null && it.playerId == currentUserId
+                                        },
+                                    )
                                 HorizontalDivider()
                             }
                         }

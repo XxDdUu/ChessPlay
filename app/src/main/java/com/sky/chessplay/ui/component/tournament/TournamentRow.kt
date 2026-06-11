@@ -95,7 +95,8 @@ fun TournamentRow(
             tournament = tournament,
             onDismissRequest = { showDetailDialog = false },
             onJoinClick = onJoinClick,
-            onStandingsClick = onStandingsClick
+            onStandingsClick = onStandingsClick,
+            isRegistered = false
         )
     }
 }

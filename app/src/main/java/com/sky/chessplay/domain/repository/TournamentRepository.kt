@@ -34,4 +34,8 @@ interface TournamentRepository {
         tournamentId: Long,
         roundId: Long
     ): Result<List<TournamentPairing>>
+
+    suspend fun getMyPairing(
+        tournamentId: Long
+    ): Result<com.sky.chessplay.domain.model.tournament.MyPairing?>
 }

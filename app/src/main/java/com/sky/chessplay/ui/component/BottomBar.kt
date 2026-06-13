@@ -17,31 +17,33 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun BottomBar(
-    onCommunityClick: () -> Unit
+    onHomeClick: () -> Unit,
+    onCommunityClick: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF1A143A))
-            .padding(vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .background(Color(0xFF262421))
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-
-        BottomItem("🎨",
-            "Appearance",
-            ) {}
-        BottomItem("🎁",
-            "Rewards",
-            ) {}
-        BottomItem("🎯",
-            "Missions",
-            ) {}
         BottomItem(
-            "📣",
-            "Community",
-            ) {
-            onCommunityClick()
-        }
+            icon = "🏠",
+            text = "Trang chủ",
+            onClick = onHomeClick
+        )
+        BottomItem(
+            icon = "👥",
+            text = "Bạn bè",
+            onClick = onCommunityClick
+        )
+        BottomItem(
+            icon = "👤",
+            text = "Hồ sơ",
+            onClick = onProfileClick
+        )
     }
 }
 
@@ -49,13 +51,15 @@ fun BottomBar(
 fun BottomItem(
     icon: String,
     text: String,
-    onClick: () -> Unit) {
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable {
-            onClick()
-        }) {
-        Text(icon, fontSize = 24.sp)
-        Text(text, color = Color.White, fontSize = 12.sp)
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Text(icon, fontSize = 22.sp)
+        Text(text, color = Color(0xFFbabfc3), fontSize = 11.sp)
     }
 }

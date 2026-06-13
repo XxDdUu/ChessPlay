@@ -1,5 +1,10 @@
 package com.sky.chessplay.ui.component.tournament
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.sky.chessplay.domain.model.tournament.Tournament
 import com.sky.chessplay.domain.state.TournamentStatus
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TournamentItem(
     tournament: Tournament,
@@ -68,6 +74,29 @@ fun TournamentItem(
                 }
                 Text("🔄 ${tournament.totalRounds} rounds")
                 Text("⏱ ${tournament.timeControl}")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Column(
+                modifier = Modifier.padding(vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "📅 Đăng ký mở: ${formatTournamentDate(tournament.registrationStart)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "🔒 Đăng ký đóng: ${formatTournamentDate(tournament.registrationEnd)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "🏁 Bắt đầu: ${formatTournamentDate(tournament.startTime)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             Spacer(Modifier.height(8.dp))
@@ -118,5 +147,23 @@ fun TournamentItem(
             onLeaveClick = onLeaveClick,
             isRegistered = isRegistered
         )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun formatTournamentDate(dateString: String): String {
+    if (dateString.isBlank()) return "Chưa thiết lập"
+    return try {
+        val parsedDate = ZonedDateTime.parse(dateString).withZoneSameInstant(java.time.ZoneId.systemDefault())
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+        parsedDate.format(formatter)
+    } catch (e: Exception) {
+        try {
+            val parsed = java.time.OffsetDateTime.parse(dateString).atZoneSameInstant(java.time.ZoneId.systemDefault())
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+            parsed.format(formatter)
+        } catch (ex: Exception) {
+            dateString
+        }
     }
 }

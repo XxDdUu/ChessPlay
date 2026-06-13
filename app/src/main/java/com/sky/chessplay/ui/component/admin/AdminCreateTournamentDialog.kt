@@ -180,9 +180,9 @@ fun CreateTournamentDialog(
                             totalRounds = totalRounds.toIntOrNull() ?: 1,
                             timeControl = timeControl,
 
-                            registrationStart = registrationStart?.toInstant(ZoneOffset.UTC)?.toString() ?: "",
-                            registrationEnd = registrationEnd?.toInstant(ZoneOffset.UTC)?.toString() ?: "",
-                            startTime = startTime?.toInstant(ZoneOffset.UTC)?.toString() ?: ""
+                            registrationStart = registrationStart?.atZone(ZoneId.systemDefault())?.toInstant()?.toString() ?: "",
+                            registrationEnd = registrationEnd?.atZone(ZoneId.systemDefault())?.toInstant()?.toString() ?: "",
+                            startTime = startTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toString() ?: ""
                         )
                     )
                 }

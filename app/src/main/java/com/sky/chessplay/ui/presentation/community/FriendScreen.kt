@@ -2,186 +2,147 @@ package com.sky.chessplay.ui.presentation.community
 
 import FriendEvent
 import FriendEvent.RemoveFriend
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.sky.chessplay.domain.state.FriendState
-import com.sky.chessplay.ui.component.friend.FriendActionCard
+import com.sky.chessplay.data.remote.dto.response.FriendResponse
 import com.sky.chessplay.ui.component.friend.FriendItem
+import com.sky.chessplay.ui.component.friend.PendingFriendItem
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
-import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
 
 @Composable
 fun FriendScreen(
-    state: FriendState,
+    friends: List<FriendResponse>,
+    pendingRequests: List<FriendResponse>,
+    isRefreshing: Boolean,
+    errorMessage: String?,
     currentUserId: Long,
     onEvent: (FriendEvent) -> Unit,
     onNavigateToDiscover: () -> Unit,
     navController: NavHostController
 ) {
-    var showPendingModal by remember {
-        mutableStateOf(false)
-    }
-    val pendingCount =
-        (state as? FriendState.PendingLoaded)
-            ?.pendingRequests
-            ?.size ?: 0
     AppScaffold(
         navController = navController,
         config = AppScaffoldConfig(
-            title = "👥 Bạn bè",
-            showTopBar = true
+            showTopBar = false,
+            showBottomBar = true
         )
-    ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0D1117))
-            .padding(16.dp)
-    ) {
-
-        Text(
-            text = "👥 Bạn bè",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF1C1A17))
+                .padding(padding)
         ) {
-
-            FriendActionCard(
-                title = "Kết nối bạn bè",
-                icon = Icons.Default.PersonAdd,
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-
-            Box(
-                modifier = Modifier.weight(1f)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
-                FriendActionCard(
-                    title = "Tìm bạn",
-                    icon = Icons.Default.Search,
-                    onClick = {
-                        showPendingModal = true
-                    }
-                )
-
-                if (pendingCount > 0) {
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = (-4).dp, y = 4.dp)
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(Color.Red),
-                        contentAlignment = Alignment.Center
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-
                         Text(
-                            text = pendingCount.toString(),
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
+                            text = "Bạn bè 👥",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
+                        OutlinedButton(
+                            onClick = onNavigateToDiscover,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color(0xFF81B64C)
+                            ),
+                            border = BorderStroke(1.dp, Color(0xFF81B64C)),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Tìm bạn mới", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                if (errorMessage != null) {
+                    item {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+                if (pendingRequests.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Lời mời kết bạn (${pendingRequests.size})",
+                            color = Color(0xFFbabfc3),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-
-            FriendActionCard(
-                title = "Gửi thư mời",
-                icon = Icons.Default.Mail,
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-
-            FriendActionCard(
-                title = "Tạo lời thách đấu",
-                icon = Icons.Default.Link,
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        when (state) {
-            is FriendState.Idle -> {
-
-                Text(
-                    text = "Không có dữ liệu",
-                    color = Color.Gray
-                )
-            }
-
-            FriendState.Loading -> {
-
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    CircularProgressIndicator()
+                    items(pendingRequests) { request ->
+                        PendingFriendItem(
+                            request = request,
+                            onAccept = {
+                                onEvent(
+                                    FriendEvent.AcceptFriendRequest(
+                                        user1 = request.userId,
+                                        user2 = currentUserId
+                                    )
+                                )
+                            },
+                            onReject = {}
+                        )
+                    }
                 }
-            }
 
-            is FriendState.FriendsLoaded -> {
+                if (friends.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Tất cả bạn bè (${friends.size})",
+                            color = Color(0xFFbabfc3),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                    items(state.friends) { friend ->
+                    items(friends) { friend ->
                         FriendItem(
                             friend = friend,
                             onRemoveFriend = {
-
                                 onEvent(
-
                                     RemoveFriend(
                                         user1 = currentUserId,
                                         user2 = friend.userId
@@ -199,55 +160,32 @@ fun FriendScreen(
                         )
                     }
                 }
-            }
 
-            is FriendState.PendingLoaded -> {
-
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                if (friends.isEmpty() && pendingRequests.isEmpty() && !isRefreshing) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 48.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Chưa có bạn bè nào.\nBấm 'Tìm bạn mới' để kết nối!",
+                                color = Color.Gray,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
             }
 
-            is FriendState.Success -> {
-
-                Text(
-                    text = state.message,
-                    color = Color.Green
+            if (isRefreshing && friends.isEmpty() && pendingRequests.isEmpty()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color(0xFF81B64C)
                 )
             }
-
-            is FriendState.Error -> {
-
-                Text(
-                    text = state.message,
-                    color = Color.Red
-                )
-            }
-
-            is FriendState.FriendRequestSent -> TODO()
-        }
-    }
-        if (
-            showPendingModal &&
-            state is FriendState.PendingLoaded
-        ) {
-
-            PendingFriendModal(
-                requests = state.pendingRequests,
-                onDismiss = {
-                    showPendingModal = false
-                },
-                onAccept = { friend ->
-
-                    onEvent(
-                        FriendEvent.AcceptFriendRequest(
-                            user1 = friend.userId,
-                            user2 = currentUserId
-                        )
-                    )
-                }
-            )
         }
     }
 }

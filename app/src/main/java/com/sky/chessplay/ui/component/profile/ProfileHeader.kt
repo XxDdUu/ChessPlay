@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.component.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,22 +34,21 @@ fun ProfileHeader(
     losses: Int,
     draws: Int
 ) {
-
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF262421)
         ),
+        border = BorderStroke(1.dp, Color(0xFF312E2B)),
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-
         Row(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
-                    .size(90.dp)
+                    .size(72.dp)
                     .background(
                         Color(0xFF312E2B),
                         RoundedCornerShape(8.dp)
@@ -56,38 +56,71 @@ fun ProfileHeader(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "♟",
-                    fontSize = 40.sp
+                    text = "♟",
+                    fontSize = 36.sp,
+                    color = Color(0xFFbabfc3)
                 )
             }
 
-            Spacer(Modifier.width(20.dp))
+            Spacer(Modifier.width(16.dp))
 
             Column {
-
                 Text(
-                    username,
+                    text = username,
                     color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold
                 )
 
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
 
-                Text(
-                    "ELO: $elo   •   👥 $friends   •   Ván: $gamesPlayed",
-                    color = Color.LightGray
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "ELO: $elo",
+                        color = Color(0xFF81B64C),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                    Text("•", color = Color(0xFF62605e))
+                    Text(
+                        text = "👥 $friends",
+                        color = Color(0xFFbabfc3),
+                        fontSize = 13.sp
+                    )
+                    Text("•", color = Color(0xFF62605e))
+                    Text(
+                        text = "Ván: $gamesPlayed",
+                        color = Color(0xFFbabfc3),
+                        fontSize = 13.sp
+                    )
+                }
 
                 Spacer(Modifier.height(6.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
-                    Text("W: $wins", color = Color(0xFF81B64C))
-                    Text("L: $losses", color = Color.Red)
-                    Text("D: $draws", color = Color.Gray)
+                    Text(
+                        text = "Thắng: $wins",
+                        color = Color(0xFF81B64C),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Thua: $losses",
+                        color = Color(0xFFF87171),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Hòa: $draws",
+                        color = Color(0xFF9CA3AF),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }

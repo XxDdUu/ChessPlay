@@ -4,6 +4,8 @@ import com.sky.chessplay.data.remote.dto.response.StandingResponse
 import com.sky.chessplay.data.remote.dto.response.TournamentPairingResponse
 import com.sky.chessplay.data.remote.dto.response.TournamentResponse as Tournament
 import com.sky.chessplay.data.remote.dto.response.TournamentRoundResponse
+import com.sky.chessplay.data.remote.dto.response.MyPairingResponse
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -33,15 +35,20 @@ interface TournamentApi {
     @POST("api/tournaments/{id}/join")
     suspend fun joinTournament(
         @Path("id") tournamentId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @POST("api/tournaments/{id}/leave")
     suspend fun leaveTournament(
         @Path("id") tournamentId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @GET("api/tournaments/{id}/standings")
     suspend fun getStandings(
         @Path("id") tournamentId: Long
     ): Response<List<StandingResponse>>
+
+    @GET("api/tournaments/{id}/my-pairing")
+    suspend fun getMyPairing(
+        @Path("id") tournamentId: Long
+    ): Response<MyPairingResponse>
 }

@@ -4,6 +4,7 @@ import TournamentRequest
 import com.sky.chessplay.data.remote.dto.response.AdminDashboardResponse
 import com.sky.chessplay.data.remote.dto.response.TournamentResponse as Tournament
 import com.sky.chessplay.data.remote.dto.response.UserAdminResponse
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -31,12 +32,12 @@ interface AdminApi {
     @POST("api/admin/users/{userId}/ban")
     suspend fun banUser(
         @Path("userId") userId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @POST("api/admin/users/{userId}/unban")
     suspend fun unbanUser(
         @Path("userId") userId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @GET("api/admin/tournaments")
     suspend fun getTournaments(): Response<List<Tournament>>
@@ -55,21 +56,21 @@ interface AdminApi {
     @POST("api/admin/tournaments/{tournamentId}/start")
     suspend fun startTournament(
         @Path("tournamentId") tournamentId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @POST("api/admin/tournaments/{tournamentId}/finish")
     suspend fun finishTournament(
         @Path("tournamentId") tournamentId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @DELETE("api/admin/tournaments/{tournamentId}")
     suspend fun cancelTournament(
         @Path("tournamentId") tournamentId: Long
-    ): Response<Unit>
+    ): Response<ResponseBody>
 
     @POST("api/admin/pairings/{pairingId}/result")
     suspend fun submitPairingResult(
         @Path("pairingId") pairingId: Long,
         @Body result: Map<String, String>
-    ): Response<Unit>
+    ): Response<ResponseBody>
 }

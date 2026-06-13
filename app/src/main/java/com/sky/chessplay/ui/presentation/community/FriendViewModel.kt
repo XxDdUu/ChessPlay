@@ -24,11 +24,22 @@ class FriendViewModel @Inject constructor(
     private val chessSocket: ChessSocket
 ) : ViewModel() {
 
-    private val _state =
-        MutableStateFlow<FriendState>(FriendState.Idle)
-
+    private val _state = MutableStateFlow<FriendState>(FriendState.Idle)
     val state: StateFlow<FriendState> = _state
+
     var uiState by mutableStateOf(FriendUiState())
+        private set
+
+    var friendsList by mutableStateOf<List<com.sky.chessplay.data.remote.dto.response.FriendResponse>>(emptyList())
+        private set
+
+    var pendingRequestsList by mutableStateOf<List<com.sky.chessplay.data.remote.dto.response.FriendResponse>>(emptyList())
+        private set
+
+    var isRefreshing by mutableStateOf(false)
+        private set
+
+    var errorMessage by mutableStateOf<String?>(null)
         private set
 
     init {
@@ -42,48 +53,40 @@ class FriendViewModel @Inject constructor(
     }
 
     fun onEvent(event: FriendEvent) {
-
         when (event) {
-
             is FriendEvent.LoadFriends -> {
                 loadFriends(event.userId)
             }
-
             is FriendEvent.LoadPendingRequests -> {
                 loadPendingRequests(event.userId)
             }
-
             is FriendEvent.SendFriendRequest -> {
                 sendFriendRequest(
                     event.senderId,
                     event.receiverId
                 )
             }
-
             is FriendEvent.AcceptFriendRequest -> {
                 acceptFriendRequest(
                     event.user1,
                     event.user2
                 )
             }
-
             FriendEvent.ClearMessage -> {
                 _state.value = FriendState.Idle
+                errorMessage = null
             }
-
             is FriendEvent.SearchFriend -> {
-
+                // Not implemented or stubbed
             }
-
             is FriendEvent.SendChallenge -> {
                 chessSocket.inviteFriend(
                     friendId = event.friendId,
                     matchType = event.matchType
                 )
             }
-
             is FriendEvent.ConnectFriend -> {
-
+                // Not implemented or stubbed
             }
             is FriendEvent.RemoveFriend -> {
                 removeFriend(
@@ -95,49 +98,32 @@ class FriendViewModel @Inject constructor(
     }
 
     private fun loadFriends(userId: Long) {
-
         viewModelScope.launch {
-
             _state.value = FriendState.Loading
-
+            isRefreshing = true
+            errorMessage = null
             try {
-
-                val friends =
-                    repository.getFriends(userId)
+                val friends = repository.getFriends(userId)
                 Log.d("LOAD FRIEND DEBUG", friends.toString())
-                _state.value =
-                    FriendState.FriendsLoaded(friends)
-
+                friendsList = friends
+                _state.value = FriendState.FriendsLoaded(friends)
             } catch (e: Exception) {
-
-                _state.value =
-                    FriendState.Error(
-                        e.message ?: "Unknown error"
-                    )
+                errorMessage = e.message ?: "Unknown error"
+                _state.value = FriendState.Error(e.message ?: "Unknown error")
+            } finally {
+                isRefreshing = false
             }
         }
     }
 
     private fun loadPendingRequests(userId: Long) {
-
         viewModelScope.launch {
-
-            _state.value = FriendState.Loading
-
             try {
-
-                val pending =
-                    repository.getPendingRequests(userId)
-
-                _state.value =
-                    FriendState.PendingLoaded(pending)
-
+                val pending = repository.getPendingRequests(userId)
+                pendingRequestsList = pending
+                _state.value = FriendState.PendingLoaded(pending)
             } catch (e: Exception) {
-
-                _state.value =
-                    FriendState.Error(
-                        e.message ?: "Unknown error"
-                    )
+                // Ignore or handle
             }
         }
     }
@@ -146,57 +132,36 @@ class FriendViewModel @Inject constructor(
         senderId: Long,
         receiverId: Long
     ) {
-
         if (uiState.isSendingRequest) return
-
         viewModelScope.launch {
-
-            uiState = uiState.copy(
-                isSendingRequest = true
-            )
-
+            uiState = uiState.copy(isSendingRequest = true)
             try {
-
-                val message = repository.sendFriendRequest(
-                    senderId,
-                    receiverId
-                )
-
+                val message = repository.sendFriendRequest(senderId, receiverId)
                 uiState = uiState.copy(
                     isSendingRequest = false,
                     friendRequestSent = true,
                     statusMessage = message
                 )
-
+                _state.value = FriendState.FriendRequestSent(message)
             } catch (e: Exception) {
-
                 uiState = uiState.copy(
                     isSendingRequest = false,
-                    statusMessage = e.message
-                        ?: "Failed to send friend request."
+                    statusMessage = e.message ?: "Failed to send friend request."
                 )
             }
         }
     }
+
     private fun removeFriend(
         user1: Long,
         user2: Long
     ) {
-
         viewModelScope.launch {
-
             try {
-
-                repository.removeFriend(
-                    user1,
-                    user2
-                )
-                onEvent(
-                    FriendEvent.LoadFriends(user1)
-                )
-
+                repository.removeFriend(user1, user2)
+                loadFriends(user1)
             } catch (e: Exception) {
-
+                // Ignore
             }
         }
     }
@@ -214,44 +179,37 @@ class FriendViewModel @Inject constructor(
                 }
             )
         }
+        friendsList = friendsList.map { friend ->
+            if (friend.userId == presence.userId) {
+                friend.copy(status = if (presence.online) "ONLINE" else "OFFLINE")
+            } else {
+                friend
+            }
+        }
     }
 
     private fun acceptFriendRequest(
         user1: Long,
         user2: Long
     ) {
-
         viewModelScope.launch {
-
             _state.value = FriendState.Loading
-
+            isRefreshing = true
             try {
-
-                val message =
-                    repository.acceptFriendRequest(
-                        user1,
-                        user2
-                    )
-
-                _state.value =
-                    FriendState.Success(message)
-                onEvent(
-                    FriendEvent.LoadFriends(user1)
-                )
-
+                val message = repository.acceptFriendRequest(user1, user2)
+                _state.value = FriendState.Success(message)
+                loadFriends(user1)
+                loadPendingRequests(user1)
             } catch (e: Exception) {
-
-                _state.value =
-                    FriendState.Error(
-                        e.message ?: "Unknown error"
-                    )
+                errorMessage = e.message ?: "Unknown error"
+                _state.value = FriendState.Error(e.message ?: "Unknown error")
+            } finally {
+                isRefreshing = false
             }
         }
     }
-    fun clearStatusMessage() {
 
-        uiState = uiState.copy(
-            statusMessage = null
-        )
+    fun clearStatusMessage() {
+        uiState = uiState.copy(statusMessage = null)
     }
 }

@@ -189,6 +189,13 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
         webSocket = null
     }
 
+    override fun sendTournamentJoinLobby(pairingId: Long) {
+        val json = JSONObject()
+            .put("type", "TOURNAMENT_JOIN_LOBBY")
+            .put("pairingId", pairingId)
+        webSocket?.send(json.toString())
+    }
+
     private val socketListener = object : WebSocketListener() {
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -347,6 +354,38 @@ class ChessSocketClient @Inject constructor() : ChessSocket {
                         SocketEvent.FriendPresence(
                             userId = json.getLong("userId"),
                             online = false
+                        )
+                    }
+                    "ROUND_BREAK_START" -> {
+                        SocketEvent.RoundBreakStart(
+                            tournamentId = json.optLong("tournamentId"),
+                            nextRoundNumber = json.optInt("nextRoundNumber"),
+                            breakDurationSeconds = json.optInt("breakDurationSeconds", 600)
+                        )
+                    }
+                    "ROUND_STARTED" -> {
+                        SocketEvent.RoundStarted(
+                            tournamentId = json.optLong("tournamentId"),
+                            roundNumber = json.optInt("roundNumber")
+                        )
+                    }
+                    "TOURNAMENT_LOBBY_UPDATE" -> {
+                        SocketEvent.TournamentLobbyUpdate(
+                            pairingId = json.optLong("pairingId"),
+                            whiteReady = json.optBoolean("whiteReady", false),
+                            blackReady = json.optBoolean("blackReady", false)
+                        )
+                    }
+                    "TOURNAMENT_MATCH_START" -> {
+                        SocketEvent.TournamentMatchStart(
+                            pairingId = json.optLong("pairingId"),
+                            gameId = json.optString("gameId")
+                        )
+                    }
+                    "TOURNAMENT_PAIRING_FORFEITED" -> {
+                        SocketEvent.TournamentPairingForfeited(
+                            pairingId = json.optLong("pairingId"),
+                            result = json.optString("result")
                         )
                     }
                     else -> null

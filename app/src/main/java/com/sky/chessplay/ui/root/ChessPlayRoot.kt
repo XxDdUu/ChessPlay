@@ -37,6 +37,8 @@ import com.sky.chessplay.ui.presentation.profile.ProfileRoute
 import com.sky.chessplay.ui.presentation.tournament.TournamentDetailScreen
 import com.sky.chessplay.ui.presentation.tournament.TournamentRoute
 import com.sky.chessplay.ui.presentation.tournament.TournamentStandingsScreen
+import com.sky.chessplay.ui.presentation.tournament.TournamentLobbyScreen
+import com.sky.chessplay.ui.presentation.tournament.TournamentBreakScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -193,12 +195,29 @@ fun ChessPlayRoot() {
                 )
             }
 
-            composable(Route.OnlinePlay.route) {
+            composable(
+                route = Route.OnlinePlay.route,
+                arguments = listOf(
+                    navArgument("isTournament") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    },
+                    navArgument("tournamentId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) { backStackEntry ->
+                val isTournament = backStackEntry.arguments?.getBoolean("isTournament") ?: false
+                val tournamentId = backStackEntry.arguments?.getLong("tournamentId") ?: -1L
+
                 OnlinePlayScreen(
                     viewModel = chessViewModel,
                     matchViewModel = matchViewModel,
                     navController = navController,
-                    authState = authState
+                    authState = authState,
+                    isTournament = isTournament,
+                    tournamentId = if (tournamentId != -1L) tournamentId else null
                 )
             }
             composable(Route.Profile.route) {
@@ -316,6 +335,44 @@ fun ChessPlayRoot() {
                 TournamentDetailScreen(
                     tournamentId = tournamentId,
                     currentUserId = currentUserId,
+                    navController = navController
+                )
+            }
+
+            composable(
+                route = Route.TournamentLobby.route,
+                arguments = listOf(
+                    navArgument("tournamentId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val tournamentId = backStackEntry.arguments?.getLong("tournamentId") ?: 0L
+                val currentUserId = (authState as? AuthState.Authenticated)?.user?.id
+                TournamentLobbyScreen(
+                    tournamentId = tournamentId,
+                    currentUserId = currentUserId,
+                    navController = navController
+                )
+            }
+
+            composable(
+                route = Route.TournamentBreak.route,
+                arguments = listOf(
+                    navArgument("tournamentId") {
+                        type = NavType.LongType
+                    },
+                    navArgument("breakDurationSeconds") {
+                        type = NavType.IntType
+                        defaultValue = 600
+                    }
+                )
+            ) { backStackEntry ->
+                val tournamentId = backStackEntry.arguments?.getLong("tournamentId") ?: 0L
+                val breakDurationSeconds = backStackEntry.arguments?.getInt("breakDurationSeconds") ?: 600
+                TournamentBreakScreen(
+                    tournamentId = tournamentId,
+                    breakDurationSeconds = breakDurationSeconds,
                     navController = navController
                 )
             }

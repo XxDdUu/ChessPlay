@@ -11,6 +11,8 @@ fun TournamentResponse.toDomain(): Tournament {
         description = description ?: "",
         totalRounds = totalRounds ?: 0,
         timeControl = timeControl ?: "",
+        registrationStart = registrationStart ?: "",
+        registrationEnd = registrationEnd ?: "",
         startTime = startTime ?: "",
         status = status.toTournamentStatus(),
         createdById = creatorId?.toLong() ?: 0L,
@@ -28,4 +30,23 @@ fun String?.toTournamentStatus(): TournamentStatus {
     } catch (_: Exception) {
         TournamentStatus.UNKNOWN
     }
+}
+
+fun com.sky.chessplay.data.remote.dto.response.MyPairingResponse.toDomain(): com.sky.chessplay.domain.model.tournament.MyPairing {
+    return com.sky.chessplay.domain.model.tournament.MyPairing(
+        pairingId = pairingId ?: 0L,
+        roundNumber = roundNumber ?: 0,
+        opponentName = opponentName ?: "BYE",
+        opponentRating = opponentRating ?: 1200,
+        myColor = myColor ?: "WHITE",
+        isBye = isBye ?: false,
+        lobbyTimeLimitSeconds = lobbyTimeLimitSeconds ?: 300,
+        lobbyTimeLeftSeconds = lobbyTimeLeftSeconds ?: 0L,
+        iAmReady = iAmReady ?: false,
+        opponentReady = opponentReady ?: false,
+        result = result,
+        gameId = gameId,
+        inBreak = inBreak ?: false,
+        breakTimeLeftSeconds = breakTimeLeftSeconds ?: 0L
+    )
 }

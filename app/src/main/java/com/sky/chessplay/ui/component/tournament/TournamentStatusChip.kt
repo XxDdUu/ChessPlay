@@ -20,6 +20,8 @@ fun TournamentStatusChip(
         "REGISTERING" -> Color(0xFF4CAF50)
         "ONGOING" -> Color(0xFFFF9800)
         "FINISHED" -> Color(0xFFF44336)
+        "UPCOMING" -> Color(0xFF00BCD4)
+        "REGISTRATION_CLOSED" -> Color(0xFF9E9E9E)
         else -> MaterialTheme.colorScheme.primary
     }
 

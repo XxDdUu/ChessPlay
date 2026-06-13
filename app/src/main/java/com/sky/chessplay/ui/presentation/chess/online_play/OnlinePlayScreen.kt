@@ -59,6 +59,8 @@ import com.sky.chessplay.ui.layout.TopBarAction
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import com.sky.chessplay.ui.presentation.chess.online_play.chat.ChatPanel
 import com.sky.chessplay.ui.presentation.community.FriendViewModel
+import com.sky.chessplay.navigation.Route
+import kotlinx.coroutines.delay
 import view.board.ChessBoard
 
 @Composable
@@ -69,8 +71,23 @@ fun OnlinePlayScreen(
     friendViewModel: FriendViewModel = hiltViewModel(),
     onlineGameViewModel: OnlineGameViewModel = hiltViewModel(),
     navController: NavHostController,
-    authState: AuthState
+    authState: AuthState,
+    isTournament: Boolean = false,
+    tournamentId: Long? = null
 ) {
+    LaunchedEffect(isTournament, tournamentId) {
+        onlineGameViewModel.isTournament = isTournament
+        onlineGameViewModel.tournamentId = tournamentId
+    }
+
+    LaunchedEffect(onlineGameViewModel.gameOverResult) {
+        if (isTournament && tournamentId != null && onlineGameViewModel.gameOverResult != null) {
+            delay(5000)
+            navController.navigate(Route.TournamentDetail.createRoute(tournamentId)) {
+                popUpTo(Route.OnlinePlay.route) { this.inclusive = true }
+            }
+        }
+    }
     val friendState by friendViewModel.state.collectAsState()
     val user = (authState as? AuthState.Authenticated)?.user
     var showChat by remember {
@@ -78,6 +95,15 @@ fun OnlinePlayScreen(
     }
     val gameState = viewModel.gameState
     val uiState = viewModel.uiState
+
+    LaunchedEffect(gameState.sideToPlay, gameState.status) {
+        if (gameState.status == GameStatus.PLAYING) {
+            onlineGameViewModel.setActiveSide(gameState.sideToPlay)
+        } else {
+            onlineGameViewModel.setActiveSide(null)
+        }
+    }
+
     val gameInit = matchViewModel.gameInitEvent
     val configuration = LocalConfiguration.current
     val rematchOffered = onlineGameViewModel.rematchOffered
@@ -120,6 +146,7 @@ fun OnlinePlayScreen(
             viewModel.startOnlineGame(
                 init.copy(fen = fen)
             )
+            onlineGameViewModel.initializeGame(init, viewModel.gameState.sideToPlay)
         }
         user?.id?.let {
             chatViewModel.setCurrentUser(it)
@@ -453,71 +480,95 @@ fun OnlinePlayScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        if (rematchOffered) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Opponent offered a rematch!",
-                                    color = Color(0xFF4ADE80),
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    textAlign = TextAlign.Center
-                                )
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        if (!isTournament) {
+                            if (rematchOffered) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Button(
-                                        onClick = {
-                                            matchViewModel.gameId?.let { onlineGameViewModel.acceptRematch(it) }
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                        shape = RoundedCornerShape(48.dp)
+                                    Text(
+                                        text = "Opponent offered a rematch!",
+                                        color = Color(0xFF4ADE80),
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
-                                        Text("Accept")
-                                    }
-                                    OutlinedButton(
-                                        onClick = {
-                                            matchViewModel.gameId?.let { onlineGameViewModel.rejectRematch(it) }
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                        shape = RoundedCornerShape(48.dp)
-                                    ) {
-                                        Text("Decline")
+                                        Button(
+                                            onClick = {
+                                                matchViewModel.gameId?.let { onlineGameViewModel.acceptRematch(it) }
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            shape = RoundedCornerShape(48.dp)
+                                        ) {
+                                            Text("Accept")
+                                        }
+                                        OutlinedButton(
+                                            onClick = {
+                                                matchViewModel.gameId?.let { onlineGameViewModel.rejectRematch(it) }
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            shape = RoundedCornerShape(48.dp)
+                                        ) {
+                                            Text("Decline")
+                                        }
                                     }
                                 }
+                            } else if (rematchSent) {
+                                Text(
+                                    text = "Rematch offer sent...",
+                                    color = Color.Gray,
+                                    fontSize = 15.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+                            } else {
+                                Button(
+                                    onClick = {
+                                        matchViewModel.gameId?.let { onlineGameViewModel.offerRematch(it) }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(48.dp)
+                                ) {
+                                    Text("Offer Rematch")
+                                }
                             }
-                        } else if (rematchSent) {
+                        } else {
                             Text(
-                                text = "Rematch offer sent...",
-                                color = Color.Gray,
-                                fontSize = 15.sp,
+                                text = "Redirecting back to standings in a few seconds...",
+                                color = Color(0xFFFFB300),
+                                fontSize = 14.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
-                        } else {
+                        }
+
+                        if (isTournament && tournamentId != null) {
                             Button(
                                 onClick = {
-                                    matchViewModel.gameId?.let { onlineGameViewModel.offerRematch(it) }
+                                    navController.navigate(Route.TournamentDetail.createRoute(tournamentId)) {
+                                        popUpTo(Route.OnlinePlay.route) { this.inclusive = true }
+                                    }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(48.dp)
                             ) {
-                                Text("Offer Rematch")
+                                Text("Return to Standings")
                             }
-                        }
-
-                        OutlinedButton(
-                            onClick = {
-                                navController.popBackStack()
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(48.dp)
-                        ) {
-                            Text("Leave Match")
+                        } else {
+                            OutlinedButton(
+                                onClick = {
+                                    navController.popBackStack()
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(48.dp)
+                            ) {
+                                Text("Leave Match")
+                            }
                         }
                     }
                 }

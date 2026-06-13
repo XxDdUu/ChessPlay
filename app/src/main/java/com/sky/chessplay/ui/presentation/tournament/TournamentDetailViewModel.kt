@@ -3,6 +3,8 @@ package com.sky.chessplay.ui.presentation.tournament
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sky.chessplay.domain.state.TournamentDetailUiState
+import com.sky.chessplay.domain.state.TournamentStatus
+import com.sky.chessplay.domain.usecases.GetMyPairingUseCase
 import com.sky.chessplay.domain.usecases.GetStandingsUseCase
 import com.sky.chessplay.domain.usecases.GetTournamentByIdUseCase
 import com.sky.chessplay.domain.usecases.GetTournamentPairingsUseCase
@@ -24,7 +26,8 @@ class TournamentDetailViewModel @Inject constructor(
     private val getTournamentRoundsUseCase: GetTournamentRoundsUseCase,
     private val getTournamentPairingsUseCase: GetTournamentPairingsUseCase,
     private val joinTournamentUseCase: JoinTournamentUseCase,
-    private val leaveTournamentUseCase: LeaveTournamentUseCase
+    private val leaveTournamentUseCase: LeaveTournamentUseCase,
+    private val getMyPairingUseCase: GetMyPairingUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TournamentDetailUiState())
@@ -43,15 +46,18 @@ class TournamentDetailViewModel @Inject constructor(
             val detailDeferred = async { getTournamentByIdUseCase(tournamentId) }
             val standingsDeferred = async { getStandingsUseCase(tournamentId) }
             val roundsDeferred = async { getTournamentRoundsUseCase(tournamentId) }
+            val myPairingDeferred = async { getMyPairingUseCase(tournamentId) }
 
             val detailResult = detailDeferred.await()
             val standingsResult = standingsDeferred.await()
             val roundsResult = roundsDeferred.await()
+            val myPairingResult = myPairingDeferred.await()
 
             val tournament = detailResult.getOrNull()
             val standings = standingsResult.getOrNull().orEmpty()
             val rounds = roundsResult.getOrNull().orEmpty()
             val selectedRound = rounds.lastOrNull()
+            val myPairing = myPairingResult.getOrNull()
 
             _uiState.update {
                 it.copy(
@@ -61,6 +67,7 @@ class TournamentDetailViewModel @Inject constructor(
                     rounds = rounds,
                     selectedRoundId = selectedRound?.id,
                     pairings = emptyList(),
+                    myPairing = myPairing,
                     roundsError = roundsResult.exceptionOrNull()?.message,
                     error = detailResult.exceptionOrNull()?.message
                         ?: standingsResult.exceptionOrNull()?.message

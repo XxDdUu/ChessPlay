@@ -8,5 +8,6 @@ data class TournamentUiState(
     val isLoading: Boolean = false,
     val tournaments: List<Tournament> = emptyList(),
     val standings: List<Standing> = emptyList(),
+    val registeredTournamentIds: Set<Long> = emptySet(),
     val error: String? = null
 )

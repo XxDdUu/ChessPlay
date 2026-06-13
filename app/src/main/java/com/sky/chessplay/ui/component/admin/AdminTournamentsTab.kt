@@ -35,7 +35,6 @@ import com.sky.chessplay.domain.state.TournamentStatus
 fun AdminTournamentsTab(
     tournaments: List<Tournament>,
     isLoading: Boolean,
-    onStartClick: (Long) -> Unit,
     onFinishClick: (Long) -> Unit,
     onCancelClick: (Long) -> Unit,
     modifier: Modifier = Modifier
@@ -55,7 +54,6 @@ fun AdminTournamentsTab(
                 items(tournaments, key = { it.id!! }) { tournament ->
                     TournamentAdminItem(
                         tournament = tournament,
-                        onStartClick = { onStartClick(tournament.id?.toLong() ?: 0L) },
                         onFinishClick = { onFinishClick(tournament.id?.toLong() ?: 0L) },
                         onCancelClick = { onCancelClick(tournament.id?.toLong() ?: 0L) }
                     )
@@ -68,7 +66,6 @@ fun AdminTournamentsTab(
 @Composable
 private fun TournamentAdminItem(
     tournament: Tournament,
-    onStartClick: () -> Unit,
     onFinishClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -111,29 +108,11 @@ private fun TournamentAdminItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = onStartClick,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(36.dp),
-                    enabled = tournament.status !in listOf(
-                        TournamentStatus.ONGOING,
-                        TournamentStatus.FINISHED
-                    )
-                ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Start")
-                }
-
-                Button(
                     onClick = onFinishClick,
                     modifier = Modifier
                         .weight(1f)
                         .height(36.dp),
-                    enabled = tournament.status !in listOf(
-                        TournamentStatus.ONGOING,
-                        TournamentStatus.FINISHED
-                    )
+                    enabled = tournament.status == TournamentStatus.ONGOING
                 ) {
                     Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))

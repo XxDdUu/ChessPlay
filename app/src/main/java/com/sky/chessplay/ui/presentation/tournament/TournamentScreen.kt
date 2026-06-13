@@ -137,10 +137,8 @@ fun TournamentScreen(
                                     onJoinClick = { viewModel.joinTournament(it) },
                                     onStandingsClick = onTournamentClick,
                                     onLeaveClick = { viewModel.leaveTournament(it) },
-                                    isRegistered = uiState.standings.any {
-                                        currentUserId != null && it.playerId == currentUserId
-                                        },
-                                    )
+                                    isRegistered = uiState.registeredTournamentIds.contains(tournament.id)
+                                )
                                 HorizontalDivider()
                             }
                         }

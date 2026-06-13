@@ -1,5 +1,10 @@
 package com.sky.chessplay.ui.presentation.tournament
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,7 +52,15 @@ import com.sky.chessplay.domain.state.TournamentStatus
 import com.sky.chessplay.ui.component.tournament.TournamentStatusChip
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
+import com.sky.chessplay.navigation.Route
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.width
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TournamentDetailScreen(
@@ -58,9 +71,16 @@ fun TournamentDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(tournamentId) {
         viewModel.loadTournament(tournamentId)
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_LONG).show()
+        }
     }
 
     AppScaffold(
@@ -103,7 +123,15 @@ fun TournamentDetailScreen(
                                     currentUserId != null && it.playerId == currentUserId
                                 },
                                 onJoinClick = { viewModel.joinTournament(tournamentId) },
-                                onLeaveClick = { viewModel.leaveTournament(tournamentId) }
+                                onLeaveClick = { viewModel.leaveTournament(tournamentId) },
+                                myPairing = uiState.myPairing,
+                                onLobbyClick = {
+                                    if (uiState.myPairing?.inBreak == true) {
+                                        navController.navigate(Route.TournamentBreak.createRoute(tournamentId))
+                                    } else {
+                                        navController.navigate(Route.TournamentLobby.createRoute(tournamentId))
+                                    }
+                                }
                             )
                         }
                     }
@@ -194,12 +222,15 @@ fun TournamentDetailScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun TournamentSummaryCard(
     tournament: Tournament,
     isRegistered: Boolean,
     onJoinClick: () -> Unit,
-    onLeaveClick: () -> Unit
+    onLeaveClick: () -> Unit,
+    myPairing: com.sky.chessplay.domain.model.tournament.MyPairing? = null,
+    onLobbyClick: () -> Unit = {}
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -249,9 +280,25 @@ private fun TournamentSummaryCard(
                 )
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DetailStat(
+                    label = "Registration Start",
+                    value = formatTournamentDate(tournament.registrationStart),
+                    modifier = Modifier.weight(1f)
+                )
+                DetailStat(
+                    label = "Registration End",
+                    value = formatTournamentDate(tournament.registrationEnd),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
             DetailStat(
-                label = "Start",
-                value = tournament.startTime.ifBlank { "Not scheduled" },
+                label = "Tournament Start",
+                value = formatTournamentDate(tournament.startTime),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -270,6 +317,33 @@ private fun TournamentSummaryCard(
                     ) {
                         Text("Join Tournament")
                     }
+                }
+            } else if (tournament.status == TournamentStatus.ONGOING && isRegistered) {
+                if (myPairing != null) {
+                    val isBreak = myPairing.inBreak
+                    Button(
+                        onClick = onLobbyClick,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isBreak) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (isBreak) "Giải lao giữa hiệp (Round ${myPairing.roundNumber})" else "Vào phòng chờ thi đấu (Round ${myPairing.roundNumber})")
+                    }
+                } else {
+                    Text(
+                        text = "Đang đợi hệ thống ghép cặp vòng đấu mới...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontStyle = FontStyle.Italic,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
@@ -452,6 +526,24 @@ private fun EmptyTournamentMessage(message: String) {
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun formatTournamentDate(dateString: String): String {
+    if (dateString.isBlank()) return "Chưa thiết lập"
+    return try {
+        val parsedDate = ZonedDateTime.parse(dateString).withZoneSameInstant(java.time.ZoneId.systemDefault())
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+        parsedDate.format(formatter)
+    } catch (e: Exception) {
+        try {
+            val parsed = java.time.OffsetDateTime.parse(dateString).atZoneSameInstant(java.time.ZoneId.systemDefault())
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.getDefault())
+            parsed.format(formatter)
+        } catch (ex: Exception) {
+            dateString
         }
     }
 }

@@ -29,4 +29,5 @@ interface ChessSocket {
     val socketEvents: SharedFlow<SocketEvent>
     fun inviteFriend(friendId: Long, matchType: String)
     fun acceptInvite(hostId: Long)
+    fun sendTournamentJoinLobby(pairingId: Long)
 }

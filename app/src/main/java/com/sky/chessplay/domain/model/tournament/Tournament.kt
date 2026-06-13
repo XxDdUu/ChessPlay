@@ -8,6 +8,8 @@ data class Tournament(
     val description: String,
     val totalRounds: Int,
     val timeControl: String,
+    val registrationStart: String,
+    val registrationEnd: String,
     val startTime: String,
     val status: TournamentStatus,
     val createdById: Long,

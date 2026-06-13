@@ -13,6 +13,7 @@ data class TournamentDetailUiState(
     val rounds: List<TournamentRound> = emptyList(),
     val selectedRoundId: Long? = null,
     val pairings: List<TournamentPairing> = emptyList(),
+    val myPairing: com.sky.chessplay.domain.model.tournament.MyPairing? = null,
     val roundsError: String? = null,
     val error: String? = null
 )

@@ -78,4 +78,31 @@ sealed class SocketEvent {
         val userId: Long,
         val online: Boolean
     ) : SocketEvent()
+
+    data class RoundBreakStart(
+        val tournamentId: Long,
+        val nextRoundNumber: Int,
+        val breakDurationSeconds: Int
+    ) : SocketEvent()
+
+    data class RoundStarted(
+        val tournamentId: Long,
+        val roundNumber: Int
+    ) : SocketEvent()
+
+    data class TournamentLobbyUpdate(
+        val pairingId: Long,
+        val whiteReady: Boolean,
+        val blackReady: Boolean
+    ) : SocketEvent()
+
+    data class TournamentMatchStart(
+        val pairingId: Long,
+        val gameId: String
+    ) : SocketEvent()
+
+    data class TournamentPairingForfeited(
+        val pairingId: Long,
+        val result: String
+    ) : SocketEvent()
 }

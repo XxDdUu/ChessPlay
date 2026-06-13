@@ -39,6 +39,9 @@ class OnlineGameViewModel @Inject constructor(
     var gameOverResult by mutableStateOf<String?>(null)
         private set
 
+    var isTournament by mutableStateOf(false)
+    var tournamentId by mutableStateOf<Long?>(null)
+
     // --- Clock State ---
     var whiteTimeSeconds by mutableIntStateOf(600)
         private set
@@ -76,11 +79,7 @@ class OnlineGameViewModel @Inject constructor(
                         stopClock()
                     }
                     is SocketEvent.GameInit -> {
-                        resetGameState()
-                        whiteTimeSeconds = event.timeWhite
-                        blackTimeSeconds = event.timeBlack
-                        // Clock starts ticking from the side that plays first (always WHITE at init)
-                        startClock(Side.WHITE)
+                        initializeGame(event, Side.WHITE)
                     }
 
                     is SocketEvent.DrawOffered -> drawOffered = true
@@ -91,14 +90,14 @@ class OnlineGameViewModel @Inject constructor(
                     }
 
                     is SocketEvent.Move -> {
-                        // Opponent just moved — sync their remaining time and flip the ticking side
-                        val oppSide = activeSide?.opposite ?: return@collect
-                        event.timeRemaining?.let { remaining ->
-                            if (oppSide == Side.WHITE) whiteTimeSeconds = remaining
-                            else blackTimeSeconds = remaining
+                        event.fen?.let { fen ->
+                            val turnPart = fen.split(" ").getOrNull(1)
+                            val sideThatMoved = if (turnPart == "w") Side.BLACK else Side.WHITE
+                            event.timeRemaining?.let { remaining ->
+                                if (sideThatMoved == Side.WHITE) whiteTimeSeconds = remaining
+                                else blackTimeSeconds = remaining
+                            }
                         }
-                        // Now it's our turn — start ticking our clock
-                        startClock(oppSide.opposite)
                     }
 
                     else -> {}
@@ -110,6 +109,21 @@ class OnlineGameViewModel @Inject constructor(
     // -------------------------------------------------------------------------
     // Clock helpers
     // -------------------------------------------------------------------------
+
+    fun initializeGame(event: SocketEvent.GameInit, startingSide: Side) {
+        resetGameState()
+        whiteTimeSeconds = event.timeWhite
+        blackTimeSeconds = event.timeBlack
+        startClock(startingSide)
+    }
+
+    fun setActiveSide(side: Side?) {
+        if (side == null) {
+            stopClock()
+        } else {
+            startClock(side)
+        }
+    }
 
     private fun startClock(side: Side) {
         stopClock()

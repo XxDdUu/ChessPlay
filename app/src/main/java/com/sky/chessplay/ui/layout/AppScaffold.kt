@@ -208,12 +208,18 @@ fun AppScaffold(
         floatingActionButtonPosition = FabPosition.Center,
 
         bottomBar = {
-
             if (config.showBottomBar) {
-
                 BottomBar(
+                    onHomeClick = {
+                        navController.navigate(Route.Home.route) {
+                            popUpTo(Route.Home.route) { inclusive = true }
+                        }
+                    },
                     onCommunityClick = {
                         navController.navigate(Route.Friend.route)
+                    },
+                    onProfileClick = {
+                        navController.navigate(Route.Profile.route)
                     }
                 )
             }

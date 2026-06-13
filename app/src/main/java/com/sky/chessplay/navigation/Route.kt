@@ -4,7 +4,11 @@ sealed class Route(val route: String) {
     data object Home : Route("home")
     data object OfflinePlay: Route("offline-play")
     data object MultiplayerOfflinePlay: Route("multiplayer-offline-play")
-    data object OnlinePlay: Route ("online-play")
+    data object OnlinePlay: Route ("online-play?isTournament={isTournament}&tournamentId={tournamentId}") {
+        fun createRoute(isTournament: Boolean, tournamentId: Long): String {
+            return "online-play?isTournament=$isTournament&tournamentId=$tournamentId"
+        }
+    }
     data object OnlineGameMode: Route ("online-gamemode")
     data object Auth : Route("authentication")
     data object Friend : Route("community-friend")
@@ -32,6 +36,16 @@ sealed class Route(val route: String) {
     data object TournamentStandings : Route("tournament_standings/{tournamentId}") {
         fun createRoute(tournamentId: Long): String {
             return "tournament_standings/$tournamentId"
+        }
+    }
+    data object TournamentLobby : Route("tournament_lobby/{tournamentId}") {
+        fun createRoute(tournamentId: Long): String {
+            return "tournament_lobby/$tournamentId"
+        }
+    }
+    data object TournamentBreak : Route("tournament_break/{tournamentId}/{breakDurationSeconds}") {
+        fun createRoute(tournamentId: Long, breakDurationSeconds: Int = 600): String {
+            return "tournament_break/$tournamentId/$breakDurationSeconds"
         }
     }
     data object Admin : Route("admin")

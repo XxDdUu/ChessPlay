@@ -32,10 +32,19 @@ android {
     }
     signingConfigs {
         create("release") {
-            storeFile = file(localProperties["KEYSTORE_FILE"] as String)
-            storePassword = localProperties["KEYSTORE_PASSWORD"] as String
-            keyAlias = localProperties["KEY_ALIAS"] as String
-            keyPassword = localProperties["KEY_PASSWORD"] as String
+            val keystoreFileVal = localProperties["KEYSTORE_FILE"] as? String
+            val keystorePasswordVal = localProperties["KEYSTORE_PASSWORD"] as? String
+            val keyAliasVal = localProperties["KEY_ALIAS"] as? String
+            val keyPasswordVal = localProperties["KEY_PASSWORD"] as? String
+            if (!keystoreFileVal.isNullOrEmpty() &&
+                !keystorePasswordVal.isNullOrEmpty() &&
+                !keyAliasVal.isNullOrEmpty() &&
+                !keyPasswordVal.isNullOrEmpty()) {
+                storeFile = file(keystoreFileVal)
+                storePassword = keystorePasswordVal
+                keyAlias = keyAliasVal
+                keyPassword = keyPasswordVal
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,100 +41,64 @@ fun HomeHeader(
     onProfileClick: () -> Unit,
     onLogout: () -> Unit
 ) {
-
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onProfileClick() }
             .background(
-                MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(20.dp)
+                color = Color(0xFF262421),
+                shape = RoundedCornerShape(12.dp)
             )
-            .padding(18.dp),
-
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Box(
             modifier = Modifier
-                .size(52.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
+                .size(48.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(Color(0xFF312E2B)),
             contentAlignment = Alignment.Center
         ) {
-
             Text(
-                text = username
-                    .firstOrNull()
-                    ?.uppercase() ?: "?",
-
-                color = Color.White,
-
-                fontSize = 20.sp,
-
+                text = "♟",
+                color = Color(0xFFbabfc3),
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(16.dp))
 
         Column(
             modifier = Modifier.weight(1f)
         ) {
-
             Text(
-                username,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                text = username,
+                color = Color.White,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 18.sp
             )
 
+            Spacer(Modifier.height(4.dp))
+
             Text(
-                "990 ♟️   💎1",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp
+                text = "Xem hồ sơ & lịch sử đấu",
+                color = Color(0xFFbabfc3),
+                fontSize = 12.sp
             )
         }
 
-        Box {
-
-            IconButton(
-                onClick = {
-                    expanded = true
-                }
-            ) {
-
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                }
-            ) {
-
-                DropdownMenuItem(
-                    text = {
-                        Text("Logout")
-                    },
-
-                    onClick = {
-
-                        expanded = false
-
-                        onLogout()
-                    }
-                )
-            }
+        IconButton(
+            onClick = onLogout,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF312E2B))
+        ) {
+            Text(
+                text = "🚪",
+                fontSize = 18.sp
+            )
         }
     }
 }

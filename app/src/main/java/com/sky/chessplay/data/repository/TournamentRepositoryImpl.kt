@@ -64,9 +64,13 @@ class TournamentRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(
-                    Exception("Join tournament failed")
-                )
+                val errorMsg = try {
+                    val json = response.errorBody()?.string()
+                    org.json.JSONObject(json ?: "").optString("message", "Join tournament failed")
+                } catch (e: Exception) {
+                    "Join tournament failed"
+                }
+                Result.failure(Exception(errorMsg))
             }
 
         } catch (e: Exception) {
@@ -83,9 +87,13 @@ class TournamentRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(
-                    Exception("Leave tournament failed")
-                )
+                val errorMsg = try {
+                    val json = response.errorBody()?.string()
+                    org.json.JSONObject(json ?: "").optString("message", "Leave tournament failed")
+                } catch (e: Exception) {
+                    "Leave tournament failed"
+                }
+                Result.failure(Exception(errorMsg))
             }
 
         } catch (e: Exception) {
@@ -151,6 +159,20 @@ class TournamentRepositoryImpl @Inject constructor(
                 Result.success(pairings)
             } else {
                 Result.failure(Exception("Failed to load round pairings"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getMyPairing(tournamentId: Long): Result<com.sky.chessplay.domain.model.tournament.MyPairing?> {
+        return try {
+            val response = api.getMyPairing(tournamentId)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.toDomain())
+            } else {
+                // If 404 or other errors, it might just mean no active pairing.
+                Result.success(null)
             }
         } catch (e: Exception) {
             Result.failure(e)

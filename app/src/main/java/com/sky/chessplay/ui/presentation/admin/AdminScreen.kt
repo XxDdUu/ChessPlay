@@ -113,7 +113,6 @@ fun AdminScreen(
                     AdminTournamentsTab(
                         tournaments = uiState.tournaments,
                         isLoading = uiState.isLoading,
-                        onStartClick = viewModel::startTournament,
                         onFinishClick = viewModel::finishTournament,
                         onCancelClick = viewModel::cancelTournament,
                         modifier = Modifier

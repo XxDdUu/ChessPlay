@@ -181,20 +181,6 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    fun startTournament(tournamentId: Long) {
-        viewModelScope.launch {
-            startTournamentUseCase(tournamentId)
-                .onSuccess {
-                    loadTournaments()
-                }
-                .onFailure { error ->
-                    _uiState.update {
-                        it.copy(error = error.message)
-                    }
-                }
-        }
-    }
-
     fun finishTournament(tournamentId: Long) {
         viewModelScope.launch {
             finishTournamentUseCase(tournamentId)

@@ -1,6 +1,9 @@
 package com.sky.chessplay.ui.presentation.tournament
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,7 +60,8 @@ fun TournamentScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(Color(0xFF1C1A17)),
             verticalArrangement = Arrangement.Top
         ) {
             AnimatedContent(
@@ -89,8 +93,9 @@ fun TournamentScreen(
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth(),
-                                    shape = MaterialTheme.shapes.extraLarge,
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1440))
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF262421)),
+                                    border = BorderStroke(1.dp, Color(0xFF312E2B))
                                 ) {
                                     Column(
                                         modifier = Modifier
@@ -158,7 +163,9 @@ fun TournamentScreenCompact(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF1C1A17)),
         verticalArrangement = Arrangement.Top
     ) {
         if (uiState.isLoading) {

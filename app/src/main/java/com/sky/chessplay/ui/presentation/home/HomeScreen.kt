@@ -1,5 +1,10 @@
 package com.sky.chessplay.ui.presentation.home
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,11 +24,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,7 +42,6 @@ import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.MatchEvent
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.navigation.Route
-import com.sky.chessplay.ui.component.admin.RainbowButton
 import com.sky.chessplay.ui.component.ai.AiSetupModal
 import com.sky.chessplay.ui.component.home.HomeHeader
 import com.sky.chessplay.ui.component.online_play.MatchInvitePopup
@@ -153,11 +158,40 @@ fun HomeScreen(
                 )
 
                 if (user?.role == Role.ROLE_ADMIN) {
-                    Spacer(Modifier.height(8.dp))
-                    RainbowButton(
-                        text = "👑 Admin Panel",
-                        onClick = onAdminClick
+                    val infiniteTransition = rememberInfiniteTransition(label = "admin_rainbow")
+                    val hue by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(
+                                durationMillis = 6000,
+                                easing = LinearEasing
+                            )
+                        ),
+                        label = "hue"
                     )
+
+                    val rainbowColors = List(12) { i ->
+                        Color.hsv(
+                            hue = (hue + i * 30f) % 360f,
+                            saturation = 0.6f,
+                            value = 0.9f
+                        )
+                    }
+                    val rainbowBorder = BorderStroke(
+                        width = 2.dp,
+                        brush = Brush.horizontalGradient(rainbowColors)
+                    )
+
+                    GameModeCard(
+                        title = "Admin Panel",
+                        description = "Quản lý hệ thống và cài đặt",
+                        emoji = "👑",
+                        accentColor = Color(0xFFEF4444),
+                        onClick = onAdminClick,
+                        border = rainbowBorder
+                    )
+                }
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -190,7 +224,6 @@ fun HomeScreen(
             },
             onDismiss = onDismissInvite
         )
-    }
 }
 
 @Composable
@@ -200,7 +233,8 @@ fun GameModeCard(
     emoji: String,
     accentColor: Color,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    border: BorderStroke? = BorderStroke(1.dp, Color(0xFF312E2B))
 ) {
     Card(
         modifier = modifier
@@ -210,7 +244,7 @@ fun GameModeCard(
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF262421)
         ),
-        border = BorderStroke(1.dp, Color(0xFF312E2B)),
+        border = border,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(

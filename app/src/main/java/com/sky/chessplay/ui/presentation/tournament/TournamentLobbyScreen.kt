@@ -2,6 +2,7 @@ package com.sky.chessplay.ui.presentation.tournament
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -65,18 +66,10 @@ fun TournamentLobbyScreen(
             title = "Match Lobby"
         )
     ) {
-        val darkBgGradient = Brush.verticalGradient(
-            colors = listOf(
-                Color(0xFF0F2027),
-                Color(0xFF203A43),
-                Color(0xFF2C5364)
-            )
-        )
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(darkBgGradient)
+                .background(Color(0xFF1C1A17))
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -108,9 +101,10 @@ fun TournamentLobbyScreen(
 
                 uiState.pairing == null -> {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0x33FFFFFF)),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth().padding(16.dp)
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF262421)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        border = BorderStroke(1.dp, Color(0xFF312E2B))
                     ) {
                         Text(
                             text = "Waiting for pairings to be generated...",
@@ -125,11 +119,11 @@ fun TournamentLobbyScreen(
                 uiState.isCompleted -> {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color(0x1A00FFCC)),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
-                            .border(1.dp, Color(0x3300FFCC), RoundedCornerShape(16.dp))
+                            .border(1.dp, Color(0x3300FFCC), RoundedCornerShape(12.dp))
                     ) {
                         Column(
                             modifier = Modifier.padding(24.dp).fillMaxWidth(),
@@ -408,11 +402,11 @@ fun PlayerCheckInCard(
             .padding(8.dp)
             .border(
                 width = 2.dp,
-                color = if (isReady) Color(0xFF00FFCC) else Color(0x22FFFFFF),
+                color = if (isReady) Color(0xFF22C55E) else Color(0xFF312E2B),
                 shape = RoundedCornerShape(12.dp)
             ),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0x1AFFFFFF))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF262421))
     ) {
         Column(
             modifier = Modifier

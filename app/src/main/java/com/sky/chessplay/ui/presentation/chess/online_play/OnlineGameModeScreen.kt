@@ -2,6 +2,7 @@ package com.sky.chessplay.ui.presentation.chess.online_play
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -113,14 +114,7 @@ fun OnlineGameModeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xFF0D0B2A),
-                            Color(0xFF1A1440)
-                        )
-                    )
-                )
+                .background(Color(0xFF1C1A17))
         ) {
 
             Column(
@@ -249,8 +243,9 @@ private fun MatchTimeDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1440))
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF262421)),
+            border = BorderStroke(1.dp, Color(0xFF312E2B))
         ) {
             Column(
                 modifier = Modifier
@@ -289,12 +284,12 @@ private fun MatchTimeDialog(
                                 .clickable { onSelectType(option.type) }
                                 .border(
                                     width = if (isSelected) 2.dp else 1.dp,
-                                    color = if (isSelected) Color(0xFF22C55E) else Color(0xFF3F3C6B),
-                                    shape = RoundedCornerShape(18.dp)
+                                    color = if (isSelected) Color(0xFF22C55E) else Color(0xFF312E2B),
+                                    shape = RoundedCornerShape(12.dp)
                                 ),
-                            shape = RoundedCornerShape(18.dp),
+                            shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = if (isSelected) Color(0xFF272458) else Color(0xFF171332)
+                                containerColor = if (isSelected) Color(0xFF272458) else Color(0xFF262421)
                             )
                         ) {
                             Row(

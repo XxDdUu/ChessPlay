@@ -88,7 +88,7 @@ fun AiPlayScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF121212))
+            .background(Color(0xFF1C1A17))
     ) {
 
         if (isLandscape) {

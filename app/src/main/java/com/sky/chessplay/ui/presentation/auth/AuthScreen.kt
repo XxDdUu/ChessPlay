@@ -112,7 +112,7 @@ fun AuthScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0D0B2A))
+                .background(Color(0xFF1C1A17))
                 .padding(padding)
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,

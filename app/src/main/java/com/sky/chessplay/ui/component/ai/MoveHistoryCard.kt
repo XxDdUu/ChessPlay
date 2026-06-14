@@ -1,5 +1,7 @@
 package com.sky.chessplay.ui.component.ai
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,9 +30,11 @@ fun MoveHistoryCard(
 ) {
 
     Card(
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1E1E1E)
-        )
+            containerColor = Color(0xFF262421)
+        ),
+        border = BorderStroke(1.dp, Color(0xFF312E2B))
     ) {
 
         Column(

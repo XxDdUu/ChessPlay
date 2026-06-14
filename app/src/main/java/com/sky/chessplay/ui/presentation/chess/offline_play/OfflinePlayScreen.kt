@@ -83,7 +83,7 @@ fun OfflinePlayScreen(
     ) { paddingValues ->
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = Color(0xFF0F0E17) // Sleek, modern dark background
+            color = Color(0xFF1C1A17) // Sleek, modern dark background
         ) {
             Column(
                 modifier = Modifier
@@ -291,12 +291,12 @@ fun PlayerInfoCard(
     Card(
         modifier = modifier.border(
             width = if (isActive) 2.dp else 1.dp,
-            color = if (isActive) Color(0xFF4ADE80) else Color(0xFF2D2C3D),
-            shape = RoundedCornerShape(16.dp)
+            color = if (isActive) Color(0xFF4ADE80) else Color(0xFF312E2B),
+            shape = RoundedCornerShape(12.dp)
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isActive) Color(0xFF1E2F23) else Color(0xFF1C1B22)
+            containerColor = if (isActive) Color(0xFF1E2F23) else Color(0xFF262421)
         )
     ) {
         Row(

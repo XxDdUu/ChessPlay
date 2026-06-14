@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.component.ai
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,13 +23,17 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun StatusCard(
     text: String,
-    isThinking: Boolean
+    isThinking: Boolean,
+    modifier: Modifier = Modifier
 ) {
 
     Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1E1E1E)
-        )
+            containerColor = Color(0xFF262421)
+        ),
+        border = BorderStroke(1.dp, Color(0xFF312E2B))
     ) {
 
         Row(

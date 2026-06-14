@@ -58,7 +58,7 @@ fun AppScaffold(
 
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFF0D0B2A),
+                        containerColor = Color(0xFF1C1A17),
                         titleContentColor = Color.White,
                         navigationIconContentColor = Color.White,
                         actionIconContentColor = Color.White
@@ -231,7 +231,7 @@ fun AppScaffold(
             modifier = Modifier.padding(padding)
         ) {
 
-            content(padding)
+            content(PaddingValues(0.dp))
         }
     }
 }

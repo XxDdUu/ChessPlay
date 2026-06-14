@@ -1,5 +1,6 @@
 package com.sky.chessplay.ui.component.ai
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,7 +51,8 @@ fun AiSetupModal(
 
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color(0xFF1B1B1B),
+            color = Color(0xFF262421),
+            border = BorderStroke(1.dp, Color(0xFF312E2B)),
             tonalElevation = 8.dp
         ) {
 

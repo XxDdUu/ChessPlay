@@ -10,7 +10,6 @@ import androidx.navigation.NavHostController
 fun FriendRoute(
     viewModel: FriendViewModel = hiltViewModel(),
     userId: Long,
-    onNavigateToDiscover: () -> Unit,
     navController: NavHostController
 ) {
     LaunchedEffect(Unit) {
@@ -25,7 +24,6 @@ fun FriendRoute(
         errorMessage = viewModel.errorMessage,
         onEvent = viewModel::onEvent,
         currentUserId = userId,
-        onNavigateToDiscover = onNavigateToDiscover,
         navController = navController
     )
 }

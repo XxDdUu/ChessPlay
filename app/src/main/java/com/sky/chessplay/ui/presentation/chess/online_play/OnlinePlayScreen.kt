@@ -3,6 +3,7 @@ package com.sky.chessplay.ui.presentation.chess.online_play
 import FriendEvent
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,15 +44,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sky.chessplay.R
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.layout.size
 import com.sky.chessplay.domain.model.chess.DEFAULT_FEN
 import com.sky.chessplay.domain.model.chess.Side
 import com.sky.chessplay.domain.socket.GameStatus
-import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.AuthState
 import com.sky.chessplay.domain.state.FriendState
+import com.sky.chessplay.navigation.Route
 import com.sky.chessplay.ui.component.online_play.BottomActions
 import com.sky.chessplay.ui.component.online_play.OnlineInfoPanel
 import com.sky.chessplay.ui.component.online_play.PlayerSection
@@ -59,7 +59,6 @@ import com.sky.chessplay.ui.layout.TopBarAction
 import com.sky.chessplay.ui.presentation.chess.ChessViewModel
 import com.sky.chessplay.ui.presentation.chess.online_play.chat.ChatPanel
 import com.sky.chessplay.ui.presentation.community.FriendViewModel
-import com.sky.chessplay.navigation.Route
 import kotlinx.coroutines.delay
 import view.board.ChessBoard
 
@@ -152,6 +151,20 @@ fun OnlinePlayScreen(
             chatViewModel.setCurrentUser(it)
         }
     }
+
+    // Load user's friend list once user + opponent are known
+    LaunchedEffect(user?.id, gameInit?.opponentId) {
+        user?.id?.let { uid ->
+            friendViewModel.onEvent(FriendEvent.LoadFriends(uid))
+        }
+    }
+
+    // True when the opponent is already in the friends list
+    val isAlreadyFriend = remember(friendViewModel.friendsList, gameInit?.opponentId) {
+        val opponentId = gameInit?.opponentId
+        opponentId != null && friendViewModel.friendsList.any { it.userId == opponentId }
+    }
+
     AppScaffold(
 
         navController = navController,
@@ -171,6 +184,7 @@ fun OnlinePlayScreen(
                     }
                 ),
                 TopBarAction.AddFriend(
+                    isAlreadyFriend = isAlreadyFriend,
                     isRequestSent = friendState is FriendState.FriendRequestSent,
                     onClick = {
                         friendViewModel.onEvent(
@@ -192,7 +206,7 @@ fun OnlinePlayScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 contentAlignment = Alignment.Center
 
             ) {
@@ -253,7 +267,7 @@ fun OnlinePlayScreen(
                                 modifier = Modifier.wrapContentWidth()
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
 
                             Box(
                                 modifier = Modifier
@@ -280,7 +294,7 @@ fun OnlinePlayScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             BottomActions(
                                 rematchOffered = rematchOffered,

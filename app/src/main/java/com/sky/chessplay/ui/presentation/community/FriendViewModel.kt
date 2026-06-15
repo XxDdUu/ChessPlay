@@ -80,6 +80,10 @@ class FriendViewModel @Inject constructor(
                 // Not implemented or stubbed
             }
             is FriendEvent.SendChallenge -> {
+                Log.d(
+                    "INVITE FRIEND DEBUG",
+                    "${event.friendId} ${event.matchType}"
+                )
                 chessSocket.inviteFriend(
                     friendId = event.friendId,
                     matchType = event.matchType

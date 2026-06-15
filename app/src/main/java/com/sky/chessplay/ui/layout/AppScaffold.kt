@@ -150,23 +150,30 @@ fun AppScaffold(
 
                                 is TopBarAction.AddFriend -> {
 
-                                    IconButton(
-                                        onClick = action.onClick,
-                                        enabled = !action.isRequestSent
-                                    ) {
+                                    if (!action.isAlreadyFriend) {
+                                        IconButton(
+                                            onClick = action.onClick,
+                                            enabled = !action.isRequestSent
+                                        ) {
 
-                                        Icon(
-                                            imageVector = if (action.isRequestSent) {
-                                                Icons.Default.Check
-                                            } else {
-                                                Icons.Default.PersonAdd
-                                            },
-                                            contentDescription = if (action.isRequestSent) {
-                                                "Friend Request Sent"
-                                            } else {
-                                                "Add Friend"
-                                            }
-                                        )
+                                            Icon(
+                                                imageVector = if (action.isRequestSent) {
+                                                    Icons.Default.Check
+                                                } else {
+                                                    Icons.Default.PersonAdd
+                                                },
+                                                contentDescription = if (action.isRequestSent) {
+                                                    "Friend Request Sent"
+                                                } else {
+                                                    "Add Friend"
+                                                },
+                                                tint = if (action.isRequestSent) {
+                                                    Color(0xFF4ADE80)
+                                                } else {
+                                                    Color.White
+                                                }
+                                            )
+                                        }
                                     }
                                 }
 
@@ -220,7 +227,8 @@ fun AppScaffold(
                     },
                     onProfileClick = {
                         navController.navigate(Route.Profile.route)
-                    }
+                    },
+                    currentRoute = currentRoute
                 )
             }
         }
@@ -257,6 +265,7 @@ sealed class TopBarAction {
 
     data class AddFriend(
         val isRequestSent: Boolean = false,
+        val isAlreadyFriend: Boolean = false,
         val onClick: () -> Unit
     ) : TopBarAction()
 

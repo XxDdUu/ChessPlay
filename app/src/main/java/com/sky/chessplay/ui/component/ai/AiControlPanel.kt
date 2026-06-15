@@ -40,7 +40,7 @@ fun AiControlPanel(
 
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1E1E1E)
+            containerColor = Color(0xFF1C1A17)
         )
     ) {
 

@@ -34,11 +34,11 @@ import com.sky.chessplay.ui.presentation.community.FriendRoute
 import com.sky.chessplay.ui.presentation.home.HomeScreen
 import com.sky.chessplay.ui.presentation.home.HomeViewModel
 import com.sky.chessplay.ui.presentation.profile.ProfileRoute
+import com.sky.chessplay.ui.presentation.tournament.TournamentBreakScreen
 import com.sky.chessplay.ui.presentation.tournament.TournamentDetailScreen
+import com.sky.chessplay.ui.presentation.tournament.TournamentLobbyScreen
 import com.sky.chessplay.ui.presentation.tournament.TournamentRoute
 import com.sky.chessplay.ui.presentation.tournament.TournamentStandingsScreen
-import com.sky.chessplay.ui.presentation.tournament.TournamentLobbyScreen
-import com.sky.chessplay.ui.presentation.tournament.TournamentBreakScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -256,12 +256,22 @@ fun ChessPlayRoot() {
                 }
 
                 val state = authState as AuthState.Authenticated
+                val navigateToGame = matchViewModel.navigateToGame
+                val gameInit = matchViewModel.gameInitEvent
 
+                LaunchedEffect(navigateToGame, gameInit) {
+                    if (navigateToGame && gameInit != null) {
+                        matchViewModel.resetMatchState()
+
+                        navController.navigate(Route.OnlinePlay.route) {
+                            popUpTo("online_mode") { inclusive = true }
+                        }
+
+                        matchViewModel.onNavigated()
+                    }
+                }
                 FriendRoute(
                     userId = state.user.id,
-                    onNavigateToDiscover = {
-                        navController.navigate("friend_discover")
-                    },
                     navController = navController
                 )
             }

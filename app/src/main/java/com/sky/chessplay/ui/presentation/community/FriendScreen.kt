@@ -6,7 +6,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +16,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sky.chessplay.data.remote.dto.response.FriendResponse
 import com.sky.chessplay.ui.component.friend.FriendItem
-import com.sky.chessplay.ui.component.friend.PendingFriendItem
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
+import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
 
 @Composable
 fun FriendScreen(
@@ -44,9 +49,9 @@ fun FriendScreen(
     errorMessage: String?,
     currentUserId: Long,
     onEvent: (FriendEvent) -> Unit,
-    onNavigateToDiscover: () -> Unit,
     navController: NavHostController
 ) {
+    var showPendingDialog by remember { mutableStateOf(false) }
     AppScaffold(
         navController = navController,
         config = AppScaffoldConfig(
@@ -77,15 +82,31 @@ fun FriendScreen(
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White
                         )
-                        OutlinedButton(
-                            onClick = onNavigateToDiscover,
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color(0xFF81B64C)
-                            ),
-                            border = BorderStroke(1.dp, Color(0xFF81B64C)),
-                            shape = RoundedCornerShape(8.dp)
+                        BadgedBox(
+                            badge = {
+                                if (pendingRequests.isNotEmpty()) {
+                                    Badge {
+                                        Text("${pendingRequests.size}")
+                                    }
+                                }
+                            }
                         ) {
-                            Text("Tìm bạn mới", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            OutlinedButton(
+                                onClick = {
+                                    showPendingDialog = true
+                                },
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color(0xFF81B64C)
+                                ),
+                                border = BorderStroke(1.dp, Color(0xFF81B64C)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    "Tìm bạn mới",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -98,32 +119,6 @@ fun FriendScreen(
                             color = Color.Red,
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                if (pendingRequests.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Lời mời kết bạn (${pendingRequests.size})",
-                            color = Color(0xFFbabfc3),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    items(pendingRequests) { request ->
-                        PendingFriendItem(
-                            request = request,
-                            onAccept = {
-                                onEvent(
-                                    FriendEvent.AcceptFriendRequest(
-                                        user1 = request.userId,
-                                        user2 = currentUserId
-                                    )
-                                )
-                            },
-                            onReject = {}
                         )
                     }
                 }
@@ -184,6 +179,17 @@ fun FriendScreen(
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = Color(0xFF81B64C)
+                )
+            }
+            if (showPendingDialog) {
+                PendingFriendModal(
+                    requests = pendingRequests,
+                    onAccept = { friend ->
+                        onEvent(FriendEvent.AcceptFriendRequest(currentUserId,friend.userId))
+                    },
+                    onDismiss = {
+                        showPendingDialog = false
+                    }
                 )
             }
         }

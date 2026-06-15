@@ -51,7 +51,7 @@ fun AiSetupModal(
 
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color(0xFF262421),
+            color = Color(0xFF1C1A17),
             border = BorderStroke(1.dp, Color(0xFF312E2B)),
             tonalElevation = 8.dp
         ) {

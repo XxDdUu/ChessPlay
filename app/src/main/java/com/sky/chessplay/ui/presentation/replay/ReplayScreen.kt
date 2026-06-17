@@ -87,14 +87,13 @@ fun ReplayScreen(
         GameState.fromFen(boardToFen(boardState, currentTurnSign))
     }
 
-    val currentUiState = remember {
-        UiState(
-            squareSize = 1,
-            pieceDragOffset = Offset.Zero,
-            canInteract = { _ -> false },
-            shouldAnimate = { _ -> true },
-            isFlipped = game.myColor.equals("BLACK", ignoreCase = true)        )
-    }
+    val currentUiState = UiState(
+        squareSize = 1,
+        pieceDragOffset = Offset.Zero,
+        canInteract = { _ -> false },
+        shouldAnimate = { _ -> true },
+        isFlipped = game.myColor.equals("BLACK", ignoreCase = true)
+    )
 
     Column(
         modifier = Modifier

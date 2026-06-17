@@ -3,6 +3,7 @@ package com.sky.chessplay.domain.engine.util
 import com.sky.chessplay.domain.model.chess.Board
 import com.sky.chessplay.domain.model.chess.Capture
 import com.sky.chessplay.domain.model.chess.CapturePromotion
+import com.sky.chessplay.domain.model.chess.EnPassant
 import com.sky.chessplay.domain.model.chess.File
 import com.sky.chessplay.domain.model.chess.KingSideCastle
 import com.sky.chessplay.domain.model.chess.Move
@@ -21,8 +22,15 @@ import model.board.Rook
 import kotlin.math.abs
 
 fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? {
-    var cleanMove = pgnMove.replace("+", "").replace("#", "")
     val currentSide = if (isWhiteTurn) Side.WHITE else Side.BLACK
+    var cleanMove = pgnMove
+        .trim()
+        .replace("+", "")
+        .replace("#", "")
+        .replace("!", "")
+        .replace("?", "")
+
+    findMoveFromUci(board, cleanMove, currentSide)?.let { return it }
 
     if (cleanMove == "O-O") return KingSideCastle(King(currentSide))
     if (cleanMove == "O-O-O") return QueenSideCastle(King(currentSide))
@@ -138,4 +146,58 @@ fun findMoveFromPgn(board: Board, pgnMove: String, isWhiteTurn: Boolean): Move? 
         }
     }
     return null
+}
+
+private fun findMoveFromUci(board: Board, move: String, currentSide: Side): Move? {
+    val normalizedMove = move.lowercase()
+    if (!normalizedMove.matches(Regex("[a-h][1-8][a-h][1-8][qrbn]?"))) return null
+
+    val fromPosition = positionFromCoordinate(normalizedMove.substring(0, 2)) ?: return null
+    val toPosition = positionFromCoordinate(normalizedMove.substring(2, 4)) ?: return null
+    val piece = board[fromPosition]?.takeIf { it.side == currentSide } ?: return null
+    val capturedPiece = board[toPosition]
+    val promotionPiece = normalizedMove.getOrNull(4)?.let { promotionPieceFor(it, currentSide) }
+
+    if (piece is King && fromPosition.file == File.e) {
+        if (toPosition.file == File.g) return KingSideCastle(piece)
+        if (toPosition.file == File.c) return QueenSideCastle(piece)
+    }
+
+    if (promotionPiece != null && piece is Pawn) {
+        return if (capturedPiece != null) {
+            CapturePromotion(piece, fromPosition, toPosition, promotionPiece, capturedPiece)
+        } else {
+            StandardPromotion(piece, fromPosition, toPosition, promotionPiece)
+        }
+    }
+
+    if (capturedPiece != null) {
+        return Capture(piece, fromPosition, toPosition, capturedPiece)
+    }
+
+    val enPassantCapturePosition = Position.fromFileAndRank(toPosition.file, fromPosition.rank)
+    val enPassantCapturedPiece = board[enPassantCapturePosition]
+    if (piece is Pawn &&
+        fromPosition.file != toPosition.file &&
+        enPassantCapturedPiece is Pawn &&
+        enPassantCapturedPiece.side != currentSide
+    ) {
+        return EnPassant(piece, fromPosition, toPosition, enPassantCapturedPiece, enPassantCapturePosition)
+    }
+
+    return StandardMove(piece, fromPosition, toPosition)
+}
+
+private fun positionFromCoordinate(coordinate: String): Position? {
+    val file = File.entries.find { it.name == coordinate[0].toString() } ?: return null
+    val rank = Rank.entries.find { it.number == coordinate[1].digitToInt() } ?: return null
+    return Position.fromFileAndRank(file, rank)
+}
+
+private fun promotionPieceFor(piece: Char, side: Side) = when (piece) {
+    'q' -> Queen(side)
+    'r' -> Rook(side)
+    'b' -> Bishop(side)
+    'n' -> Knight(side)
+    else -> null
 }

@@ -171,7 +171,7 @@ fun OnlinePlayScreen(
 
         config = AppScaffoldConfig(
 
-            title = "Online Match",
+            title = "Trận đấu trực tuyến",
 
             actions = listOf(
 
@@ -346,7 +346,7 @@ fun OnlinePlayScreen(
                         onSendClick = {
                             chatViewModel.sendMessage(
                                 gameId = matchViewModel.gameId,
-                                myName = user?.username ?: "You"
+                                myName = user?.username ?: "Bạn"
                             )
                         },
                         modifier = Modifier
@@ -374,14 +374,14 @@ fun OnlinePlayScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "DRAW OFFER",
+                            text = "ĐỀ NGHỊ HÒA",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
 
                         Text(
-                            text = "Opponent offered a draw.",
+                            text = "Đối thủ đề nghị một ván hòa.",
                             fontSize = 16.sp,
                             color = Color.Gray
                         )
@@ -397,7 +397,7 @@ fun OnlinePlayScreen(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(48.dp)
                             ) {
-                                Text("Accept")
+                                Text("Chấp nhận")
                             }
                             OutlinedButton(
                                 onClick = {
@@ -406,7 +406,7 @@ fun OnlinePlayScreen(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(48.dp)
                             ) {
-                                Text("Decline")
+                                Text("Từ chối")
                             }
                         }
                     }
@@ -442,19 +442,19 @@ fun OnlinePlayScreen(
                         if (isWin) {
                             Image(
                                 painter = painterResource(id = R.drawable.ic_golden_cup),
-                                contentDescription = "Golden Cup",
+                                contentDescription = "Cup Vàng",
                                 modifier = Modifier.size(100.dp)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "YOU WON",
+                                text = "BẠN ĐÃ CHIẾN THẮNG",
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFFBBF24),
                                 textAlign = TextAlign.Center
                             )
                         } else if (isLoss) {
-                            val winnerText = if (resultStr == "WHITE_WIN") "White won" else "Black won"
+                            val winnerText = if (resultStr == "WHITE_WIN") "Trắng thắng" else "Đen thắng"
                             Text(
                                 text = winnerText,
                                 fontSize = 28.sp,
@@ -464,7 +464,7 @@ fun OnlinePlayScreen(
                             )
                         } else {
                             Text(
-                                text = "GAME OVER",
+                                text = "VÁN ĐẤU KẾT THÚC",
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -476,12 +476,31 @@ fun OnlinePlayScreen(
                             val reason = onlineGameViewModel.gameOverReason
                             val result = onlineGameViewModel.gameOverResult
                             if (!reason.isNullOrBlank() || !result.isNullOrBlank()) {
-                                if (!reason.isNullOrBlank()) append(reason)
+                                if (!reason.isNullOrBlank()) {
+                                    val translatedReason = when (reason.uppercase()) {
+                                        "CHECKMATE" -> "Chiếu hết"
+                                        "RESIGNATION" -> "Đầu hàng"
+                                        "TIMEOUT" -> "Hết thời gian"
+                                        "STALEMATE" -> "Hòa Stalemate"
+                                        "INSUFFICIENT_MATERIAL" -> "Hòa do không đủ lực lượng"
+                                        "FIFTY_MOVES" -> "Hòa luật 50 nước đi"
+                                        "REPETITION" -> "Hòa lặp lại 3 lần"
+                                        "AGREEMENT" -> "Hòa do thỏa thuận"
+                                        else -> reason
+                                    }
+                                    append(translatedReason)
+                                }
                                 if (!result.isNullOrBlank()) {
-                                    if (reason.isNullOrBlank()) append(result) else append(" ($result)")
+                                    val translatedResult = when (result.uppercase()) {
+                                        "WHITE_WIN" -> "Trắng thắng"
+                                        "BLACK_WIN" -> "Đen thắng"
+                                        "DRAW" -> "Hòa"
+                                        else -> result
+                                    }
+                                    if (reason.isNullOrBlank()) append(translatedResult) else append(" ($translatedResult)")
                                 }
                             } else {
-                                append("Finished")
+                                append("Đã kết thúc")
                             }
                         }
 
@@ -502,7 +521,7 @@ fun OnlinePlayScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = "Opponent offered a rematch!",
+                                        text = "Đối thủ đề nghị đấu lại!",
                                         color = Color(0xFF4ADE80),
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.SemiBold,
@@ -519,7 +538,7 @@ fun OnlinePlayScreen(
                                             modifier = Modifier.weight(1f),
                                             shape = RoundedCornerShape(48.dp)
                                         ) {
-                                            Text("Accept")
+                                            Text("Chấp nhận")
                                         }
                                         OutlinedButton(
                                             onClick = {
@@ -528,13 +547,13 @@ fun OnlinePlayScreen(
                                             modifier = Modifier.weight(1f),
                                             shape = RoundedCornerShape(48.dp)
                                         ) {
-                                            Text("Decline")
+                                            Text("Từ chối")
                                         }
                                     }
                                 }
                             } else if (rematchSent) {
                                 Text(
-                                    text = "Rematch offer sent...",
+                                    text = "Đã gửi đề xuất đấu lại...",
                                     color = Color.Gray,
                                     fontSize = 15.sp,
                                     textAlign = TextAlign.Center,
@@ -548,12 +567,12 @@ fun OnlinePlayScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(48.dp)
                                 ) {
-                                    Text("Offer Rematch")
+                                    Text("Đề xuất đấu lại")
                                 }
                             }
                         } else {
                             Text(
-                                text = "Redirecting back to standings in a few seconds...",
+                                text = "Đang chuyển hướng về BXH giải đấu trong vài giây...",
                                 color = Color(0xFFFFB300),
                                 fontSize = 14.sp,
                                 textAlign = TextAlign.Center,
@@ -571,7 +590,7 @@ fun OnlinePlayScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(48.dp)
                             ) {
-                                Text("Return to Standings")
+                                Text("Quay lại BXH giải đấu")
                             }
                         } else {
                             OutlinedButton(
@@ -581,7 +600,7 @@ fun OnlinePlayScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(48.dp)
                             ) {
-                                Text("Leave Match")
+                                Text("Rời trận đấu")
                             }
                         }
                     }

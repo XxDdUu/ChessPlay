@@ -33,10 +33,10 @@ fun TournamentDetailDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(text = tournament.description)
-                Text(text = "Rounds: ${tournament.totalRounds}")
-                Text(text = "Time Control: ${tournament.timeControl}")
-                Text(text = "Start Time: ${tournament.startTime}")
-                Text(text = "Organizer: ${tournament.createdByName}")
+                Text(text = "Số ván đấu: ${tournament.totalRounds}")
+                Text(text = "Kiểm soát thời gian: ${tournament.timeControl}")
+                Text(text = "Thời gian bắt đầu: ${tournament.startTime}")
+                Text(text = "Ban tổ chức: ${tournament.createdByName}")
                 TournamentStatusChip(status = tournament.status.name)
 
                 Row(
@@ -53,7 +53,7 @@ fun TournamentDetailDialog(
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Leave")
+                                Text("Rời giải")
                             }
                         } else {
                             Button(
@@ -66,7 +66,7 @@ fun TournamentDetailDialog(
                                     containerColor = Color(0xFF22C55E)
                                 )
                             ) {
-                                Text("Join")
+                                Text("Tham gia")
                             }
                         }
                     }
@@ -78,14 +78,14 @@ fun TournamentDetailDialog(
                         },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Standings")
+                        Text(text = "Bảng xếp hạng")
                     }
                 }
             }
         },
         confirmButton = {
             OutlinedButton(onClick = onDismissRequest) {
-                Text(text = "Close")
+                Text(text = "Đóng")
             }
         }
     )

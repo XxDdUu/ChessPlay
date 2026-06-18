@@ -101,7 +101,7 @@ fun HomeScreen(
             Spacer(Modifier.height(20.dp))
 
             HomeHeader(
-                username = user?.username ?: "Guest",
+                username = user?.username ?: "Khách",
                 avatarUrl = user?.avatar,
                 onLogout = onLogout,
                 onProfileClick = {
@@ -184,7 +184,7 @@ fun HomeScreen(
                     )
 
                     GameModeCard(
-                        title = "Admin Panel",
+                        title = "Bảng quản trị",
                         description = "Quản lý hệ thống và cài đặt",
                         emoji = "👑",
                         accentColor = Color(0xFFEF4444),

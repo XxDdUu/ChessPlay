@@ -89,7 +89,7 @@ fun TournamentDetailScreen(
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = true,
-            title = "Tournament Detail",
+            title = "Chi tiết giải đấu",
             actions = listOf(
                 TopBarAction.Refresh(onClick = lambdaRefresh)
             )
@@ -105,7 +105,7 @@ fun TournamentDetailScreen(
             uiState.error != null && uiState.tournament == null -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Text(
-                        text = uiState.error ?: "Failed to load tournament",
+                        text = uiState.error ?: "Không thể tải thông tin giải đấu",
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -147,12 +147,12 @@ fun TournamentDetailScreen(
                             Tab(
                                 selected = selectedTab == 0,
                                 onClick = { selectedTab = 0 },
-                                text = { Text("Leaderboard") }
+                                text = { Text("Bảng xếp hạng") }
                             )
                             Tab(
                                 selected = selectedTab == 1,
                                 onClick = { selectedTab = 1 },
-                                text = { Text("Rounds & Matches") }
+                                text = { Text("Vòng & Trận đấu") }
                             )
                         }
                     }
@@ -160,7 +160,7 @@ fun TournamentDetailScreen(
                     if (selectedTab == 0) {
                         if (uiState.standings.isEmpty()) {
                             item {
-                                EmptyTournamentMessage("No players registered yet.")
+                                EmptyTournamentMessage("Chưa có người chơi nào đăng ký.")
                             }
                         } else {
                             item { LeaderboardHeader() }
@@ -172,7 +172,7 @@ fun TournamentDetailScreen(
                                     standing = standing,
                                     rank = standing.rank.takeIf { it > 0 } ?: index + 1,
                                     isCurrentUser = currentUserId != null &&
-                                            standing.playerId == currentUserId
+                                             standing.playerId == currentUserId
                                 )
                             }
                         }
@@ -189,9 +189,9 @@ fun TournamentDetailScreen(
                         when {
                             uiState.rounds.isEmpty() -> item {
                                 val message = if (tournament?.status == TournamentStatus.REGISTERING) {
-                                    "Rounds will be generated when the tournament starts."
+                                    "Các vòng đấu sẽ được tạo khi giải đấu bắt đầu."
                                 } else {
-                                    "Round and match details are not available yet."
+                                    "Thông tin chi tiết về vòng đấu và trận đấu chưa có sẵn."
                                 }
                                 EmptyTournamentMessage(uiState.roundsError ?: message)
                             }
@@ -210,7 +210,7 @@ fun TournamentDetailScreen(
 
                             uiState.pairings.isEmpty() -> item {
                                 EmptyTournamentMessage(
-                                    uiState.roundsError ?: "No matches in this round."
+                                    uiState.roundsError ?: "Không có trận đấu nào trong vòng này."
                                 )
                             }
 
@@ -244,7 +244,7 @@ private fun RoundsSelector(
             FilterChip(
                 selected = selectedRoundId == round.id,
                 onClick = { onRoundClick(tournamentId, round.id) },
-                label = { Text("Round ${round.number}") }
+                label = { Text("Vòng ${round.number}") }
             )
         }
     }

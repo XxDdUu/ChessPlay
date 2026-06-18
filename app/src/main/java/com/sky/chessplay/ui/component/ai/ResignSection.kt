@@ -20,6 +20,6 @@ fun ResignSection(
             contentColor = Color.Red
         )
     ) {
-        Text("Resign")
+        Text("Đầu hàng")
     }
 }

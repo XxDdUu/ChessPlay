@@ -51,13 +51,13 @@ fun AdminDashboardTab(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StatCard(
-                    title = "Total Users",
+                    title = "Tổng người dùng",
                     value = stats.totalUsers.toString(),
                     modifier = Modifier.weight(1f),
                     textColor = Color.Yellow
                 )
                 StatCard(
-                    title = "Total Games",
+                    title = "Tổng ván đấu",
                     value = stats.totalGames.toString(),
                     modifier = Modifier.weight(1f),
                     textColor = Color.Cyan
@@ -71,13 +71,13 @@ fun AdminDashboardTab(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StatCard(
-                    title = "Tournaments",
+                    title = "Giải đấu",
                     value = stats.totalTournaments.toString(),
                     modifier = Modifier.weight(1f),
                     textColor = Color.Red
                 )
                 StatCard(
-                    title = "Online Now",
+                    title = "Đang trực tuyến",
                     value = stats.onlinePlayersCount.toString(),
                     modifier = Modifier.weight(1f),
                     textColor = Color.Green
@@ -86,7 +86,7 @@ fun AdminDashboardTab(
 
             // Top Players Section
             Text(
-                text = "Top Players",
+                text = "Kỳ thủ hàng đầu",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 12.dp)
             )

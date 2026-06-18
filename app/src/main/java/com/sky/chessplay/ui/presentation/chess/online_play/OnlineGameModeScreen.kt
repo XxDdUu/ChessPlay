@@ -132,7 +132,7 @@ fun OnlineGameModeScreen(
                 Spacer(Modifier.height(32.dp))
 
                 Text(
-                    text = "Online Play",
+                    text = "Chơi trực tuyến",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 36.sp,
@@ -143,7 +143,7 @@ fun OnlineGameModeScreen(
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = "Connect with players worldwide",
+                    text = "Kết nối với các kỳ thủ trên toàn thế giới",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
@@ -157,8 +157,8 @@ fun OnlineGameModeScreen(
                 ) {
 
                     GradientButton(
-                        title = "Auto Match",
-                        subtitle = "Find opponents instantly",
+                        title = "Ghép cặp tự động",
+                        subtitle = "Tìm đối thủ ngay lập tức",
                         colors = listOf(Color(0xFF22C55E), Color(0xFF16A34A)),
                         onClick = {
                             showMatchTypeDialog = true
@@ -167,16 +167,16 @@ fun OnlineGameModeScreen(
                     )
 
                     GradientButton(
-                        title = "Create Room",
-                        subtitle = "Invite friends to join your game",
+                        title = "Tạo phòng",
+                        subtitle = "Mời bạn bè tham gia ván đấu của bạn",
                         colors = listOf(Color(0xFF6D5BFF), Color(0xFF4F46E5)),
                         onClick = { matchViewModel.createRoom() },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     GradientButton(
-                        title = "Join Room",
-                        subtitle = "Enter a room code",
+                        title = "Vào phòng",
+                        subtitle = "Nhập mã phòng có sẵn",
                         colors = listOf(Color(0xFF8B5CF6), Color(0xFF6D28D9)),
                         onClick = { showJoinDialog = true },
                         modifier = Modifier.fillMaxWidth()
@@ -254,7 +254,7 @@ private fun MatchTimeDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Choose time control",
+                    text = "Chọn thời gian thi đấu",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -263,7 +263,7 @@ private fun MatchTimeDialog(
                 Spacer(Modifier.height(12.dp))
 
                 Text(
-                    text = "Select the play time for random matchmaking",
+                    text = "Chọn thời gian chơi cho hệ thống ghép cặp ngẫu nhiên",
                     color = Color(0xFFB0B0C3),
                     fontSize = 15.sp,
                     textAlign = TextAlign.Center,
@@ -336,7 +336,7 @@ private fun MatchTimeDialog(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("Cancel")
+                        Text("Hủy")
                     }
                     Button(
                         onClick = onConfirm,
@@ -344,7 +344,7 @@ private fun MatchTimeDialog(
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E))
                     ) {
-                        Text("Start")
+                        Text("Bắt đầu")
                     }
                 }
             }

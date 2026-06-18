@@ -44,7 +44,7 @@ fun PairingCard(pairing: TournamentPairing) {
                 )
                 Text(
                     text = if (pairing.isBye) {
-                        "BYE"
+                        "MIỄN ĐẤU"
                     } else {
                         pairing.result.ifBlank { "vs" }
                     },
@@ -55,7 +55,7 @@ fun PairingCard(pairing: TournamentPairing) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 PlayerColumn(
-                    name = pairing.blackPlayerName.ifBlank { "No opponent" },
+                    name = pairing.blackPlayerName.ifBlank { "Không có đối thủ" },
                     rating = pairing.blackPlayerRating,
                     modifier = Modifier.weight(1f),
                     alignEnd = true
@@ -64,7 +64,7 @@ fun PairingCard(pairing: TournamentPairing) {
 
             if (pairing.gameId != null) {
                 Text(
-                    text = "Game #${pairing.gameId}",
+                    text = "Trận đấu #${pairing.gameId}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.align(Alignment.End)

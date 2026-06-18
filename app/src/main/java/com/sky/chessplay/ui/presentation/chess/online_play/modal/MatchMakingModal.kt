@@ -66,7 +66,7 @@ fun MatchMakingModal(viewModel: MatchViewModel) {
 
                         Spacer(Modifier.height(16.dp))
 
-                        Text("Finding opponent...", color = Color.White)
+                        Text("Đang tìm đối thủ...", color = Color.White)
 
                         Spacer(Modifier.height(16.dp))
 
@@ -74,12 +74,12 @@ fun MatchMakingModal(viewModel: MatchViewModel) {
                             onClick = { viewModel.cancelSearch() },
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                         ) {
-                            Text("Cancel")
+                            Text("Hủy")
                         }
                     }
 
                     MatchState.FOUND -> {
-                        Text("Opponent Found!", color = Color.White)
+                        Text("Đã tìm thấy đối thủ!", color = Color.White)
 
                         Spacer(Modifier.height(12.dp))
 
@@ -99,7 +99,7 @@ fun MatchMakingModal(viewModel: MatchViewModel) {
                         Spacer(Modifier.height(8.dp))
 
                         Text(
-                            text = "Accept in ${confirmCountdown}s",
+                            text = "Chấp nhận trong ${confirmCountdown} giây",
                             color = if (confirmCountdown <= 3) Color.Red else Color.LightGray
                         )
 
@@ -111,20 +111,20 @@ fun MatchMakingModal(viewModel: MatchViewModel) {
                                 onClick = { viewModel.acceptMatch() },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E))
                             ) {
-                                Text("Accept")
+                                Text("Chấp nhận")
                             }
 
                             Button(
                                 onClick = { viewModel.rejectMatch() },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                             ) {
-                                Text("Reject")
+                                Text("Từ chối")
                             }
                         }
                     }
 
                     MatchState.COUNTDOWN -> {
-                        Text("Game starting...", color = Color.White)
+                        Text("Trận đấu chuẩn bị bắt đầu...", color = Color.White)
 
                         Spacer(Modifier.height(12.dp))
 

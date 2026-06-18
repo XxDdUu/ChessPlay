@@ -77,7 +77,7 @@ fun AiPlayScreen(
     AppScaffold(
         navController = navController,
         config = AppScaffoldConfig(
-            title = "AI PLAY",
+            title = "ĐẤU VỚI MÁY",
             showTopBar = true,
             showBottomBar = false,
             actions = listOf(
@@ -178,7 +178,7 @@ fun AiPlayScreen(
             AlertDialog(
                 onDismissRequest = onDismissError,
                 title = {
-                    Text("Error")
+                    Text("Lỗi")
                 },
                 text = {
                     Text(apiError)

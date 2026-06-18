@@ -91,13 +91,23 @@ private fun TournamentAdminItem(
                         )
                     }
                     Text(
-                        text = "Status: ${tournament.status}",
+                        text = "Trạng thái: ${
+                            when (tournament.status) {
+                                TournamentStatus.UPCOMING -> "Sắp diễn ra"
+                                TournamentStatus.REGISTERING -> "Mở đăng ký"
+                                TournamentStatus.REGISTRATION_CLOSED -> "Đóng đăng ký"
+                                TournamentStatus.ONGOING -> "Đang diễn ra"
+                                TournamentStatus.IN_PROGRESS -> "Đang diễn ra"
+                                TournamentStatus.FINISHED -> "Đã kết thúc"
+                                else -> "Không rõ"
+                            }
+                        }",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Badge {
-                    Text("Rounds ${tournament.totalRounds}")
+                    Text("${tournament.totalRounds} ván đấu")
                 }
             }
 
@@ -116,7 +126,7 @@ private fun TournamentAdminItem(
                 ) {
                     Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Finish")
+                    Text("Kết thúc")
                 }
 
                 Button(
@@ -133,7 +143,7 @@ private fun TournamentAdminItem(
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Cancel")
+                    Text("Hủy bỏ")
                 }
             }
         }

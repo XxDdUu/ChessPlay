@@ -107,7 +107,7 @@ fun TournamentScreen(
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = true,
-            title = "Tournaments"
+            title = "Giải đấu"
         )
     ) { padding ->
         Column(
@@ -126,13 +126,13 @@ fun TournamentScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text("Search tournaments...", color = Color.Gray) },
+                    placeholder = { Text("Tìm kiếm giải đấu...", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray)
+                                Icon(Icons.Default.Close, contentDescription = "Xóa", tint = Color.Gray)
                             }
                         }
                     },
@@ -154,7 +154,7 @@ fun TournamentScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filters",
+                        contentDescription = "Bộ lọc",
                         tint = if (selectedDateStr != null) Color(0xFFFFD54F) else Color.White
                     )
                 }
@@ -181,7 +181,7 @@ fun TournamentScreen(
                     state.error != null -> {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Text(
-                                text = state.error ?: "Unknown error",
+                                text = state.error ?: "Lỗi không xác định",
                                 modifier = Modifier.align(Alignment.Center),
                                 color = Color.White
                             )
@@ -208,19 +208,19 @@ fun TournamentScreen(
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Icon(
                                                 imageVector = Icons.Default.EmojiEvents,
-                                                contentDescription = "Tournaments",
+                                                contentDescription = "Giải đấu",
                                                 tint = Color(0xFFFFD54F)
                                             )
                                             Spacer(Modifier.width(12.dp))
                                             Text(
-                                                text = "Tournament Lobby",
+                                                text = "Phòng chờ giải đấu",
                                                 style = MaterialTheme.typography.headlineSmall,
                                                 color = Color.White
                                             )
                                         }
                                         Spacer(Modifier.height(8.dp))
                                         Text(
-                                            text = "Discover ongoing competitions, join a tournament, or review standings.",
+                                            text = "Khám phá các giải đấu đang diễn ra, tham gia tranh tài hoặc xem bảng xếp hạng.",
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = Color(0xFFB0B0C3)
                                         )
@@ -239,7 +239,7 @@ fun TournamentScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = "No tournaments matches your filter criteria.",
+                                            text = "Không có giải đấu nào khớp với bộ lọc của bạn.",
                                             color = Color.Gray,
                                             style = MaterialTheme.typography.bodyLarge
                                         )
@@ -314,7 +314,7 @@ fun TournamentScreenCompact(
                     .align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = uiState.error ?: "Unknown error",
+                    text = uiState.error ?: "Lỗi không xác định",
                     modifier = Modifier.align(Alignment.Center)
                 )
             }

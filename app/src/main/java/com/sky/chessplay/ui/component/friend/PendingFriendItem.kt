@@ -96,7 +96,7 @@ fun PendingFriendItem(
                 ) {
 
                     Text(
-                        text = request.status,
+                        text = if (request.status == "ONLINE") "Trực tuyến" else "Ngoại tuyến",
                         color = Color.White,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold

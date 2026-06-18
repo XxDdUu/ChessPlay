@@ -12,7 +12,22 @@ object ProfileMapper {
             gamesPlayed = gamesPlayed,
             wins = wins,
             losses = losses,
-            draws = draws
+            draws = draws,
+            winRate = winRate ?: 0.0,
+            goldMedals = goldMedals ?: 0,
+            silverMedals = silverMedals ?: 0,
+            bronzeMedals = bronzeMedals ?: 0,
+            tournamentHistory = tournamentHistory?.map { t ->
+                com.sky.chessplay.domain.model.profile.UserTournament(
+                    tournamentId = t.tournamentId,
+                    tournamentName = t.tournamentName,
+                    startTime = t.startTime,
+                    status = t.status,
+                    rank = t.rank,
+                    medal = t.medal,
+                    score = t.score
+                )
+            } ?: emptyList()
         )
     }
 

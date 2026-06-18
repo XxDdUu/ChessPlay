@@ -71,7 +71,7 @@ fun TournamentSummaryCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = tournament.description.ifBlank { "No description." },
+                        text = tournament.description.ifBlank { "Không có mô tả." },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -86,12 +86,12 @@ fun TournamentSummaryCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 DetailStat(
-                    label = "Time",
+                    label = "Thời gian",
                     value = tournament.timeControl,
                     modifier = Modifier.weight(1f)
                 )
                 DetailStat(
-                    label = "Rounds",
+                    label = "Số ván đấu",
                     value = tournament.totalRounds.toString(),
                     modifier = Modifier.weight(1f)
                 )
@@ -102,19 +102,19 @@ fun TournamentSummaryCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 DetailStat(
-                    label = "Registration Start",
+                    label = "Mở đăng ký",
                     value = formatTournamentDate(tournament.registrationStart),
                     modifier = Modifier.weight(1f)
                 )
                 DetailStat(
-                    label = "Registration End",
+                    label = "Đóng đăng ký",
                     value = formatTournamentDate(tournament.registrationEnd),
                     modifier = Modifier.weight(1f)
                 )
             }
 
             DetailStat(
-                label = "Tournament Start",
+                label = "Bắt đầu giải đấu",
                 value = formatTournamentDate(tournament.startTime),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -125,14 +125,14 @@ fun TournamentSummaryCard(
                         onClick = onLeaveClick,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Leave Tournament")
+                        Text("Rời giải đấu")
                     }
                 } else {
                     Button(
                         onClick = onJoinClick,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Join Tournament")
+                        Text("Tham gia giải đấu")
                     }
                 }
             } else if (tournament.status == TournamentStatus.ONGOING && isRegistered) {

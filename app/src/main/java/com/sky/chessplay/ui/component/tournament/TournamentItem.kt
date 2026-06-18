@@ -82,7 +82,7 @@ fun TournamentItem(
                         modifier = Modifier.wrapContentWidth()
                     )
                 }
-                Text("🔄 ${tournament.totalRounds} rounds")
+                Text("🔄 ${tournament.totalRounds} ván đấu")
                 Text("⏱ ${tournament.timeControl}")
             }
 
@@ -127,13 +127,13 @@ fun TournamentItem(
                         OutlinedButton(
                             onClick = { onLeaveClick(tournament.id) }
                         ) {
-                            Text("Leave")
+                            Text("Rời giải")
                         }
                     } else {
                         Button(
                             onClick = { onJoinClick(tournament.id) }
                         ) {
-                            Text("Join")
+                            Text("Tham gia")
                         }
                     }
                 }
@@ -142,7 +142,7 @@ fun TournamentItem(
                         onStandingsClick(tournament.id)
                     }
                 ) {
-                    Text("Details")
+                    Text("Chi tiết")
                 }
             }
         }

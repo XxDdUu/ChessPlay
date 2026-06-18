@@ -90,7 +90,7 @@ fun MatchHeader(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = if (isMyTurn) "Your move" else "Opponent move",
+                    text = if (isMyTurn) "Lượt của bạn" else "Lượt của đối thủ",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -106,7 +106,7 @@ fun MatchHeader(
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
             ) {
                 Text(
-                    text = if (isMyTurn) "ACTIVE" else "WAITING",
+                    text = if (isMyTurn) "ĐANG ĐI" else "ĐANG CHỜ",
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 14.dp),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -173,15 +173,20 @@ fun OpponentSection(
 
                 Text(
                     text = gameState.opponent?.name
-                        ?: "Waiting...",
+                        ?: "Đang chờ...",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
 
+                val opponentSideText = when (opponentSide.uppercase()) {
+                    "WHITE" -> "Trắng"
+                    "BLACK" -> "Đen"
+                    else -> opponentSide
+                }
                 Text(
-                    text = "${gameState.opponent?.rating ?: "--"} • $opponentSide",
+                    text = "${gameState.opponent?.rating ?: "--"} • Bên: $opponentSideText",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -223,12 +228,17 @@ fun PlayerSection(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "You",
+                    text = "Bạn",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
+                val mySideText = when (gameState.mySide?.name?.uppercase()) {
+                    "WHITE" -> "Trắng"
+                    "BLACK" -> "Đen"
+                    else -> "Không rõ"
+                }
                 Text(
-                    text = "Side: ${gameState.mySide?.name ?: "Unknown"}",
+                    text = "Bên: $mySideText",
                     fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -262,7 +272,7 @@ fun BottomActions(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             GradientButton(
-                title = "Chat",
+                title = "Trò chuyện",
                 icon = Icons.Default.Chat,
                 onClick = onChatClick,
                 modifier = Modifier.weight(1f),
@@ -273,7 +283,7 @@ fun BottomActions(
             )
 
             GradientButton(
-                title = "Rematch",
+                title = "Đấu lại",
                 icon = Icons.Default.Refresh,
                 onClick = onOfferRematch,
                 modifier = Modifier.weight(1f),
@@ -288,7 +298,7 @@ fun BottomActions(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             GradientButton(
-                title = "Draw",
+                title = "Hòa",
                 icon = Icons.Default.Handshake,
                 onClick = onOfferDraw,
                 modifier = Modifier.weight(1f),
@@ -299,7 +309,7 @@ fun BottomActions(
             )
 
             GradientButton(
-                title = "Resign",
+                title = "Đầu hàng",
                 icon = Icons.Default.Flag,
                 onClick = onResign,
                 modifier = Modifier.weight(1f),
@@ -321,7 +331,7 @@ fun BottomActions(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(48.dp)
                 ) {
-                    Text("Accept")
+                    Text("Chấp nhận")
                 }
                 OutlinedButton(
                     onClick = onRejectRematch,
@@ -330,18 +340,18 @@ fun BottomActions(
                 ) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Reject")
+                    Text("Từ chối")
                 }
             }
             Text(
-                text = "Opponent offered a rematch.",
+                text = "Đối thủ đề xuất một ván đấu lại.",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
         } else if (rematchSent) {
             Text(
-                text = "Rematch request sent.",
+                text = "Đã gửi yêu cầu đấu lại.",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp)

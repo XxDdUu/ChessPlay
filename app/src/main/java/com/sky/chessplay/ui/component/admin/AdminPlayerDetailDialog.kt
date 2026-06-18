@@ -44,7 +44,7 @@ fun AdminPlayerDetailDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close")
+                Text("Đóng")
             }
         },
         title = null,
@@ -112,7 +112,7 @@ fun AdminPlayerDetailDialog(
                     AssistChip(
                         onClick = {},
                         label = {
-                            Text("🎮 ${player.gamesPlayed} games")
+                            Text("🎮 ${player.gamesPlayed} ván đấu")
                         }
                     )
 
@@ -129,7 +129,7 @@ fun AdminPlayerDetailDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Statistics",
+                    text = "Thống kê",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -144,14 +144,14 @@ fun AdminPlayerDetailDialog(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
 
-                        StatRow("Wins", player.wins.toString())
-                        StatRow("Losses", player.losses.toString())
-                        StatRow("Draws", player.draws.toString())
+                        StatRow("Thắng", player.wins.toString())
+                        StatRow("Thua", player.losses.toString())
+                        StatRow("Hòa", player.draws.toString())
 
                         HorizontalDivider()
 
                         StatRow(
-                            "Win Rate",
+                            "Tỷ lệ thắng",
                             String.format("%.1f%%", winRate)
                         )
                     }

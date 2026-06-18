@@ -25,13 +25,22 @@ fun TournamentStatusChip(
         else -> MaterialTheme.colorScheme.primary
     }
 
+    val displayText = when (status) {
+        "REGISTERING" -> "Mở đăng ký"
+        "ONGOING" -> "Đang diễn ra"
+        "FINISHED" -> "Đã kết thúc"
+        "UPCOMING" -> "Sắp diễn ra"
+        "REGISTRATION_CLOSED" -> "Đóng đăng ký"
+        else -> status
+    }
+
     Surface(
         color = color.copy(alpha = 0.15f),
         shape = RoundedCornerShape(50),
         modifier = modifier
     ) {
         Text(
-            text = status,
+            text = displayText,
             color = color,
             modifier = Modifier.padding(
                 horizontal = 12.dp,

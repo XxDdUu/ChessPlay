@@ -74,7 +74,7 @@ fun TournamentBreakScreen(
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = false,
-            title = "Round Break"
+            title = "Nghỉ giải lao"
         )
     ) {
         val darkBgGradient = Brush.verticalGradient(
@@ -98,7 +98,7 @@ fun TournamentBreakScreen(
             ) {
                 // Round Break Title
                 Text(
-                    text = "ROUND COMPLETED",
+                    text = "VÒNG ĐẤU ĐÃ HOÀN THÀNH",
                     color = Color(0xFF00FFCC),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
@@ -107,7 +107,7 @@ fun TournamentBreakScreen(
                 )
 
                 Text(
-                    text = "Take a break, next round starts soon!",
+                    text = "Hãy nghỉ ngơi, vòng tiếp theo sẽ sớm bắt đầu!",
                     color = Color.LightGray,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -153,7 +153,7 @@ fun TournamentBreakScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "Next round pairings will generate automatically when break ends.",
+                            text = "Cặp đấu cho vòng tiếp theo sẽ được tự động tạo khi hết thời gian giải lao.",
                             color = Color.LightGray,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center
@@ -170,13 +170,13 @@ fun TournamentBreakScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Current Leaderboard",
+                        text = "Bảng xếp hạng hiện tại",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Standings",
+                        text = "Bảng xếp hạng",
                         color = Color(0xFF00FFCC),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -201,7 +201,7 @@ fun TournamentBreakScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = uiState.error ?: "Failed to load standings",
+                            text = uiState.error ?: "Không thể tải bảng xếp hạng",
                             color = Color.LightGray
                         )
                     }
@@ -231,7 +231,7 @@ fun TournamentBreakScreen(
                         .padding(top = 8.dp)
                 ) {
                     Text(
-                        text = "VIEW TOURNAMENT DETAILS",
+                        text = "XEM CHI TIẾT GIẢI ĐẤU",
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )

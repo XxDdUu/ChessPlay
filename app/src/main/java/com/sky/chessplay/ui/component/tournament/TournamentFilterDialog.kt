@@ -44,13 +44,13 @@ fun TournamentFilterDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Color(0xFF262421),
-        title = { Text("Filter Tournaments", color = Color.White) },
+        title = { Text("Bộ lọc giải đấu", color = Color.White) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = filterNameQuery,
                     onValueChange = { filterNameQuery = it },
-                    label = { Text("Tournament Name") },
+                    label = { Text("Tên giải đấu") },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -62,9 +62,9 @@ fun TournamentFilterDialog(
                 )
 
                 OutlinedTextField(
-                    value = selectedDateStr ?: "All Dates (No filter)",
+                    value = selectedDateStr ?: "Tất cả ngày (Không lọc)",
                     onValueChange = {},
-                    label = { Text("Date") },
+                    label = { Text("Ngày") },
                     readOnly = true,
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -81,7 +81,7 @@ fun TournamentFilterDialog(
                     onClick = { selectedDateStr = todayStr },
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text("Reset to Today", color = Color(0xFFFFD54F))
+                    Text("Đặt lại về hôm nay", color = Color(0xFFFFD54F))
                 }
             }
         },
@@ -90,12 +90,12 @@ fun TournamentFilterDialog(
                 onClick = { onApply(filterNameQuery, selectedDateStr) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F), contentColor = Color.Black)
             ) {
-                Text("Apply Filters")
+                Text("Áp dụng bộ lọc")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = Color.White)
+                Text("Hủy", color = Color.White)
             }
         }
     )
@@ -111,12 +111,12 @@ fun TournamentFilterDialog(
                     }
                     showDatePicker = false
                 }) {
-                    Text("OK")
+                    Text("Đồng ý")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text("Hủy")
                 }
             }
         ) {

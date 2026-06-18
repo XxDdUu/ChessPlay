@@ -42,7 +42,7 @@ fun MoveHistoryCard(
         ) {
 
             Text(
-                text = "MOVE HISTORY",
+                text = "LỊCH SỬ NƯỚC ĐI",
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
@@ -52,7 +52,7 @@ fun MoveHistoryCard(
             if (history.isEmpty()) {
 
                 Text(
-                    text = "No moves yet",
+                    text = "Chưa có nước đi nào",
                     color = Color.Gray
                 )
 
@@ -84,11 +84,11 @@ fun MoveHistoryDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Move History")
+            Text("Lịch sử nước đi")
         },
         text = {
             if (history.isEmpty()) {
-                Text("No moves yet")
+                Text("Chưa có nước đi nào")
             } else {
                 LazyColumn(
                     modifier = Modifier
@@ -103,7 +103,7 @@ fun MoveHistoryDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close")
+                Text("Đóng")
             }
         }
     )

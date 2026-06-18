@@ -64,7 +64,7 @@ fun AiSetupModal(
             ) {
 
                 Text(
-                    text = "Play vs AI",
+                    text = "Đấu với Máy (AI)",
                     color = Color.White,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
@@ -92,7 +92,7 @@ fun AiSetupModal(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text("Hủy")
                     }
 
                     Button(
@@ -107,7 +107,7 @@ fun AiSetupModal(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Start Game")
+                            Text("Bắt đầu ván đấu")
                         }
                     }
                 }

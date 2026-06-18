@@ -68,10 +68,17 @@ fun ActiveFilterTags(
             }
 
             if (filterResult.isNotEmpty()) {
+                val displayResult = when (filterResult) {
+                    "ALL" -> "Tất cả"
+                    "WIN" -> "Thắng"
+                    "LOSS" -> "Thua"
+                    "DRAW" -> "Hòa"
+                    else -> filterResult
+                }
                 InputChip(
                     selected = true,
                     onClick = {},
-                    label = { Text("Kết quả: $filterResult", color = Color.White) },
+                    label = { Text("Kết quả: $displayResult", color = Color.White) },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Close,

@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class HistoryType {
-    ONLINE, LOCAL
+    ONLINE, LOCAL, TOURNAMENT
 }
 
 data class ProfileState(
@@ -98,7 +98,11 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
 
-                val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) onlineHistory else localHistory
+                val activeHistory = when (_state.value.historyType) {
+                    HistoryType.ONLINE -> onlineHistory
+                    HistoryType.LOCAL -> localHistory
+                    HistoryType.TOURNAMENT -> emptyList()
+                }
                 val filtered = applyFilters(activeHistory, _state.value.filterOpponent, _state.value.filterResult)
                 val friends = friendRepository.getFriends(user.id)
 
@@ -118,7 +122,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun setHistoryType(type: HistoryType) {
-        val activeHistory = if (type == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
+        val activeHistory = when (type) {
+            HistoryType.ONLINE -> _state.value.onlineHistory
+            HistoryType.LOCAL -> _state.value.localHistory
+            HistoryType.TOURNAMENT -> emptyList()
+        }
         _state.value = _state.value.copy(
             historyType = type,
             filteredHistory = applyFilters(activeHistory, _state.value.filterOpponent, _state.value.filterResult)
@@ -126,7 +134,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun onFilterOpponentChanged(value: String) {
-        val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
+        val activeHistory = when (_state.value.historyType) {
+            HistoryType.ONLINE -> _state.value.onlineHistory
+            HistoryType.LOCAL -> _state.value.localHistory
+            HistoryType.TOURNAMENT -> emptyList()
+        }
         _state.value = _state.value.copy(
             filterOpponent = value,
             filteredHistory = applyFilters(activeHistory, value, _state.value.filterResult)
@@ -134,7 +146,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun onFilterResultChanged(value: String) {
-        val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
+        val activeHistory = when (_state.value.historyType) {
+            HistoryType.ONLINE -> _state.value.onlineHistory
+            HistoryType.LOCAL -> _state.value.localHistory
+            HistoryType.TOURNAMENT -> emptyList()
+        }
         _state.value = _state.value.copy(
             filterResult = value,
             filteredHistory = applyFilters(activeHistory, _state.value.filterOpponent, value)
@@ -142,7 +158,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun resetFilters() {
-        val activeHistory = if (_state.value.historyType == HistoryType.ONLINE) _state.value.onlineHistory else _state.value.localHistory
+        val activeHistory = when (_state.value.historyType) {
+            HistoryType.ONLINE -> _state.value.onlineHistory
+            HistoryType.LOCAL -> _state.value.localHistory
+            HistoryType.TOURNAMENT -> emptyList()
+        }
         _state.value = _state.value.copy(
             filterOpponent = "",
             filterResult = "ALL",

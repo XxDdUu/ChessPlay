@@ -119,7 +119,7 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (isLoginMode) "LOGIN" else "REGISTER",
+                text = if (isLoginMode) "ĐĂNG NHẬP" else "ĐĂNG KÝ",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
@@ -159,7 +159,7 @@ fun AuthScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "Login",
+                                        text = "Đăng nhập",
                                         color = if (isLoginMode) Color.White else Color.White.copy(alpha = 0.6f),
                                         fontWeight = FontWeight.Bold
                                     )
@@ -174,7 +174,7 @@ fun AuthScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "Register",
+                                        text = "Đăng ký",
                                         color = if (!isLoginMode) Color.White else Color.White.copy(alpha = 0.6f),
                                         fontWeight = FontWeight.Bold
                                     )
@@ -214,7 +214,7 @@ fun AuthScreen(
                                 ),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Text("Next", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text("Tiếp tục", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             }
                         }
 
@@ -245,7 +245,7 @@ fun AuthScreen(
                                 OutlinedTextField(
                                     value = password,
                                     onValueChange = onPasswordChange,
-                                    label = { Text("Password") },
+                                    label = { Text("Mật khẩu") },
                                     singleLine = true,
                                     modifier = Modifier.fillMaxWidth(),
                                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -313,7 +313,7 @@ fun AuthScreen(
                                 OutlinedTextField(
                                     value = username,
                                     onValueChange = onUsernameChange,
-                                    label = { Text("User name") },
+                                    label = { Text("Tên người dùng") },
                                     singleLine = true,
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = OutlinedTextFieldDefaults.colors(
@@ -329,7 +329,7 @@ fun AuthScreen(
                                 OutlinedTextField(
                                     value = password,
                                     onValueChange = onPasswordChange,
-                                    label = { Text("Password") },
+                                    label = { Text("Mật khẩu") },
                                     singleLine = true,
                                     modifier = Modifier.fillMaxWidth(),
                                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -358,7 +358,7 @@ fun AuthScreen(
                                 OutlinedTextField(
                                     value = confirmPassword,
                                     onValueChange = onConfirmPasswordChange,
-                                    label = { Text("Confirm password") },
+                                    label = { Text("Xác nhận mật khẩu") },
                                     singleLine = true,
                                     modifier = Modifier.fillMaxWidth(),
                                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -390,7 +390,7 @@ fun AuthScreen(
                                         value = selectedCountryName,
                                         onValueChange = {},
                                         readOnly = true,
-                                        label = { Text("Country") },
+                                        label = { Text("Quốc gia") },
                                         trailingIcon = {
                                             Icon(
                                                 imageVector = if (dropdownExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
@@ -442,7 +442,7 @@ fun AuthScreen(
                                     ),
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
-                                    Text("Register", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    Text("Đăng ký", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                 }
                             }
                         }
@@ -474,7 +474,7 @@ fun AuthScreen(
                                 OutlinedTextField(
                                     value = otp,
                                     onValueChange = onOtpChange,
-                                    label = { Text("Verification Code (OTP)") },
+                                    label = { Text("Mã xác thực (OTP)") },
                                     singleLine = true,
                                     modifier = Modifier.fillMaxWidth(),
                                     keyboardOptions = KeyboardOptions(
@@ -500,7 +500,7 @@ fun AuthScreen(
                                     ),
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
-                                    Text("Submit OTP", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    Text("Xác thực OTP", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                 }
                             }
                         }
@@ -562,7 +562,7 @@ fun AuthScreen(
                         color = Color.White.copy(alpha = 0.1f)
                     )
                     Text(
-                        text = "  Or  ",
+                        text = "  Hoặc  ",
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.5f)
                     )
@@ -595,7 +595,7 @@ fun AuthScreen(
                         tint = Color.Unspecified
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Continue with Google", fontWeight = FontWeight.Bold)
+                    Text("Tiếp tục với Google", fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

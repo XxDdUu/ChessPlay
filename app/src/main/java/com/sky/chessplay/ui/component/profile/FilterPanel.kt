@@ -79,7 +79,13 @@ fun FilterModal(
                     onExpandedChange = { expanded = it }
                 ) {
                     OutlinedTextField(
-                        value = filterResult.ifEmpty { "Tất cả" },
+                        value = when (filterResult) {
+                            "ALL", "" -> "Tất cả"
+                            "WIN" -> "Thắng"
+                            "LOSS" -> "Thua"
+                            "DRAW" -> "Hòa"
+                            else -> filterResult
+                        },
                         onValueChange = { },
                         readOnly = true,
                         label = { Text("Kết quả") },
@@ -94,10 +100,17 @@ fun FilterModal(
                         onDismissRequest = { expanded = false }
                     ) {
                         resultOptions.forEach { option ->
+                            val label = when (option) {
+                                "ALL" -> "Tất cả"
+                                "WIN" -> "Thắng"
+                                "LOSS" -> "Thua"
+                                "DRAW" -> "Hòa"
+                                else -> option
+                            }
                             DropdownMenuItem(
-                                text = { Text(option) },
+                                text = { Text(label) },
                                 onClick = {
-                                    onFilterResultChange(if (option == "Tất cả") "" else option)
+                                    onFilterResultChange(option)
                                     expanded = false
                                 }
                             )

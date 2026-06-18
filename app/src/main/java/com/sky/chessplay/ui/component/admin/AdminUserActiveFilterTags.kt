@@ -37,11 +37,11 @@ fun AdminUserActiveFilterTags(
                 InputChip(
                     selected = true,
                     onClick = onClearSearch,
-                    label = { Text("Name: ${searchQuery.trim()}") },
+                    label = { Text("Tên: ${searchQuery.trim()}") },
                     trailingIcon = {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Clear name filter",
+                            contentDescription = "Xóa bộ lọc tên",
                             modifier = Modifier.size(14.dp)
                         )
                     },
@@ -60,8 +60,8 @@ fun AdminUserActiveFilterTags(
                     label = {
                         Text(
                             text = when (banFilter) {
-                                AdminUserBanFilter.Banned -> "Status: Banned"
-                                AdminUserBanFilter.NotBanned -> "Status: Not banned"
+                                AdminUserBanFilter.Banned -> "Trạng thái: Bị khóa"
+                                AdminUserBanFilter.NotBanned -> "Trạng thái: Không bị khóa"
                                 AdminUserBanFilter.All -> ""
                             }
                         )
@@ -69,7 +69,7 @@ fun AdminUserActiveFilterTags(
                     trailingIcon = {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Clear status filter",
+                            contentDescription = "Xóa bộ lọc trạng thái",
                             modifier = Modifier.size(14.dp)
                         )
                     },

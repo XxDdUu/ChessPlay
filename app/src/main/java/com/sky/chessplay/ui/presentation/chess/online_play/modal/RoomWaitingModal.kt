@@ -63,7 +63,7 @@ fun RoomWaitingModal(
             ) {
 
                 Text(
-                    text = "Private Room",
+                    text = "Phòng riêng",
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -72,7 +72,7 @@ fun RoomWaitingModal(
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    text = "Share this code with your friend",
+                    text = "Chia sẻ mã này với bạn của bạn",
                     color = Color(0xFFB0B0C3),
                     textAlign = TextAlign.Center
                 )
@@ -104,7 +104,7 @@ fun RoomWaitingModal(
                             Toast
                                 .makeText(
                                     context,
-                                    "Room code copied!",
+                                    "Đã sao chép mã phòng!",
                                     Toast.LENGTH_SHORT
                                 )
                                 .show()
@@ -113,7 +113,7 @@ fun RoomWaitingModal(
 
                         Icon(
                             imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy Room Code",
+                            contentDescription = "Sao chép mã phòng",
                             tint = Color.White
                         )
                     }
@@ -139,7 +139,7 @@ fun RoomWaitingModal(
                 ) {
 
                     Text(
-                        text = "Cancel",
+                        text = "Hủy",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )

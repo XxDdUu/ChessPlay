@@ -19,9 +19,9 @@ fun LeaderboardHeader() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text("#", modifier = Modifier.weight(0.5f), fontWeight = FontWeight.Bold)
-        Text("Player", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold)
+        Text("Người chơi", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold)
         Text("Elo", modifier = Modifier.weight(0.9f), fontWeight = FontWeight.Bold)
-        Text("Pts", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold)
+        Text("Điểm", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold)
         Text("BH", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold)
         Text("SB", modifier = Modifier.weight(0.8f), fontWeight = FontWeight.Bold)
     }

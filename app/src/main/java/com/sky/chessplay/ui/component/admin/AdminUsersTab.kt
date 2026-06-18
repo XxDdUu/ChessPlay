@@ -151,7 +151,7 @@ private fun UserAdminItem(
                         Badge(
                             containerColor = MaterialTheme.colorScheme.error
                         ) {
-                            Text("BANNED")
+                            Text("ĐÃ BỊ KHÓA")
                         }
                     }
                 }
@@ -162,7 +162,7 @@ private fun UserAdminItem(
                 IconButton(onClick = onUnbanClick) {
                     Icon(
                         Icons.Default.Check,
-                        contentDescription = "Unban user",
+                        contentDescription = "Mở khóa người dùng",
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -170,7 +170,7 @@ private fun UserAdminItem(
                 IconButton(onClick = onBanClick) {
                     Icon(
                         Icons.Default.Block,
-                        contentDescription = "Ban user",
+                        contentDescription = "Khóa người dùng",
                         tint = MaterialTheme.colorScheme.error
                     )
                 }

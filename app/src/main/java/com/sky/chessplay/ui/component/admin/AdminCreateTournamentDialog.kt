@@ -57,7 +57,7 @@ fun CreateTournamentDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Create Tournament",
+                text = "Tạo giải đấu",
                 style = MaterialTheme.typography.headlineSmall
             )
         },
@@ -71,14 +71,14 @@ fun CreateTournamentDialog(
                 OutlinedTextField(
                     value = tournamentName,
                     onValueChange = { tournamentName = it },
-                    label = { Text("Tournament Name") },
+                    label = { Text("Tên giải đấu") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { Text("Mô tả") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3
                 )
@@ -86,7 +86,7 @@ fun CreateTournamentDialog(
                 OutlinedTextField(
                     value = totalRounds,
                     onValueChange = { totalRounds = it.filter(Char::isDigit) },
-                    label = { Text("Total Rounds") },
+                    label = { Text("Số ván đấu") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -94,12 +94,12 @@ fun CreateTournamentDialog(
                 OutlinedTextField(
                     value = timeControl,
                     onValueChange = { timeControl = it },
-                    label = { Text("Time Control (10+0)") },
+                    label = { Text("Thời gian đấu (ví dụ: 10+0)") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 DateTimeField(
-                    label = "Registration Start",
+                    label = "Mở đăng ký",
                     value = registrationStart,
                     onClick = {
                         selectedTarget = DateTarget.REGISTRATION_START
@@ -108,7 +108,7 @@ fun CreateTournamentDialog(
                 )
 
                 DateTimeField(
-                    label = "Registration End",
+                    label = "Đóng đăng ký",
                     value = registrationEnd,
                     onClick = {
                         selectedTarget = DateTarget.REGISTRATION_END
@@ -118,7 +118,7 @@ fun CreateTournamentDialog(
 
                 // FIX 1: Fixed the assigned DateTarget here
                 DateTimeField(
-                    label = "Tournament Start",
+                    label = "Bắt đầu giải đấu",
                     value = startTime,
                     onClick = {
                         selectedTarget = DateTarget.TOURNAMENT_START
@@ -187,12 +187,12 @@ fun CreateTournamentDialog(
                     )
                 }
             ) {
-                Text("Create")
+                Text("Tạo")
             }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Hủy")
             }
         }
     )

@@ -50,7 +50,7 @@ fun AiControlPanel(
         ) {
 
             Text(
-                text = "AI SETTINGS",
+                text = "CÀI ĐẶT MÁY (AI)",
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
@@ -67,7 +67,7 @@ fun AiControlPanel(
             Column {
 
                 Text(
-                    text = "Difficulty: $difficulty",
+                    text = "Độ khó: $difficulty",
                     color = Color.White
                 )
 
@@ -93,7 +93,7 @@ fun AiControlPanel(
                         onPlayerColorChange(Side.WHITE)
                     },
                     label = {
-                        Text("White")
+                        Text("Trắng")
                     },
                     enabled = !gameStarted
                 )
@@ -104,7 +104,7 @@ fun AiControlPanel(
                         onPlayerColorChange(Side.BLACK)
                     },
                     label = {
-                        Text("Black")
+                        Text("Đen")
                     },
                     enabled = !gameStarted
                 )
@@ -133,9 +133,9 @@ fun AiControlPanel(
 
                     Text(
                         if (gameStarted) {
-                            "Resign"
+                            "Đầu hàng"
                         } else {
-                            "Start Game"
+                            "Bắt đầu ván đấu"
                         }
                     )
                 }

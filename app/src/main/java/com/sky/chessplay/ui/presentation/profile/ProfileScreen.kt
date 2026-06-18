@@ -51,6 +51,7 @@ import com.sky.chessplay.ui.component.profile.ActiveFilterTags
 import com.sky.chessplay.ui.component.profile.FilterModal
 import com.sky.chessplay.ui.component.profile.MatchHistoryCard
 import com.sky.chessplay.ui.component.profile.ProfileHeader
+import com.sky.chessplay.ui.component.profile.TournamentHistoryCard
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.presentation.replay.ReplayScreen
@@ -108,7 +109,11 @@ fun ProfileScreen(
                 gamesPlayed = state.stats?.gamesPlayed ?: 0,
                 wins = state.stats?.wins ?: 0,
                 losses = state.stats?.losses ?: 0,
-                draws = state.stats?.draws ?: 0
+                draws = state.stats?.draws ?: 0,
+                winRate = state.stats?.winRate ?: 0.0,
+                gold = state.stats?.goldMedals ?: 0,
+                silver = state.stats?.silverMedals ?: 0,
+                bronze = state.stats?.bronzeMedals ?: 0
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -128,73 +133,86 @@ fun ProfileScreen(
                 Tab(
                     selected = state.historyType == HistoryType.ONLINE,
                     onClick = { onHistoryTypeChange(HistoryType.ONLINE) },
-                    text = { Text("Đấu Online", fontWeight = FontWeight.Bold, fontSize = 14.sp) }
+                    text = { Text("Trực tuyến", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
                 )
                 Tab(
                     selected = state.historyType == HistoryType.LOCAL,
                     onClick = { onHistoryTypeChange(HistoryType.LOCAL) },
-                    text = { Text("Đấu Máy/Local", fontWeight = FontWeight.Bold, fontSize = 14.sp) }
+                    text = { Text("Máy/Local", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+                )
+                Tab(
+                    selected = state.historyType == HistoryType.TOURNAMENT,
+                    onClick = { onHistoryTypeChange(HistoryType.TOURNAMENT) },
+                    text = { Text("Giải đấu", fontWeight = FontWeight.Bold, fontSize = 12.sp) }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedButton(
-                    onClick = onRefresh,
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFbabfc3)
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFF312E2B)),
-                    shape = RoundedCornerShape(8.dp)
+            if (state.historyType != HistoryType.TOURNAMENT) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Làm mới",
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Làm mới", fontSize = 13.sp)
+                    OutlinedButton(
+                        onClick = onRefresh,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFFbabfc3)
+                        ),
+                        border = BorderStroke(1.dp, Color(0xFF312E2B)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Làm mới",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Làm mới", fontSize = 13.sp)
+                    }
+
+                    IconButton(
+                        onClick = { showSearchModal = true },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color(0xFF262421)
+                        ),
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Bộ lọc tìm kiếm",
+                            tint = Color.White
+                        )
+                    }
                 }
 
-                IconButton(
-                    onClick = { showSearchModal = true },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color(0xFF262421)
-                    ),
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Bộ lọc tìm kiếm",
-                        tint = Color.White
-                    )
-                }
-            }
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            ActiveFilterTags(
-                filterOpponent = state.filterOpponent,
-                filterResult = state.filterResult,
-                onRemoveOpponent = { onFilterOpponentChange("") },
-                onRemoveResult = { onFilterResultChange("") }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Box(modifier = Modifier.weight(1f)) {
-                MatchHistoryCard(
-                    history = state.filteredHistory,
-                    onReplayClick = { gameItem ->
-                        selectedGameForReplay = gameItem
-                    },
-                    username = username
+                ActiveFilterTags(
+                    filterOpponent = state.filterOpponent,
+                    filterResult = state.filterResult,
+                    onRemoveOpponent = { onFilterOpponentChange("") },
+                    onRemoveResult = { onFilterResultChange("") }
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Box(modifier = Modifier.weight(1f)) {
+                    MatchHistoryCard(
+                        history = state.filteredHistory,
+                        onReplayClick = { gameItem ->
+                            selectedGameForReplay = gameItem
+                        },
+                        username = username
+                    )
+                }
+            } else {
+                Box(modifier = Modifier.weight(1f)) {
+                    TournamentHistoryCard(
+                        tournaments = state.stats?.tournamentHistory ?: emptyList()
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

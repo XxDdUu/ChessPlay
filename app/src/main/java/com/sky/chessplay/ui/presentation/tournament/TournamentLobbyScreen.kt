@@ -63,7 +63,7 @@ fun TournamentLobbyScreen(
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = false,
-            title = "Match Lobby"
+            title = "Phòng chờ thi đấu"
         )
     ) {
         Box(
@@ -91,7 +91,7 @@ fun TournamentLobbyScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = uiState.error ?: "Failed to load lobby",
+                            text = uiState.error ?: "Không thể tải phòng chờ",
                             color = Color.White,
                             style = MaterialTheme.typography.titleMedium,
                             textAlign = TextAlign.Center
@@ -107,7 +107,7 @@ fun TournamentLobbyScreen(
                         border = BorderStroke(1.dp, Color(0xFF312E2B))
                     ) {
                         Text(
-                            text = "Waiting for pairings to be generated...",
+                            text = "Đang chờ ghép cặp thi đấu...",
                             color = Color.White,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
@@ -137,19 +137,19 @@ fun TournamentLobbyScreen(
                                 modifier = Modifier.size(64.dp)
                             )
                             Text(
-                                text = "ROUND COMPLETED",
+                                text = "VÒNG ĐẤU ĐÃ HOÀN THÀNH",
                                 color = Color(0xFF00FFCC),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = uiState.completedMessage ?: "You have completed your match.",
+                                text = uiState.completedMessage ?: "Bạn đã hoàn thành trận đấu của mình.",
                                 color = Color.White,
                                 style = MaterialTheme.typography.bodyLarge,
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = "Waiting for other matches to finish. Please stay on this screen to start the next round.",
+                                text = "Đang chờ các trận đấu khác kết thúc. Vui lòng ở lại màn hình này để bắt đầu vòng tiếp theo.",
                                 color = Color.LightGray,
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center
@@ -162,7 +162,7 @@ fun TournamentLobbyScreen(
                                 modifier = Modifier.fillMaxWidth().height(48.dp)
                             ) {
                                 Text(
-                                    text = "VIEW STANDINGS",
+                                    text = "XEM BẢNG XẾP HẠNG",
                                     color = Color.Black,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -185,14 +185,14 @@ fun TournamentLobbyScreen(
                             modifier = Modifier.padding(top = 16.dp)
                         ) {
                             Text(
-                                text = "ROUND ${pairing.roundNumber}",
+                                text = "VÒNG ${pairing.roundNumber}",
                                 color = Color(0xFF00FFCC),
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 2.sp
                             )
                             Text(
-                                text = if (pairing.isBye) "You have a BYE this round!" else "Tournament Match Check-in",
+                                text = if (pairing.isBye) "Bạn được miễn đấu vòng này!" else "Điểm danh trận đấu giải đấu",
                                 color = Color.LightGray,
                                 fontSize = 16.sp
                             )
@@ -209,7 +209,7 @@ fun TournamentLobbyScreen(
                             ) {
                                 // Player 1 (You)
                                 PlayerCheckInCard(
-                                    name = "You",
+                                    name = "Bạn",
                                     rating = pairing.opponentRating, // Just placeholder rating
                                     color = pairing.myColor,
                                     isReady = pairing.iAmReady,
@@ -251,7 +251,7 @@ fun TournamentLobbyScreen(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
                             ) {
                                 Text(
-                                    text = uiState.forfeitMessage ?: "Match Forfeited",
+                                    text = uiState.forfeitMessage ?: "Trận đấu bị xử thua (Bỏ cuộc)",
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center,
@@ -289,7 +289,7 @@ fun TournamentLobbyScreen(
                                             fontWeight = FontWeight.Bold
                                         )
                                         Text(
-                                            text = "Check-in",
+                                            text = "Điểm danh",
                                             color = Color.LightGray,
                                             fontSize = 12.sp
                                         )
@@ -299,7 +299,7 @@ fun TournamentLobbyScreen(
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 Text(
-                                    text = "Failure to check-in within 5 minutes results in immediate forfeit.",
+                                    text = "Không điểm danh trong vòng 5 phút sẽ bị xử thua ngay lập tức.",
                                     color = Color(0xFFFFB300),
                                     fontSize = 13.sp,
                                     textAlign = TextAlign.Center,
@@ -320,7 +320,7 @@ fun TournamentLobbyScreen(
                                     .padding(bottom = 16.dp)
                              ) {
                                 Text(
-                                    text = "GO TO STANDINGS",
+                                    text = "XEM BẢNG XẾP HẠNG",
                                     color = Color.Black,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
@@ -349,14 +349,14 @@ fun TournamentLobbyScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "READY & CHECKED IN",
+                                        text = "ĐÃ ĐIỂM DANH & SẴN SÀNG",
                                         color = Color(0xFF00FFCC),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp
                                     )
                                 } else {
                                     Text(
-                                        text = "CHECK IN (READY)",
+                                        text = "ĐIỂM DANH (SẴN SÀNG)",
                                         color = Color.Black,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp
@@ -375,7 +375,7 @@ fun TournamentLobbyScreen(
                                     .padding(bottom = 16.dp)
                             ) {
                                 Text(
-                                    text = "RETURN TO TOURNAMENT",
+                                    text = "QUAY LẠI GIẢI ĐẤU",
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
@@ -424,13 +424,13 @@ fun PlayerCheckInCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Rating: $rating",
+                text = "Hệ số: $rating",
                 color = Color.LightGray,
                 fontSize = 13.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Color: $color",
+                text = "Màu quân: ${if (color == "WHITE") "Trắng" else "Đen"}",
                 color = if (color == "WHITE") Color.White else Color.DarkGray,
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
@@ -458,7 +458,7 @@ fun PlayerCheckInCard(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = if (isReady) "READY" else "NOT READY",
+                    text = if (isReady) "SẴN SÀNG" else "CHƯA SẴN SÀNG",
                     color = if (isReady) Color(0xFF00FFCC) else Color(0xFFFF3366),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold

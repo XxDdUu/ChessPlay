@@ -39,13 +39,13 @@ fun AdminUserFilterDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Color(0xFF262421),
-        title = { Text("Filter Users", color = Color.White) },
+        title = { Text("Bộ lọc người dùng", color = Color.White) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    label = { Text("User name") },
+                    label = { Text("Tên người dùng") },
                     leadingIcon = {
                         Icon(
                             Icons.Default.Search,
@@ -76,9 +76,9 @@ fun AdminUserFilterDialog(
                             label = {
                                 Text(
                                     text = when (filter) {
-                                        AdminUserBanFilter.All -> "All"
-                                        AdminUserBanFilter.Banned -> "Banned"
-                                        AdminUserBanFilter.NotBanned -> "Not banned"
+                                        AdminUserBanFilter.All -> "Tất cả"
+                                        AdminUserBanFilter.Banned -> "Bị khóa"
+                                        AdminUserBanFilter.NotBanned -> "Không bị khóa"
                                     }
                                 )
                             }
@@ -95,7 +95,7 @@ fun AdminUserFilterDialog(
                     contentColor = Color.Black
                 )
             ) {
-                Text("Apply")
+                Text("Áp dụng")
             }
         },
         dismissButton = {
@@ -106,13 +106,13 @@ fun AdminUserFilterDialog(
                         banFilter = AdminUserBanFilter.All
                     }
                 ) {
-                    Text("Clear", color = Color(0xFFFFD54F))
+                    Text("Xóa bộ lọc", color = Color(0xFFFFD54F))
                 }
 
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
 
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel", color = Color.White)
+                    Text("Hủy", color = Color.White)
                 }
             }
         }

@@ -60,7 +60,7 @@ fun AdminScreen(
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = true,
-            title = "\uD83D\uDEE1\uFE0F Admin Panel",
+            title = "🛡️ Trang quản trị",
             actions = if (uiState.selectedTab == AdminTab.Users) {
                 listOf(
                     TopBarAction.Filter(
@@ -98,7 +98,15 @@ fun AdminScreen(
                     Tab(
                         selected = uiState.selectedTab == tab,
                         onClick = { viewModel.selectTab(tab) },
-                        text = { Text(tab.name) }
+                        text = {
+                            Text(
+                                when (tab) {
+                                    AdminTab.Dashboard -> "Tổng quan"
+                                    AdminTab.Users -> "Người dùng"
+                                    AdminTab.Tournaments -> "Giải đấu"
+                                }
+                            )
+                        }
                     )
                 }
             }

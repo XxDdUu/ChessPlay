@@ -165,7 +165,7 @@ fun FriendItem(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = friend.status,
+                        text = if (friend.status == "ONLINE") "Trực tuyến" else "Ngoại tuyến",
                         color = Color.LightGray,
                         fontSize = 14.sp
                     )

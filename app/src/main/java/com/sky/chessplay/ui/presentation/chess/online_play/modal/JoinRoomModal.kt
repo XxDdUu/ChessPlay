@@ -55,7 +55,7 @@ fun JoinRoomDialog(
             ) {
 
                 Text(
-                    text = "Join Private Room",
+                    text = "Vào phòng riêng",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -64,7 +64,7 @@ fun JoinRoomDialog(
                 Spacer(Modifier.height(12.dp))
 
                 Text(
-                    text = "Enter the room code shared by your friend",
+                    text = "Nhập mã phòng được chia sẻ từ bạn của bạn",
                     textAlign = TextAlign.Center,
                     color = Color(0xFFB0B0C3),
                     fontSize = 15.sp
@@ -117,7 +117,7 @@ fun JoinRoomDialog(
                         shape = RoundedCornerShape(14.dp)
                     ) {
 
-                        Text("Cancel")
+                        Text("Hủy")
                     }
 
                     Button(
@@ -130,7 +130,7 @@ fun JoinRoomDialog(
                     ) {
 
                         Text(
-                            text = "Join",
+                            text = "Vào phòng",
                             fontWeight = FontWeight.Bold
                         )
                     }

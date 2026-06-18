@@ -39,7 +39,7 @@ fun TournamentTableHeader() {
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                "Tournament",
+                "Giải đấu",
                 fontWeight = FontWeight.Bold
             )
         }
@@ -52,7 +52,7 @@ fun TournamentTableHeader() {
             )
             Spacer(Modifier.width(6.dp))
             Text(
-                "Rounds",
+                "Ván đấu",
                 fontWeight = FontWeight.Bold
             )
         }
@@ -65,12 +65,12 @@ fun TournamentTableHeader() {
             )
             Spacer(Modifier.width(6.dp))
             Text(
-                "TC",
+                "Thời gian",
                 fontWeight = FontWeight.Bold
             )
         }
         Text(
-            "Status",
+            "Trạng thái",
             modifier = Modifier.weight(1f),
             fontWeight = FontWeight.Bold
         )

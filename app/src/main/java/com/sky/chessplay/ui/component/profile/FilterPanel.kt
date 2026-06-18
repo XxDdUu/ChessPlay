@@ -37,7 +37,6 @@ fun FilterModal(
     onDismiss: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val resultOptions = listOf("Tất cả", "Thắng", "Thua", "Hòa") // Tùy chỉnh theo data thực tế
 
     AlertDialog(
         onDismissRequest = onDismiss,

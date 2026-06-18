@@ -3,6 +3,8 @@ package com.sky.chessplay.ui.presentation.profile
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sky.chessplay.data.mapper.ProfileMapper.toDomain
+import com.sky.chessplay.data.remote.api.ProfileApi
 import com.sky.chessplay.domain.model.auth.User
 import com.sky.chessplay.domain.model.profile.GameHistoryItem
 import com.sky.chessplay.domain.model.profile.UserStats
@@ -10,8 +12,6 @@ import com.sky.chessplay.domain.repository.AuthRepository
 import com.sky.chessplay.domain.repository.FriendRepository
 import com.sky.chessplay.domain.repository.GameRepository
 import com.sky.chessplay.domain.repository.LocalMatchRepository
-import com.sky.chessplay.data.remote.api.ProfileApi
-import com.sky.chessplay.data.mapper.ProfileMapper.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -155,31 +155,30 @@ class ProfileViewModel @Inject constructor(
         opponent: String,
         result: String
     ): List<GameHistoryItem> {
+
         return history.filter { game ->
-            val opponentMatch = opponent.isBlank() || game.opponentName?.contains(opponent, ignoreCase = true) == true
+
+            val opponentMatch =
+                opponent.isBlank() ||
+                        game.opponentName?.contains(opponent, true) == true
+
+            val isWin =
+                (game.result == "1-0" && game.myColor == "WHITE") ||
+                        (game.result == "0-1" && game.myColor == "BLACK")
+
+            val isLoss =
+                (game.result == "1-0" && game.myColor == "BLACK") ||
+                        (game.result == "0-1" && game.myColor == "WHITE")
+
+            val isDraw =
+                game.result == "1/2-1/2" ||
+                        game.result == "0.5-0.5"
+
             val resultMatch = when (result.uppercase()) {
-                "ALL" -> true
-                "WIN", "THẮNG" -> {
-                    if (game.gameId.startsWith("local_")) {
-                        game.result == "1-0"
-                    } else {
-                        game.result.contains("WIN", ignoreCase = true)
-                    }
-                }
-                "LOSS", "THUA" -> {
-                    if (game.gameId.startsWith("local_")) {
-                        game.result == "0-1"
-                    } else {
-                        game.result.contains("LOSS", ignoreCase = true)
-                    }
-                }
-                "DRAW", "HÒA" -> {
-                    if (game.gameId.startsWith("local_")) {
-                        game.result == "1/2-1/2" || game.result == "0.5-0.5"
-                    } else {
-                        game.result.contains("DRAW", ignoreCase = true)
-                    }
-                }
+                "", "ALL" -> true
+                "WIN", "THẮNG" -> isWin
+                "LOSS", "THUA" -> isLoss
+                "DRAW", "HÒA" -> isDraw
                 else -> true
             }
             opponentMatch && resultMatch

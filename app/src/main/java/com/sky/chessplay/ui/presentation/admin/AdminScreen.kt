@@ -34,9 +34,11 @@ import com.sky.chessplay.domain.state.AdminTab
 import com.sky.chessplay.ui.component.admin.AdminDashboardTab
 import com.sky.chessplay.ui.component.admin.AdminTournamentsTab
 import com.sky.chessplay.ui.component.admin.AdminUsersTab
+import com.sky.chessplay.ui.component.admin.AdminUserBanFilter
 import com.sky.chessplay.ui.component.admin.CreateTournamentDialog
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
+import com.sky.chessplay.ui.layout.TopBarAction
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -48,12 +50,27 @@ fun AdminScreen(
     var showCreateTournamentDialog by remember {
         mutableStateOf(false)
     }
+    var showUserFilterDialog by remember { mutableStateOf(false) }
+    var userSearchQuery by remember { mutableStateOf("") }
+    var userBanFilter by remember { mutableStateOf(AdminUserBanFilter.All) }
+    val hasActiveUserFilters = userSearchQuery.isNotBlank() || userBanFilter != AdminUserBanFilter.All
+
     AppScaffold(
         navController = navController,
         config = AppScaffoldConfig(
             showTopBar = true,
             showBottomBar = true,
             title = "\uD83D\uDEE1\uFE0F Admin Panel",
+            actions = if (uiState.selectedTab == AdminTab.Users) {
+                listOf(
+                    TopBarAction.Filter(
+                        isActive = hasActiveUserFilters,
+                        onClick = { showUserFilterDialog = true }
+                    )
+                )
+            } else {
+                emptyList()
+            },
             createTournamentAction =
             if (uiState.selectedTab == AdminTab.Tournaments) {
                 {
@@ -104,6 +121,17 @@ fun AdminScreen(
                     AdminUsersTab(
                         users = uiState.users,
                         isLoading = uiState.isLoading,
+                        searchQuery = userSearchQuery,
+                        banFilter = userBanFilter,
+                        showFilterDialog = showUserFilterDialog,
+                        onDismissFilterDialog = { showUserFilterDialog = false },
+                        onApplyFilters = { query, banFilter ->
+                            userSearchQuery = query
+                            userBanFilter = banFilter
+                            showUserFilterDialog = false
+                        },
+                        onClearSearch = { userSearchQuery = "" },
+                        onClearBanFilter = { userBanFilter = AdminUserBanFilter.All },
                         onBanClick = viewModel::banUser,
                         onUnbanClick = viewModel::unbanUser,
                         modifier = Modifier

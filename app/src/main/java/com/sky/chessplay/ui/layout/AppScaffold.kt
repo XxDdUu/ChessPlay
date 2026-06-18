@@ -12,8 +12,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ButtonDefaults
@@ -115,6 +117,14 @@ fun AppScaffold(
                         config.actions.forEach { action ->
 
                             when (action) {
+                                is TopBarAction.Refresh -> {
+                                    IconButton(onClick = action.onClick) {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = "Refresh"
+                                        )
+                                    }
+                                }
 
                                 is TopBarAction.Chat -> {
 
@@ -184,6 +194,20 @@ fun AppScaffold(
                                         Icon(
                                             Icons.Default.History,
                                             contentDescription = "History"
+                                        )
+                                    }
+                                }
+
+                                is TopBarAction.Filter -> {
+                                    IconButton(onClick = action.onClick) {
+                                        Icon(
+                                            Icons.Default.FilterList,
+                                            contentDescription = "Filter",
+                                            tint = if (action.isActive) {
+                                                Color(0xFFFFD54F)
+                                            } else {
+                                                Color.White
+                                            }
                                         )
                                     }
                                 }
@@ -257,7 +281,7 @@ data class FabConfig(
     val contentDescription: String = ""
 )
 sealed class TopBarAction {
-
+    data class Refresh(val onClick: () -> Unit) : TopBarAction()
     data class Chat(
         val unreadCount: Int = 0,
         val onClick: () -> Unit
@@ -270,6 +294,11 @@ sealed class TopBarAction {
     ) : TopBarAction()
 
     data class History(
+        val onClick: () -> Unit
+    ) : TopBarAction()
+
+    data class Filter(
+        val isActive: Boolean = false,
         val onClick: () -> Unit
     ) : TopBarAction()
 }

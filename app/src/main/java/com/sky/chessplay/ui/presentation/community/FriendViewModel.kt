@@ -12,6 +12,7 @@ import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.FriendState
 import com.sky.chessplay.domain.state.FriendUiState
+import com.sky.chessplay.domain.state.FriendshipStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -108,6 +109,8 @@ class FriendViewModel @Inject constructor(
                     event.user2
                 )
             }
+
+            FriendEvent.ClearSearchResults -> TODO()
         }
     }
 
@@ -161,7 +164,7 @@ class FriendViewModel @Inject constructor(
                 
                 searchResultList = searchResultList.map { u ->
                     if (u.userId == receiverId) {
-                        u.copy(friendshipStatus = "PENDING_SENT")
+                        u.copy(friendshipStatus = FriendshipStatus.PENDING_SENT)
                     } else {
                         u
                     }
@@ -241,7 +244,7 @@ class FriendViewModel @Inject constructor(
                 
                 searchResultList = searchResultList.map { u ->
                     if (u.userId == user2) {
-                        u.copy(friendshipStatus = "ACCEPTED")
+                        u.copy(friendshipStatus = FriendshipStatus.ACCEPTED)
                     } else {
                         u
                     }

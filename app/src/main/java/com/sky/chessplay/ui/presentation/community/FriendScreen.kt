@@ -40,6 +40,7 @@ import com.sky.chessplay.ui.component.friend.FriendItem
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
+import com.sky.chessplay.ui.presentation.community.modal.SearchFriendModal
 
 @Composable
 fun FriendScreen(
@@ -218,22 +219,14 @@ fun FriendScreen(
                 )
             }
             if (showSearchDialog) {
-                com.sky.chessplay.ui.presentation.community.modal.SearchFriendModal(
+                SearchFriendModal(
                     searchResults = searchResults,
-                    isSearching = isSearching,
+                    isLoading = isSearching,
                     currentUserId = currentUserId,
-                    onSearch = { query ->
-                        onEvent(FriendEvent.SearchFriend(query))
-                    },
-                    onSendRequest = { targetId ->
-                        onEvent(FriendEvent.SendFriendRequest(currentUserId, targetId))
-                    },
-                    onAcceptRequest = { targetId ->
-                        onEvent(FriendEvent.AcceptFriendRequest(currentUserId, targetId))
-                    },
                     onDismiss = {
                         showSearchDialog = false
-                    }
+                    },
+                    onEvent = onEvent
                 )
             }
         }

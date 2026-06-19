@@ -152,7 +152,6 @@ fun OnlinePlayScreen(
         }
     }
 
-    // Load user's friend list once user + opponent are known
     LaunchedEffect(user?.id, gameInit?.opponentId) {
         user?.id?.let { uid ->
             friendViewModel.onEvent(FriendEvent.LoadFriends(uid))

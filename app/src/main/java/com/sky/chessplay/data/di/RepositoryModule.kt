@@ -52,7 +52,7 @@ abstract class RepositoryModule {
         impl: TournamentRepositoryImpl
     ): TournamentRepository
     @Binds
-    abstract fun bindAdmintRepository(
+    abstract fun bindAdminRepository(
         impl: AdminRepositoryImpl
     ): AdminRepository
 }

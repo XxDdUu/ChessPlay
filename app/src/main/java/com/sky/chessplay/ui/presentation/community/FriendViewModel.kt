@@ -22,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FriendViewModel @Inject constructor(
     private val repository: FriendRepository,
-    private val chessSocket: ChessSocket
+    private val chessSocket: ChessSocket,
+    private val profileApi: com.sky.chessplay.data.remote.api.ProfileApi
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<FriendState>(FriendState.Idle)
@@ -41,6 +42,18 @@ class FriendViewModel @Inject constructor(
         private set
 
     var isSearching by mutableStateOf(false)
+        private set
+
+    var leaderboardList by mutableStateOf<List<com.sky.chessplay.data.remote.dto.response.LeaderboardResponse>>(emptyList())
+        private set
+
+    var isLeaderboardLoading by mutableStateOf(false)
+        private set
+
+    var selectedPlayerStats by mutableStateOf<com.sky.chessplay.data.remote.dto.response.UserProfileResponse?>(null)
+        private set
+
+    var isPlayerStatsLoading by mutableStateOf(false)
         private set
 
     private var currentUserId: Long? = null
@@ -121,8 +134,39 @@ class FriendViewModel @Inject constructor(
         }
     }
 
+    fun loadLeaderboard() {
+        viewModelScope.launch {
+            isLeaderboardLoading = true
+            try {
+                leaderboardList = profileApi.getLeaderboard()
+            } catch (e: Exception) {
+                Log.e("FriendViewModel", "Failed to load leaderboard", e)
+            } finally {
+                isLeaderboardLoading = false
+            }
+        }
+    }
+
+    fun loadPlayerStats(playerId: Long) {
+        viewModelScope.launch {
+            isPlayerStatsLoading = true
+            try {
+                selectedPlayerStats = profileApi.getUserStats(playerId)
+            } catch (e: Exception) {
+                Log.e("FriendViewModel", "Failed to load player stats", e)
+            } finally {
+                isPlayerStatsLoading = false
+            }
+        }
+    }
+
+    fun clearPlayerStats() {
+        selectedPlayerStats = null
+    }
+
     private fun loadFriends(userId: Long) {
         currentUserId = userId
+        loadLeaderboard()
         viewModelScope.launch {
             _state.value = FriendState.Loading
             isRefreshing = true
@@ -174,6 +218,11 @@ class FriendViewModel @Inject constructor(
                         u.copy(friendshipStatus = FriendshipStatus.PENDING_SENT)
                     } else {
                         u
+                    }
+                }
+                selectedPlayerStats?.let { stats ->
+                    if (stats.userId.toLong() == receiverId) {
+                        selectedPlayerStats = stats.copy(friendshipStatus = "PENDING_SENT")
                     }
                 }
             } catch (e: Exception) {
@@ -254,6 +303,11 @@ class FriendViewModel @Inject constructor(
                         u.copy(friendshipStatus = FriendshipStatus.ACCEPTED)
                     } else {
                         u
+                    }
+                }
+                selectedPlayerStats?.let { stats ->
+                    if (stats.userId.toLong() == user2) {
+                        selectedPlayerStats = stats.copy(friendshipStatus = "ACCEPTED")
                     }
                 }
 

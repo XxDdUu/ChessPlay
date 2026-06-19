@@ -40,6 +40,7 @@ fun FriendItem(
     friend: FriendResponse,
     onChallengeClick: (() -> Unit)? = null,
     onRemoveFriend: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
 
     var showRemoveDialog by remember {
@@ -103,6 +104,7 @@ fun FriendItem(
             containerColor = Color(0xFF1C1F26)
         ),
         shape = RoundedCornerShape(16.dp),
+        onClick = { onClick?.invoke() },
         modifier = Modifier.fillMaxWidth()
     ) {
 

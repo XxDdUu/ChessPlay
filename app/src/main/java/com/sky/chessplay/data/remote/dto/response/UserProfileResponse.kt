@@ -30,7 +30,10 @@ data class UserProfileResponse(
     val bronzeMedals: Int?,
 
     @SerializedName("tournamentHistory")
-    val tournamentHistory: List<UserTournamentResponse>?
+    val tournamentHistory: List<UserTournamentResponse>?,
+
+    @SerializedName("friendshipStatus")
+    val friendshipStatus: String? = null
 )
 
 data class UserTournamentResponse(

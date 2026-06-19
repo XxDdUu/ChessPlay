@@ -24,6 +24,11 @@ fun FriendRoute(
         isSearching = viewModel.isSearching,
         isRefreshing = viewModel.isRefreshing,
         errorMessage = viewModel.errorMessage,
+        leaderboard = viewModel.leaderboardList,
+        selectedPlayerStats = viewModel.selectedPlayerStats,
+        isPlayerStatsLoading = viewModel.isPlayerStatsLoading,
+        onPlayerClick = viewModel::loadPlayerStats,
+        onDismissPlayerStats = viewModel::clearPlayerStats,
         onEvent = viewModel::onEvent,
         currentUserId = userId,
         navController = navController

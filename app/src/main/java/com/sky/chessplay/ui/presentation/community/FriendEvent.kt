@@ -23,6 +23,7 @@ sealed class FriendEvent {
     ) : FriendEvent()
 
     data class SearchFriend(
+        val userId: Long,
         val query: String
     ) : FriendEvent()
 
@@ -35,4 +36,5 @@ sealed class FriendEvent {
     ) : FriendEvent()
 
     data object ClearMessage : FriendEvent()
+    data object ClearSearchResults : FriendEvent()
 }

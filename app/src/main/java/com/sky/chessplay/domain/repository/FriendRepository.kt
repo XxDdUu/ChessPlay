@@ -1,6 +1,7 @@
 package com.sky.chessplay.domain.repository
 
 import com.sky.chessplay.data.remote.dto.response.FriendResponse
+import com.sky.chessplay.data.remote.dto.response.UserSearchResponse
 
 interface FriendRepository {
 
@@ -21,4 +22,8 @@ interface FriendRepository {
         user1: Long,
         user2: Long
     ): String
+    suspend fun searchFriends(
+        userId: Long,
+        query: String
+    ): Result<List<UserSearchResponse>>
 }

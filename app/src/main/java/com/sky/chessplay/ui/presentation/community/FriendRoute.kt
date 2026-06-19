@@ -22,6 +22,8 @@ fun FriendRoute(
         pendingRequests = viewModel.pendingRequestsList,
         isRefreshing = viewModel.isRefreshing,
         errorMessage = viewModel.errorMessage,
+        searchResults = viewModel.searchResults,
+        isSearching = viewModel.isSearching,
         onEvent = viewModel::onEvent,
         currentUserId = userId,
         navController = navController

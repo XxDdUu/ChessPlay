@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ButtonDefaults
@@ -36,21 +35,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sky.chessplay.data.remote.dto.response.FriendResponse
+import com.sky.chessplay.data.remote.dto.response.UserSearchResponse
 import com.sky.chessplay.ui.component.friend.FriendItem
 import com.sky.chessplay.ui.layout.AppScaffold
 import com.sky.chessplay.ui.layout.AppScaffoldConfig
 import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
+import com.sky.chessplay.ui.presentation.community.modal.SearchFriendModal
 
 @Composable
 fun FriendScreen(
     friends: List<FriendResponse>,
     pendingRequests: List<FriendResponse>,
+    searchResults: List<UserSearchResponse>,
     isRefreshing: Boolean,
+    isSearching: Boolean = false,
     errorMessage: String?,
     currentUserId: Long,
     onEvent: (FriendEvent) -> Unit,
     navController: NavHostController
 ) {
+    var showSearchDialog by remember {
+        mutableStateOf(false)
+    }
     var showPendingDialog by remember { mutableStateOf(false) }
     AppScaffold(
         navController = navController,
@@ -82,30 +88,41 @@ fun FriendScreen(
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White
                         )
-                        BadgedBox(
-                            badge = {
-                                if (pendingRequests.isNotEmpty()) {
-                                    Badge {
-                                        Text("${pendingRequests.size}")
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            BadgedBox(
+                                badge = {
+                                    if (pendingRequests.isNotEmpty()) {
+                                        Badge {
+                                            Text("${pendingRequests.size}")
+                                        }
                                     }
                                 }
+                            ) {
+                                OutlinedButton(
+                                    onClick = {
+                                        showPendingDialog = true
+                                    },
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = Color(0xFF81B64C)
+                                    ),
+                                    border = BorderStroke(1.dp, Color(0xFF81B64C))
+                                ) {
+                                    Text("📩 Lời mời")
+                                }
                             }
-                        ) {
+
                             OutlinedButton(
                                 onClick = {
-                                    showPendingDialog = true
+                                    showSearchDialog = true
                                 },
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color(0xFF81B64C)
-                                ),
-                                border = BorderStroke(1.dp, Color(0xFF81B64C)),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text(
-                                    "Tìm bạn mới",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp
+                                    contentColor = Color.White
                                 )
+                            ) {
+                                Text("➕ Tìm bạn")
                             }
                         }
                     }
@@ -190,6 +207,18 @@ fun FriendScreen(
                     onDismiss = {
                         showPendingDialog = false
                     }
+                )
+            }
+            if (showSearchDialog) {
+                SearchFriendModal(
+                    currentUserId = currentUserId,
+                    onDismiss = {
+                        onEvent(FriendEvent.ClearSearchResults)
+                        showSearchDialog = false
+                    },
+                    onEvent = onEvent,
+                    isLoading = isSearching,
+                    searchResults = searchResults
                 )
             }
         }

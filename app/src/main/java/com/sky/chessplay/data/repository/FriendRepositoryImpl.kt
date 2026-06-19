@@ -2,6 +2,7 @@ package com.sky.chessplay.data.repository
 
 import com.sky.chessplay.data.remote.api.FriendApi
 import com.sky.chessplay.data.remote.dto.response.FriendResponse
+import com.sky.chessplay.data.remote.dto.response.UserSearchResponse
 import com.sky.chessplay.domain.repository.FriendRepository
 import javax.inject.Inject
 
@@ -68,5 +69,23 @@ class FriendRepositoryImpl @Inject constructor(
 
             throw Exception("Failed to remove friend")
         }
+    }
+    override suspend fun searchFriends(
+            userId: Long,
+            query: String
+        ): Result<List<UserSearchResponse>> {
+            return try {
+                val response = api.searchFriends(userId, query)
+
+                if (response.isSuccessful) {
+                    Result.success(response.body() ?: emptyList())
+                } else {
+                    Result.failure(
+                        Exception(response.errorBody()?.string())
+                    )
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
     }
 }

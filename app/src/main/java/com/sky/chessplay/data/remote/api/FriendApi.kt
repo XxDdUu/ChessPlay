@@ -1,6 +1,7 @@
 package com.sky.chessplay.data.remote.api
 
 import com.sky.chessplay.data.remote.dto.response.FriendResponse
+import com.sky.chessplay.data.remote.dto.response.UserSearchResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -34,4 +35,9 @@ interface FriendApi {
         @Query("user1") user1: Long,
         @Query("user2") user2: Long
     ): Response<String>
+    @GET("api/friends/search")
+    suspend fun searchFriends(
+        @Query("userId") userId: Long,
+        @Query("query") query: String
+    ): Response<List<UserSearchResponse>>
 }

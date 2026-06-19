@@ -7,17 +7,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sky.chessplay.data.remote.dto.response.UserSearchResponse
 import com.sky.chessplay.domain.repository.FriendRepository
 import com.sky.chessplay.domain.socket.ChessSocket
 import com.sky.chessplay.domain.socket.SocketEvent
 import com.sky.chessplay.domain.state.FriendState
 import com.sky.chessplay.domain.state.FriendUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class FriendViewModel @Inject constructor(
     private val repository: FriendRepository,
@@ -41,14 +48,31 @@ class FriendViewModel @Inject constructor(
 
     var errorMessage by mutableStateOf<String?>(null)
         private set
-
+    var searchResults: List<UserSearchResponse> by mutableStateOf(emptyList())
+        private set
+    private val searchFlow = MutableSharedFlow<FriendEvent.SearchFriend>()
+    var isSearching by mutableStateOf(false)
+        private set
     init {
+
         viewModelScope.launch {
             chessSocket.socketEvents.collect { event ->
                 if (event is SocketEvent.FriendPresence) {
                     updateFriendPresence(event)
                 }
             }
+        }
+
+        viewModelScope.launch {
+            searchFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collectLatest { event ->
+                    searchFriends(
+                        event.userId,
+                        event.query
+                    )
+                }
         }
     }
 
@@ -77,7 +101,10 @@ class FriendViewModel @Inject constructor(
                 errorMessage = null
             }
             is FriendEvent.SearchFriend -> {
-                // Not implemented or stubbed
+                isSearching = true
+                viewModelScope.launch {
+                    searchFlow.emit(event)
+                }
             }
             is FriendEvent.SendChallenge -> {
                 Log.d(
@@ -91,6 +118,14 @@ class FriendViewModel @Inject constructor(
             }
             is FriendEvent.ConnectFriend -> {
                 // Not implemented or stubbed
+            }
+            is FriendEvent.ClearSearchResults -> {
+                searchResults = emptyList()
+
+                uiState = uiState.copy(
+                    searchQuery = "",
+                    searchResults = emptyList()
+                )
             }
             is FriendEvent.RemoveFriend -> {
                 removeFriend(
@@ -108,7 +143,6 @@ class FriendViewModel @Inject constructor(
             errorMessage = null
             try {
                 val friends = repository.getFriends(userId)
-                Log.d("LOAD FRIEND DEBUG", friends.toString())
                 friendsList = friends
                 _state.value = FriendState.FriendsLoaded(friends)
             } catch (e: Exception) {
@@ -212,7 +246,41 @@ class FriendViewModel @Inject constructor(
             }
         }
     }
+    private fun searchFriends(
+        userId: Long,
+        query: String
+    ) {
+        if (query.isBlank()) {
+            searchResults = emptyList()
+            isSearching = false
+            return
+        }
 
+        viewModelScope.launch {
+            _state.value = FriendState.Loading
+            isSearching = true
+            repository.searchFriends(userId, query)
+                .onSuccess { result ->
+                    searchResults = result
+
+                    uiState = uiState.copy(
+                        searchQuery = query,
+                        searchResults = result
+                    )
+
+                    _state.value = FriendState.Success("Searched for $query")
+                }
+                .onFailure { error ->
+                    errorMessage = error.message
+                    _state.value = FriendState.Error(
+                        error.message ?: "Search failed"
+                    )
+                }
+                .also {
+                    isSearching = false
+                }
+        }
+    }
     fun clearStatusMessage() {
         uiState = uiState.copy(statusMessage = null)
     }

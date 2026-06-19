@@ -36,6 +36,14 @@ class FriendViewModel @Inject constructor(
     var pendingRequestsList by mutableStateOf<List<com.sky.chessplay.data.remote.dto.response.FriendResponse>>(emptyList())
         private set
 
+    var searchResultList by mutableStateOf<List<com.sky.chessplay.data.remote.dto.response.UserSearchResponse>>(emptyList())
+        private set
+
+    var isSearching by mutableStateOf(false)
+        private set
+
+    private var currentUserId: Long? = null
+
     var isRefreshing by mutableStateOf(false)
         private set
 
@@ -77,7 +85,9 @@ class FriendViewModel @Inject constructor(
                 errorMessage = null
             }
             is FriendEvent.SearchFriend -> {
-                // Not implemented or stubbed
+                currentUserId?.let { userId ->
+                    searchNewFriends(userId, event.query)
+                }
             }
             is FriendEvent.SendChallenge -> {
                 Log.d(
@@ -102,6 +112,7 @@ class FriendViewModel @Inject constructor(
     }
 
     private fun loadFriends(userId: Long) {
+        currentUserId = userId
         viewModelScope.launch {
             _state.value = FriendState.Loading
             isRefreshing = true
@@ -147,11 +158,36 @@ class FriendViewModel @Inject constructor(
                     statusMessage = message
                 )
                 _state.value = FriendState.FriendRequestSent(message)
+                
+                searchResultList = searchResultList.map { u ->
+                    if (u.userId == receiverId) {
+                        u.copy(friendshipStatus = "PENDING_SENT")
+                    } else {
+                        u
+                    }
+                }
             } catch (e: Exception) {
                 uiState = uiState.copy(
                     isSendingRequest = false,
                     statusMessage = e.message ?: "Failed to send friend request."
                 )
+            }
+        }
+    }
+
+    private fun searchNewFriends(userId: Long, query: String) {
+        if (query.isBlank()) {
+            searchResultList = emptyList()
+            return
+        }
+        viewModelScope.launch {
+            isSearching = true
+            try {
+                searchResultList = repository.searchNewFriends(userId, query)
+            } catch (e: Exception) {
+                Log.e("FriendViewModel", "Search failed", e)
+            } finally {
+                isSearching = false
             }
         }
     }
@@ -202,6 +238,15 @@ class FriendViewModel @Inject constructor(
             try {
                 val message = repository.acceptFriendRequest(user1, user2)
                 _state.value = FriendState.Success(message)
+                
+                searchResultList = searchResultList.map { u ->
+                    if (u.userId == user2) {
+                        u.copy(friendshipStatus = "ACCEPTED")
+                    } else {
+                        u
+                    }
+                }
+
                 loadFriends(user1)
                 loadPendingRequests(user1)
             } catch (e: Exception) {

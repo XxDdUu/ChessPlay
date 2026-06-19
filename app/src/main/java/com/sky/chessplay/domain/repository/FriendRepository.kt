@@ -21,4 +21,9 @@ interface FriendRepository {
         user1: Long,
         user2: Long
     ): String
+
+    suspend fun searchNewFriends(
+        userId: Long,
+        query: String
+    ): List<com.sky.chessplay.data.remote.dto.response.UserSearchResponse>
 }

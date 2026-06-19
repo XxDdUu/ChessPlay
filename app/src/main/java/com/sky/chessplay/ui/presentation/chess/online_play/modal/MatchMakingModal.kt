@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sky.chessplay.domain.state.MatchState
@@ -98,28 +99,38 @@ fun MatchMakingModal(viewModel: MatchViewModel) {
 
                         Spacer(Modifier.height(8.dp))
 
-                        Text(
-                            text = "Chấp nhận trong ${confirmCountdown} giây",
-                            color = if (confirmCountdown <= 3) Color.Red else Color.LightGray
-                        )
+                        if (!viewModel.hasAccepted) {
+                            Text(
+                                text = "Chấp nhận trong ${confirmCountdown} giây",
+                                color = if (confirmCountdown <= 3) Color.Red else Color.LightGray
+                            )
 
-                        Spacer(Modifier.height(16.dp))
+                            Spacer(Modifier.height(16.dp))
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Button(
+                                    onClick = { viewModel.acceptMatch() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E))
+                                ) {
+                                    Text("Chấp nhận")
+                                }
 
-                            Button(
-                                onClick = { viewModel.acceptMatch() },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF22C55E))
-                            ) {
-                                Text("Chấp nhận")
+                                Button(
+                                    onClick = { viewModel.rejectMatch() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                                ) {
+                                    Text("Từ chối")
+                                }
                             }
-
-                            Button(
-                                onClick = { viewModel.rejectMatch() },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
-                            ) {
-                                Text("Từ chối")
-                            }
+                        } else {
+                            Spacer(Modifier.height(8.dp))
+                            CircularProgressIndicator(color = Color.White)
+                            Spacer(Modifier.height(12.dp))
+                            Text(
+                                text = "Đã chấp nhận! Đang chờ đối thủ xác nhận...",
+                                color = Color.LightGray,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
 

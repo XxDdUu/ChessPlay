@@ -20,6 +20,8 @@ fun FriendRoute(
     FriendScreen(
         friends = viewModel.friendsList,
         pendingRequests = viewModel.pendingRequestsList,
+        searchResults = viewModel.searchResultList,
+        isSearching = viewModel.isSearching,
         isRefreshing = viewModel.isRefreshing,
         errorMessage = viewModel.errorMessage,
         onEvent = viewModel::onEvent,

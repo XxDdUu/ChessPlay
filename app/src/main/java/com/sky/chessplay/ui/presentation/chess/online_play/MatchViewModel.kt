@@ -77,6 +77,10 @@ class MatchViewModel @Inject constructor(
 
     var incomingInvite by mutableStateOf<MatchEvent.MatchInvite?>(null)
         private set
+
+    var hasAccepted by mutableStateOf(false)
+        private set
+
     fun onNavigated() {
         navigateToGame = false
     }
@@ -91,6 +95,7 @@ class MatchViewModel @Inject constructor(
         status = ""
         confirmCountdown = 10
         countdown = 5
+        hasAccepted = false
 
         matchState = MatchState.INITIALIZING
     }
@@ -146,8 +151,7 @@ class MatchViewModel @Inject constructor(
         }
     }
     fun acceptMatch() {
-        confirmJob?.cancel()
-        matchState = MatchState.COUNTDOWN
+        hasAccepted = true
         status = "Waiting opponent..."
 
         socketClient.sendReady(gameId)
@@ -155,6 +159,7 @@ class MatchViewModel @Inject constructor(
     fun rejectMatch() {
         confirmJob?.cancel()
         gameCountdownJob?.cancel()
+        hasAccepted = false
         matchState = MatchState.CANCELLED
         status = "Match rejected"
 
@@ -212,18 +217,26 @@ class MatchViewModel @Inject constructor(
 
                 gameId = event.gameId
                 confirmCountdown = event.timeout
+                hasAccepted = false
 
                 matchState = MatchState.FOUND
                 startConfirmCountdown()
             }
 
             is MatchEvent.MatchCancelled -> {
-                matchState = MatchState.CANCELLED
-                status = event.reason
+                hasAccepted = false
+                if (event.reason == "MATCH_TIMEOUT") {
+                    status = "Đối thủ không phản hồi. Đang tự động tìm đối thủ mới..."
+                    matchState = MatchState.SEARCHING
+                } else {
+                    matchState = MatchState.CANCELLED
+                    status = event.reason
+                }
             }
 
 
             is MatchEvent.Error -> {
+                hasAccepted = false
                 matchState = MatchState.CANCELLED
                 status = event.message
             }
@@ -271,8 +284,13 @@ class MatchViewModel @Inject constructor(
                 confirmCountdown = i
                 delay(1000)
             }
-            if (matchState == MatchState.FOUND) {
+            if (!hasAccepted) {
                 rejectMatch()
+            } else {
+                delay(3000)
+                if (matchState == MatchState.FOUND) {
+                    rejectMatch()
+                }
             }
         }
     }
@@ -292,5 +310,6 @@ class MatchViewModel @Inject constructor(
         confirmCountdown = 0
         countdown = 0
         status = ""
+        hasAccepted = false
     }
 }

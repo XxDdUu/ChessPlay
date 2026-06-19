@@ -34,4 +34,10 @@ interface FriendApi {
         @Query("user1") user1: Long,
         @Query("user2") user2: Long
     ): Response<String>
+
+    @GET("api/friends/search")
+    suspend fun searchNewFriends(
+        @Query("userId") userId: Long,
+        @Query("query") query: String
+    ): Response<List<com.sky.chessplay.data.remote.dto.response.UserSearchResponse>>
 }

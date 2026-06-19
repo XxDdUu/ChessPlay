@@ -45,6 +45,8 @@ import com.sky.chessplay.ui.presentation.community.modal.PendingFriendModal
 fun FriendScreen(
     friends: List<FriendResponse>,
     pendingRequests: List<FriendResponse>,
+    searchResults: List<com.sky.chessplay.data.remote.dto.response.UserSearchResponse>,
+    isSearching: Boolean,
     isRefreshing: Boolean,
     errorMessage: String?,
     currentUserId: Long,
@@ -52,6 +54,7 @@ fun FriendScreen(
     navController: NavHostController
 ) {
     var showPendingDialog by remember { mutableStateOf(false) }
+    var showSearchDialog by remember { mutableStateOf(false) }
     AppScaffold(
         navController = navController,
         config = AppScaffoldConfig(
@@ -82,18 +85,40 @@ fun FriendScreen(
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White
                         )
-                        BadgedBox(
-                            badge = {
-                                if (pendingRequests.isNotEmpty()) {
-                                    Badge {
-                                        Text("${pendingRequests.size}")
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            BadgedBox(
+                                badge = {
+                                    if (pendingRequests.isNotEmpty()) {
+                                        Badge {
+                                            Text("${pendingRequests.size}")
+                                        }
                                     }
                                 }
+                            ) {
+                                OutlinedButton(
+                                    onClick = {
+                                        showPendingDialog = true
+                                    },
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = Color(0xFFbabfc3)
+                                    ),
+                                    border = BorderStroke(1.dp, Color(0xFF30363D)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text(
+                                        "Lời mời",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
+                                    )
+                                }
                             }
-                        ) {
+
                             OutlinedButton(
                                 onClick = {
-                                    showPendingDialog = true
+                                    showSearchDialog = true
                                 },
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = Color(0xFF81B64C)
@@ -102,7 +127,7 @@ fun FriendScreen(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
-                                    "Tìm bạn mới",
+                                    "Tìm bạn",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp
                                 )
@@ -189,6 +214,25 @@ fun FriendScreen(
                     },
                     onDismiss = {
                         showPendingDialog = false
+                    }
+                )
+            }
+            if (showSearchDialog) {
+                com.sky.chessplay.ui.presentation.community.modal.SearchFriendModal(
+                    searchResults = searchResults,
+                    isSearching = isSearching,
+                    currentUserId = currentUserId,
+                    onSearch = { query ->
+                        onEvent(FriendEvent.SearchFriend(query))
+                    },
+                    onSendRequest = { targetId ->
+                        onEvent(FriendEvent.SendFriendRequest(currentUserId, targetId))
+                    },
+                    onAcceptRequest = { targetId ->
+                        onEvent(FriendEvent.AcceptFriendRequest(currentUserId, targetId))
+                    },
+                    onDismiss = {
+                        showSearchDialog = false
                     }
                 )
             }

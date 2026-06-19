@@ -110,7 +110,14 @@ class FriendViewModel @Inject constructor(
                 )
             }
 
-            FriendEvent.ClearSearchResults -> TODO()
+            is FriendEvent.ClearSearchResults -> {
+                searchResultList = emptyList()
+
+                uiState = uiState.copy(
+                    searchQuery = "",
+                    searchResults = emptyList()
+                )
+            }
         }
     }
 

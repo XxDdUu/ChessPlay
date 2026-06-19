@@ -224,6 +224,7 @@ fun FriendScreen(
                     isLoading = isSearching,
                     currentUserId = currentUserId,
                     onDismiss = {
+                        onEvent(FriendEvent.ClearSearchResults)
                         showSearchDialog = false
                     },
                     onEvent = onEvent

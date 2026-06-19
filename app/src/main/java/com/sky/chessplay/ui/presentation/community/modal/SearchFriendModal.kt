@@ -133,8 +133,6 @@ fun SearchFriendModal(
                                 strokeCap = StrokeCap.Round // Smooth rounded caps
                             )
                         }
-
-                        // 2. Initial state prompt
                         query.length < 2 -> {
                             Text(
                                 text = "Nhập ít nhất 2 ký tự để tìm kiếm",

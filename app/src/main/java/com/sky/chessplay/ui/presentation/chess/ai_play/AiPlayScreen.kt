@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.sky.chessplay.domain.model.chess.Position
 import com.sky.chessplay.domain.model.chess.Promotion
-import com.sky.chessplay.ui.component.ai.MoveHistoryCard
 import com.sky.chessplay.ui.component.ai.MoveHistoryDialog
 import com.sky.chessplay.ui.component.ai.ResignSection
 import com.sky.chessplay.ui.component.ai.StatusCard
